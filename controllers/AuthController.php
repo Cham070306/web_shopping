@@ -116,41 +116,52 @@ switch ($action) {
                 notify("../user/login.php", "error", "Email này không tồn tại trong hệ thống!");
             }
         }
-        break;
+    break;
 
     case 'update_full':
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user'])) {
-
             $userId = $_SESSION['user']['id'];
-            $name   = trim($_POST['name'] ?? '');
-            $phone  = trim($_POST['phone'] ?? '');
+            $name = trim($_POST['display_name'] ?? '');
+            $successCount = 0;
 
-            $userModel->updateProfile($userId, $name, $phone);
+            if (!empty($name)) {
+                $stmt = $conn->prepare("UPDATE users SET name = ? WHERE id = ?");
+                $stmt->bind_param("si", $name, $userId);
+                if ($stmt->execute()) {
+                    $_SESSION['user']['name'] = $name;
+                    $successCount++;
+                }
+            }
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = dirname(__DIR__) . '/assets/uploads/';
+                $allowedExtensions = ['jpg', 'jpeg', 'png'];
+                $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+                $fileName = 'avatar_' . $userId . '_' . time() . '.' . $ext;
+                
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $fileName)) {
+                    if ($userModel->updateAvatar($userId, $fileName)) {
+                        $_SESSION['user']['avatar'] = $fileName;
+                        $successCount++;
+                    }
+                }
+            }
 
-            $_SESSION['user']['name'] = $name;
-            $_SESSION['user']['phone'] = $phone;
-
-            if (!empty($_POST['new_password'])) {
-
-                $u = $userModel->getById($userId);
-
-                if (password_verify($_POST['current_password'], $u['password'])) {
-
+            if (!empty($_POST['old_password']) && !empty($_POST['new_password'])) {
+                $user = $userModel->getById($userId);
+                if (password_verify($_POST['old_password'], $user['password'])) {
                     $newHash = password_hash($_POST['new_password'], PASSWORD_BCRYPT);
                     $userModel->updatePassword($userId, $newHash);
-
                 } else {
                     notify("../user/my_account.php", "error", "Mật khẩu hiện tại không đúng.");
                 }
             }
-
-            notify("../user/my_account.php", "success", "Đã cập nhật thông tin tài khoản.");
+            notify("../user/my_account.php", "success", "Đã cập nhật thông tin và ảnh đại diện.");
         }
-        break;
+    break;
 
     case 'save_address':
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user'])) {
-
             $userId   = $_SESSION['user']['id'];
             $type     = $_POST['type'] ?? 'shipping';
             $fullName = trim($_POST['full_name'] ?? '');
@@ -158,12 +169,15 @@ switch ($action) {
             $address  = trim($_POST['address'] ?? '');
 
             if ($userModel->updateAddress($userId, $type, $fullName, $phone, $address)) {
-                notify("../user/my_address.php", "success", "Địa chỉ đã được cập nhật thành công.");
-            } else {
-                notify("../user/my_address.php", "error", "Không thể lưu địa chỉ. Vui lòng thử lại.");
+                $_SESSION['user'][$type . '_name'] = $fullName;
+                $_SESSION['user'][$type . '_phone'] = $phone;
+                $_SESSION['user'][$type . '_address'] = $address;
+
+                if (isset($_POST['ajax'])) { echo "success"; exit(); }
+                notify("../user/my_address.php", "success", "Thành công");
             }
         }
-        break;
+    break;
 
     case 'logout':
 
@@ -176,10 +190,10 @@ switch ($action) {
 
         header("Location: ../user/login.php");
         exit();
-        break;
+    break;
 
     default:
         header("Location: ../user/index.php");
-        exit();
+    exit();
 }
-```
+

@@ -15,26 +15,29 @@
             --white: #FFFFFF;
         }
 
-        body { font-family: 'Inter', sans-serif; 
-            margin: 0; color: var(--black); 
+        body { 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            color: var(--black); 
             line-height: 1.5; 
             background-color: var(--white); 
         }
+
         .container { 
             max-width: 1120px; 
             margin: 0 auto; 
             padding: 0 20px; 
         }
+
         a { 
             text-decoration: none; 
             transition: 0.3s; 
         }
-
-        /* --- HERO SECTION --- */
+        
         .hero { 
             padding: 48px 0; 
         }
-        .breadcrumb { 
+        .home { 
             font-size: 14px; 
             color: var(--gray-400); 
             margin-bottom: 16px; 
@@ -44,29 +47,31 @@
             font-size: 54px; 
             font-weight: 500; 
             margin: 0; 
-            max-width: 800px; 
             line-height: 1.1; 
         }
         .hero p { 
             color: var(--gray-600); 
-            max-width: 800px; 
             margin-top: 24px; 
             font-size: 16px; 
+            max-width: 800px; 
         }
 
         .about-section { 
             display: flex; 
             background: #F3F5F7; 
-            align-items: center; 
             margin: 48px 0; 
         }
         .about-image { 
             flex: 1; 
             min-height: 450px; 
-            background: url('../image/contact.png') center/cover; }
+            background: url('../assets/image/contact.png') center/cover no-repeat; 
+        }
         .about-content { 
             flex: 1; 
             padding: 72px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
         }
         .about-content h2 { 
             font-size: 40px; 
@@ -76,14 +81,13 @@
         .about-content p { 
             color: var(--gray-600); 
             margin-bottom: 24px; 
-            font-size: 16px; 
         }
         .shop-now { 
             font-weight: 600; 
             border-bottom: 1px solid var(--black); 
-            cursor: pointer; display: inline-block; 
-            padding-bottom: 4px; 
+            display: inline-block; 
             color: var(--black); 
+            width: fit-content; 
         }
 
         .contact-methods { 
@@ -99,31 +103,52 @@
         }
         .card-icon { 
             font-size: 32px; 
-            margin-bottom: 16px;
+            margin-bottom: 16px; 
         }
         .card h3 { 
             font-size: 16px; 
             color: var(--gray-400); 
             text-transform: uppercase; 
             margin-bottom: 8px; 
-            letter-spacing: 1px; 
         }
         .card p { 
-            font-weight: 600; margin: 0; font-size: 16px; }
+            font-weight: 600; 
+            margin: 0; 
+        }
 
-        /* --- FORM & MAP --- */
         .contact-us-title { 
             text-align: center; 
             font-size: 40px; 
             margin-top: 80px; 
             font-weight: 500; 
         }
+        
         .form-map-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr;
+            display: flex; 
             gap: 48px; 
             margin: 48px 0 80px 0; 
+            align-items: stretch; 
         }
+
+        .contact-form-wrapper { 
+            flex: 1; 
+            order: 1; 
+        }
+        .map-container { 
+            flex: 1; 
+            order: 2; 
+            min-height: 400px; 
+            background: #eee; 
+            border-radius: 4px; 
+            overflow: hidden; 
+        }
+        .map-container iframe { 
+            width: 100%; 
+            height: 100%; 
+            min-height: 400px; 
+            display: block; 
+        }
+
         .form-group { 
             margin-bottom: 24px; 
         }
@@ -135,7 +160,18 @@
             text-transform: uppercase; 
             margin-bottom: 8px; 
         }
-        .form-group input, .form-group textarea { 
+        .form-group input { 
+            width: 100%; 
+            border: 1px solid var(--gray-200); 
+            border-radius: 6px; 
+            padding: 12px 16px; 
+            font-size: 16px; 
+            outline: none; 
+            font-family: inherit; 
+            box-sizing: border-box; 
+        } 
+
+        .form-group textarea { 
             width: 100%; 
             border: 1px solid var(--gray-200); 
             border-radius: 6px; 
@@ -145,34 +181,25 @@
             font-family: inherit; 
             box-sizing: border-box; 
         }
-        .form-group input:focus, .form-group textarea:focus { 
+        .form-group input:focus { 
+            border-color: var(--black); 
+        } 
+        .form-group textarea:focus { 
             border-color: var(--black); 
         }
         .btn-submit { 
             background: var(--black); 
-            color: white; 
-            border: none; 
+            color: white; border: none; 
             padding: 12px 40px; 
             border-radius: 40px; 
             font-weight: 500; 
             cursor: pointer; 
-            font-size: 16px;
-        }
-        
-        .map-container { 
-            width: 100%; 
-            height: 100%; 
-            min-height: 400px; 
-            background: #eee; 
-            border-radius: 4px; 
-            overflow: hidden; 
         }
 
-        /* --- VALUES SECTION --- */
         .values-section { 
             padding: 80px 0; 
-        background: #fff; 
-    }
+            background: #fff; 
+        }
         .values-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
@@ -182,7 +209,6 @@
             background: #F3F5F7; 
             padding: 48px 32px; 
             border: 1px dashed var(--gray-400); 
-            text-align: left; 
         }
         .value-icon { 
             font-size: 32px; 
@@ -192,7 +218,6 @@
             font-size: 18px; 
             font-weight: 600; 
             margin-bottom: 8px; 
-            color: var(--black); 
         }
         .value-item p { 
             font-size: 14px; 
@@ -200,12 +225,15 @@
             margin: 0; 
         }
 
-        /* --- FOOTER DARK --- */
-        .footer-dark { 
+        .footer { 
             background: var(--black); 
             color: #fff; 
             padding: 80px 0 40px 0; 
-            margin-top: 20px; 
+        }
+        .footercontainer { 
+            max-width: 1120px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
         }
         .footer-top { 
             display: flex; 
@@ -229,15 +257,12 @@
             height: 24px; 
             background: var(--gray-600); 
         }
-        .footer-brand .slogan { 
-            font-size: 14px; 
-            color: var(--gray-200); 
-        }
         .footer-nav a { 
             color: #fff; 
             margin-left: 40px; 
-            font-size: 14px; 
+            font-size: 14px;
         }
+        
         .footer-bottom { 
             display: flex; 
             justify-content: space-between; 
@@ -247,75 +272,129 @@
         }
         .footer-legal { 
             display: flex; 
-            align-items: center; 
+            gap: 28px; 
         }
-        .legal-links a { 
+        .footer-legal a { 
             color: #fff; 
             font-weight: 600; 
-            margin-left: 28px; 
         }
         .footer-social { 
             display: flex; 
             gap: 24px; 
-            align-items: center;
         }
         .footer-social a { 
             color: var(--white); 
             font-size: 18px; 
-            text-decoration: none; 
-            opacity: 0.8; 
-            transition: 0.3s; 
         }
-        .footer-social a:hover {
-            color: var(--gray-400); 
-        }
-        @media (max-width: 992px) {
-            .values-grid { 
-                grid-template-columns: repeat(2, 1fr); 
-            }
-            .about-content { 
-                padding: 40px; }
-        }
+
         @media (max-width: 768px) {
             .hero h1 { 
-                font-size: 36px; 
-        }
-            .about-section, .form-map-grid { 
-                display: block; 
-        }
-            .about-image { 
-                min-height: 300px; 
+                font-size: 34px; 
+            }
+            .about-section { 
+                flex-direction: column; 
+            }
+            .about-content {
+                padding: 40px 20px; 
             }
             .contact-methods { 
                 grid-template-columns: 1fr; 
-            }
+            } 
             .values-grid { 
                 grid-template-columns: 1fr; 
             }
-            .footer-top, .footer-bottom { 
+
+            .form-map-grid { 
                 flex-direction: column; 
-                text-align: center; 
+            }
+            .map-container { 
+                order: 1; 
+                min-height: 300px; 
+            }
+            .contact-form-wrapper { 
+                order: 2; 
+            }
+
+            .footer .footercontainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
                 gap: 32px; 
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+            .footer-top { 
+                display: flex;
+                flex-direction: column;
+                text-align: center;  
+                gap: 30px;
+                width: 100%; 
+                
+            } 
+            .footer-top .line {
+                width: 24px;    
+                height: 1px;  
+                margin: 0;
+            }
+            .footer-bottom { 
+                flex-direction: column; 
+                gap: 25px; 
+                text-align: center; 
+            }
+            .footer-brand {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .footer-nav { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 30px; 
             }
             .footer-nav a { 
-                margin: 0 10px; }
+                margin: 0; 
+            }
             .footer-legal { 
                 flex-direction: column; 
-                gap: 12px; 
+                display: flex;
+                gap: 25px; 
             }
-            .legal-links a { 
-                margin: 0 14px; 
+            .legal-links {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap; 
+                gap: 20px; 
+                order: -2;
             }
-        }
+            .legal-links a {
+                margin: 0;
+                color: var(--white);
+                font-weight: 500;
+            
+            }
+
+            .footer-social {
+                display: flex;
+                justify-content: center;
+                gap: 24px;
+                width: 100%;
+                order: -1;
+            
+            }
+            .footer-social a {
+                font-size: 18px;
+            }
+        } 
     </style>
 </head>
 <body>
 
 <div class="container">
     <section class="hero">
-        <div class="breadcrumb">Home > <span style="color:var(--black)">Contact Us</span></div>
+        <a href="index.php" class="home">Home ><span style="color:var(--black)">Contact Us</span></a>
         <h1>We believe in sustainable decor. We're passionate about life at home.</h1>
-        <p>Our features timeless furniture, with natural fabrics, curved lines, plenty of mirrors and classic design, which can be incorporated into any decor project. The pieces enchant for their sobriety, to last for generations, faithful to the shapes of each period, with a touch of the present.</p>
+        <p>Our features timeless furniture, with natural fabrics, curved lines, plenty of mirrors and classic design, which can be incorporated into any decor project.</p>
     </section>
 
     <section class="about-section">
@@ -343,29 +422,32 @@
         <div class="card">
             <div class="card-icon">✉️</div>
             <h3>Email</h3>
-            <p>test@legant.com</p>
+            <p>hotro@legant.com</p>
         </div>
     </section>
 
     <section class="form-map-grid">
-        <form action="../controllers/ContactController.php" method="POST">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="name" placeholder="Your Name" required>
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" placeholder="Your Email" required>
-            </div>
-            <div class="form-group">
-                <label>Message</label>
-                <textarea name="message" rows="5" placeholder="Your message" required></textarea>
-            </div>
-            <button type="submit" class="btn-submit">Send Message</button>
-        </form>
+        <div class="contact-form-wrapper">
+            <form action="../controllers/ContactController.php" method="POST">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" rows="5" placeholder="Your message" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Send Message</button>
+            </form>
+        </div>
+
         <div class="map-container">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.5201952558837!2d106.701812!3d10.771348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f40a430d417%3A0x67341851e36f1d!2zMjM0IEjhuqNpIFRyaeG7gXUsIELhurNuIE5naMOpLCBRdeG6rW4gMSwgSOG7kyBDaMOtIE1pbmgsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1710000000000!5m2!1svi!2s" 
-                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.126422730336!2d106.7121283147491!3d10.80162799230438!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317528a459cb436b%3A0x70b53ad55e60630!2zMDIgVsO1IE9hbmgsIFBoxrDhu51uZyAyNSwgQsOsbmggVGjhuqFuaCwgVGjDoG5oIHBo4buRIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1690000000000!5m2!1svi!2s" 
+                style="border: 0;" allowfullscreen="" loading="lazy"></iframe>
         </div>
     </section>
 </div>
@@ -395,8 +477,8 @@
     </div>
 </section>
 
-<footer class="footer-dark">
-    <div class="container">
+<footer class="footer">
+    <div class="footercontainer">
         <div class="footer-top">
             <div class="footer-brand">
                 <span class="logo-light">3legant.</span>
@@ -416,14 +498,14 @@
             <div class="footer-legal">
                 <span>Copyright © 2026 3legant. All rights reserved</span>
                 <div class="legal-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Use</a>
+                    <a href="Privacy Policy">Privacy Policy</a>
+                    <a href="Terms of Use">Terms of Use</a>
                 </div>
             </div>
             <div class="footer-social">
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>  
-                <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                <a href="instagram"><i class="fa-brands fa-instagram"></i></a>  
+                <a href="facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="youtube"><i class="fa-brands fa-youtube"></i></a>
             </div>
         </div>
     </div>

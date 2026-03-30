@@ -13,6 +13,7 @@ include "../includes/auth.php";
     <style>
         :root {
             --black: #141718;
+            --gray-600: #343839;
             --gray-400: #6C7275;
             --gray-200: #E8ECEF;
             --white: #FFFFFF;
@@ -105,14 +106,12 @@ include "../includes/auth.php";
             margin-top: 16px;
         }
 
-        /* --- Footer --- */
-        .main-footer { 
+        .footer { 
             background: var(--black); 
-            color: var(--white); 
-            padding: 80px 0 40px; 
-            margin-top: 100px; 
+            color: #fff; 
+            padding: 80px 0 40px 0; 
         }
-        .footer-container { 
+        .footercontainer { 
             max-width: 1120px; 
             margin: 0 auto; 
             padding: 0 20px; 
@@ -123,85 +122,140 @@ include "../includes/auth.php";
             justify-content: space-between; 
             align-items: center; 
             padding-bottom: 40px; 
-            border-bottom: 1px solid #343839; 
+            border-bottom: 1px solid var(--gray-600); 
+            margin-bottom: 32px; 
         }
-        
-        .footer-logo { 
+
+        .footer-brand { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+        }
+
+        .logo-light { 
             font-size: 24px; 
             font-weight: 600; 
         }
-        .footer-logo span { 
-            color: var(--gray-400); 
-        }
-        
-        .footer-nav { 
-            display: flex; 
-            gap: 40px; 
+        .footer-brand .line { 
+            width: 1px; 
+            height: 24px; 
+            background: var(--gray-600); 
         }
         .footer-nav a { 
-            color: var(--gray-200); 
-            text-decoration: none; 
-            font-size: 14px; 
+            color: #fff; 
+            margin-left: 40px; 
+            font-size: 14px;
+            text-decoration: none;
         }
-
+        
         .footer-bottom { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding-top: 32px;
-            font-size: 12px;
+            font-size: 12px; 
+            color: var(--gray-200); 
         }
-
         .footer-legal { 
             display: flex; 
             gap: 28px; 
-            margin-left: 28px; 
         }
         .footer-legal a { 
-            color: var(--white); 
-            text-decoration: none; 
-            font-weight: 600; 
+            color: #fff; 
+            font-weight: 600;
+            text-decoration: none;
         }
-
-        .social-icons { 
+        .footer-social { 
             display: flex; 
             gap: 24px; 
         }
-        .social-icons a { 
+        .footer-social a { 
             color: var(--white); 
             font-size: 18px; 
-            text-decoration: none; 
-            opacity: 0.8; 
-            transition: 0.3s; 
-        }
-        .social-icons a:hover { 
-            color: var(--gray-400);  
         }
 
         @media (max-width: 768px) {
+           
             .account-layout { 
                 flex-direction: column; 
                 gap: 40px; 
             }
-            .footer-top { 
-                flex-direction: column; 
+            
+            .footer .footercontainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
                 gap: 32px; 
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+            .footer-top { 
+                display: flex;
+                flex-direction: column;
+                text-align: center;  
+                gap: 30px;
+                width: 100%;
+            }
+            .footer-top .line {
+                width: 24px;    
+                height: 1px;  
+                margin: 0;
+            }
+
+             .footer-bottom { 
+                flex-direction: column; 
+                gap: 25px; 
                 text-align: center; 
             }
-            .footer-bottom { 
-                flex-direction: column-reverse; 
-                gap: 24px; 
-                text-align: center; 
+            .footer-brand {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .footer-nav { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 30px; 
+            }
+            .footer-nav a { 
+                margin: 0; 
             }
             .footer-legal { 
-                margin-left: 0; 
-                justify-content: center; 
+                flex-direction: column; 
+                display: flex;
+                gap: 25px; 
             }
+            .legal-links {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap; 
+                gap: 20px; 
+                order: -2;
+            }
+            .legal-links a {
+                margin: 0;
+                color: var(--white);
+                font-weight: 500;
+            
+            } 
+
+            .footer-social {
+                display: flex;
+                justify-content: center;
+                gap: 24px;
+                width: 100%;
+                order: -1;
+            
+            }
+            .footer-social a {
+                font-size: 18px;
+            }
+
         }
     </style>
 </head>
-<body>
 
+<body>
     <div class="container">
         <h1 class="page-header">My Account</h1>
         
@@ -209,7 +263,7 @@ include "../includes/auth.php";
             <?php include "../includes/account_sidebar.php"; ?>
 
             <div class="account-main-content">
-                <form action="../controllers/AuthController.php?action=update_profile" method="POST">
+               <form action="../controllers/AuthController.php?action=update_full" method="POST" enctype="multipart/form-data">
                     <h2 class="section-title">Account Details</h2>
                     
                     <div class="form-group">
@@ -251,10 +305,15 @@ include "../includes/auth.php";
         </div>
     </div>
 
-    <footer class="main-footer">
-        <div class="footer-container">
+    <footer class="footer">
+        <div class="footercontainer">
             <div class="footer-top">
-                <div class="footer-logo">3legant<span>.</span></div>
+                <div class="footer-brand">
+                <span class="logo-light">3legant.</span>
+                <span class="line"></span>
+                <span class="slogan">Gift & Decoration Store</span>
+            </div>
+
                 <nav class="footer-nav">
                     <a href="index.php">Home</a>
                     <a href="shop.php">Shop</a>
@@ -265,22 +324,41 @@ include "../includes/auth.php";
             </div>
             
             <div class="footer-bottom">
-                <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                    <p style="color: var(--gray-200); margin: 0;">Copyright © 2026 3legant. All rights reserved</p>
-                    <div class="footer-legal">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Use</a>
+                <div class="footer-legal">
+                    <span>Copyright © 2026 3legant. All rights reserved</span>
+                    <div class="legal-links">
+                        <a href="Privacy Polic">Privacy Policy</a>
+                        <a href="Terms of Use">Terms of Use</a>
                     </div>
                 </div>
                 
-                <div class="social-icons">
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                <div class="footer-social">
+                    <a href="instagram "><i class="fa-brands fa-instagram"></i></a>  
+                    <a href="facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href=" youtube "><i class="fa-brands fa-youtube"></i></a>
                 </div>
             </div>
         </div>
     </footer>
+
+    <script>
+        document.getElementById('avatar-upload').addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+        
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('avatar-preview').src = event.target.result;
+            };
+            reader.readAsDataURL(this.files[0]);
+            const form = document.getElementById('avatar-form');
+            if (form) {
+                form.submit();
+            } else {
+                alert("Lỗi: Không tìm thấy thẻ form có id='avatar-form'");
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

@@ -26,9 +26,9 @@ class User {
         return $stmt->execute();
     }
 
-    public function updateProfile($id, $name, $phone) {
-        $stmt = $this->conn->prepare("UPDATE users SET name = ?, phone = ? WHERE id = ?");
-        $stmt->bind_param("ssi", $name, $phone, $id);
+    public function updateAvatar($id, $avatar) {
+        $stmt = $this->conn->prepare("UPDATE users SET avatar = ? WHERE id = ?");
+        $stmt->bind_param("si", $avatar, $id);
         return $stmt->execute();
     }
 
@@ -51,6 +51,12 @@ class User {
             $stmt->bind_param("sssis", $name, $phone, $address, $userId, $type);
         }
         return $stmt->execute();
+    }
+    public function getAddress($userId, $type) {
+        $stmt = $this->conn->prepare("SELECT * FROM user_addresses WHERE user_id = ? AND type = ?");
+        $stmt->bind_param("is", $userId, $type);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
     }
 
     public function saveContact($name, $email, $phone, $subject, $message) {

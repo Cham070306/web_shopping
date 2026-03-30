@@ -21,4 +21,5 @@ $user_phone = $userData['phone'] ?? '';
 $user_avatar = $userData['avatar'] ?? 'default-avatar.jpg';
 
 $current_page = basename($_SERVER['PHP_SELF']);
+
 ?>

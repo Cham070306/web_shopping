@@ -34,7 +34,7 @@
         .auth-side-bg { 
             flex: 1; 
             background-color: var(--color-gray-100); 
-            background-image: url('../image/login1.png'); 
+            background-image: url('../assets/image/login1.png'); 
             background-position: center; 
             background-repeat: no-repeat; 
             background-size: cover; 
@@ -91,7 +91,8 @@
             margin-bottom: 8px; 
             text-transform: uppercase; 
         }
-        .form-group input[type="email"], .form-group input[type="password"] { 
+        .form-group input[type="email"], 
+        .form-group input[type="password"] { 
             border: none; 
             border-bottom: 1px solid var(--color-gray-200); 
             padding: 12px 0; font-size: 16px; 
@@ -163,13 +164,18 @@
             border-color: var(--color-green); 
         }
 
-        @media (max-width: 900px) { 
+        @media (max-width: 768px) { 
             .auth-wrapper { 
                 flex-direction: column; 
             }
             .auth-side-bg { 
-                height: 300px; 
+                height: 350px; 
                 flex: none; 
+            }
+            .auth-side-bg::after {
+                top: 25px; 
+                font-size: 25px; 
+                font-weight: 600;
             }
         }
     </style>

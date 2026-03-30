@@ -177,11 +177,18 @@ include "../includes/auth.php";
             margin-top: 10px; 
         }
 
-        .footer-dark { 
-            background-color: var(--black); 
-            color: #fff; padding: 80px 0 40px; 
-            margin-top: 100px; 
+
+       .footer { 
+            background: var(--black); 
+            color: #fff; 
+            padding: 80px 0 40px 0; 
         }
+        .footercontainer { 
+            max-width: 1120px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
+        }
+        
         .footer-top { 
             display: flex; 
             justify-content: space-between; 
@@ -190,11 +197,13 @@ include "../includes/auth.php";
             border-bottom: 1px solid var(--gray-600); 
             margin-bottom: 32px; 
         }
+
         .footer-brand { 
             display: flex; 
             align-items: center; 
             gap: 20px; 
         }
+
         .logo-light { 
             font-size: 24px; 
             font-weight: 600; 
@@ -204,61 +213,112 @@ include "../includes/auth.php";
             height: 24px; 
             background: var(--gray-600); 
         }
-        .footer-brand .slogan { 
-            font-size: 14px; 
-            color: var(--gray-200); 
-        }
         .footer-nav a { 
             color: #fff; 
-            text-decoration: none; 
             margin-left: 40px; 
-            font-size: 14px; 
+            font-size: 14px;
+            text-decoration: none;
         }
+        
         .footer-bottom { 
             display: flex; 
-            justify-content: space-between;
+            justify-content: space-between; 
             align-items: center; 
             font-size: 12px; 
             color: var(--gray-200); 
         }
         .footer-legal { 
             display: flex; 
-            align-items: center; 
+            gap: 28px; 
         }
-        .legal-links a { 
+        .footer-legal a { 
             color: #fff; 
-            font-weight: 600; 
+            font-weight: 600;
             text-decoration: none;
-            margin-left: 28px; 
         }
         .footer-social { 
             display: flex; 
             gap: 24px; 
-            font-size: 20px; 
         }
         .footer-social a { 
-            color: #fff; 
-            transition: 0.3s; 
-        }
-        .footer-social a:hover { 
-            color: var(--gray-400); 
+            color: var(--white); 
+            font-size: 18px; 
         }
 
         @media (max-width: 768px) {
-            .account-layout { 
-                flex-direction: column; 
-            }
-            .address-grid { 
-                grid-template-columns: 1fr; 
-            }
-            .footer-top, .footer-bottom { 
-                flex-direction: column; 
-                text-align: center; 
+            .account-layout { flex-direction: column; }
+            .address-grid { grid-template-columns: 1fr; }
+            .footer .footercontainer {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
                 gap: 32px; 
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+            .footer-top { 
+                display: flex;
+                flex-direction: column;
+                text-align: center;  
+                gap: 30px;
+                width: 100%;
+            }
+            .footer-top .line {
+                width: 24px;    
+                height: 1px;  
+                margin: 0;
+            }
+
+             .footer-bottom { 
+                flex-direction: column; 
+                gap: 25px; 
+                text-align: center; 
+            }
+            .footer-brand {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .footer-nav { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 30px; 
             }
             .footer-nav a { 
-                margin: 0 10px; 
+                margin: 0; 
             }
+            .footer-legal { 
+                flex-direction: column; 
+                display: flex;
+                gap: 25px; 
+            }
+            .legal-links {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap; 
+                gap: 20px; 
+                order: -2;
+            }
+            .legal-links a {
+                margin: 0;
+                color: var(--white);
+                font-weight: 500;
+            
+            }
+
+            .footer-social {
+                display: flex;
+                justify-content: center;
+                gap: 24px;
+                width: 100%;
+                order: -1;
+            
+            }
+            .footer-social a {
+                font-size: 18px;
+            }
+
         }
     </style>
 </head>
@@ -278,9 +338,9 @@ include "../includes/auth.php";
                             <button class="edit-btn" onclick="openModal('billing')"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
                         </div>
                         <div class="address-info">
-                            <strong id="billing-name">Chưa nhập tên</strong>
-                            <span id="billing-phone">Chưa nhập SĐT</span>
-                            <p id="billing-address">Vui lòng cập nhật địa chỉ thanh toán</p>
+                            <strong id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Chưa nhập tên') ?></strong>
+                            <span id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                            <p id="billing-address"><?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Vui lòng cập nhật địa chỉ') ?></p>
                         </div>
                     </div>
 
@@ -290,9 +350,9 @@ include "../includes/auth.php";
                             <button class="edit-btn" onclick="openModal('shipping')"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
                         </div>
                         <div class="address-info">
-                            <strong id="shipping-name">Chưa nhập tên</strong>
-                            <span id="shipping-phone">Chưa nhập SĐT</span>
-                            <p id="shipping-address">Vui lòng cập nhật địa chỉ giao hàng</p>
+                            <strong id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Chưa nhập tên') ?></strong>
+                            <span id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                            <p id="shipping-address"><?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Vui lòng cập nhật địa chỉ') ?></p>
                         </div>
                     </div>
                 </div>
@@ -323,8 +383,8 @@ include "../includes/auth.php";
         </div>
     </div>
 
-    <footer class="footer-dark">
-        <div class="container" style="margin: 0 auto; min-height: auto;"> 
+    <footer class="footer">
+        <div class="footercontainer"> 
             <div class="footer-top">
                 <div class="footer-brand">
                     <span class="logo-light">3legant.</span>
@@ -343,14 +403,14 @@ include "../includes/auth.php";
                 <div class="footer-legal">
                     <span>Copyright © 2026 3legant. All rights reserved</span>
                     <div class="legal-links">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Use</a>
+                        <a href="Privacy Policy">Privacy Policy</a>
+                        <a href="Terms of Use">Terms of Use</a>
                     </div>
                 </div>
                 <div class="footer-social">
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>  
-                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="instagram"><i class="fa-brands fa-instagram"></i></a>  
+                    <a href="facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="youtube"><i class="fa-brands fa-youtube"></i></a>
                 </div>
             </div>
         </div>
@@ -358,19 +418,18 @@ include "../includes/auth.php";
 
     <script>
         const modal = document.getElementById("addressModal");
-
         function openModal(type) {
             const prefix = type.toLowerCase();
             document.getElementById("modalTitle").innerText = "Edit " + (prefix === 'billing' ? 'Billing' : 'Shipping') + " Address";
             document.getElementById("addressType").value = prefix;
             
-            const currentName = document.getElementById(prefix + "-name").innerText;
-            const currentPhone = document.getElementById(prefix + "-phone").innerText;
-            const currentAddr = document.getElementById(prefix + "-address").innerText;
+            const currentName = document.getElementById(prefix + "-name").innerText.trim();
+            const currentPhone = document.getElementById(prefix + "-phone").innerText.trim();
+            const currentAddr = document.getElementById(prefix + "-address").innerText.trim();
 
-            document.getElementById("inputName").value = currentName.includes("Chưa nhập") ? "" : currentName;
-            document.getElementById("inputPhone").value = currentPhone.includes("Chưa nhập") ? "" : currentPhone;
-            document.getElementById("inputAddress").value = currentAddr.includes("Vui lòng cập nhật") ? "" : currentAddr;
+            document.getElementById("inputName").value = (currentName === "Chưa nhập tên") ? "" : currentName;
+            document.getElementById("inputPhone").value = (currentPhone === "Chưa nhập SĐT") ? "" : currentPhone;
+            document.getElementById("inputAddress").value = (currentAddr === "Vui lòng cập nhật địa chỉ") ? "" : currentAddr;
             
             modal.style.display = "flex";
         }
@@ -379,21 +438,36 @@ include "../includes/auth.php";
             modal.style.display = "none";
         }
 
-        window.onclick = function(event) {
-            if (event.target == modal) closeModal();
-        }
-
         document.getElementById("editAddressForm").onsubmit = function(e) {
             e.preventDefault();
             const type = document.getElementById("addressType").value;
+            const name = document.getElementById("inputName").value;
+            const phone = document.getElementById("inputPhone").value;
+            const address = document.getElementById("inputAddress").value;
             
-            document.getElementById(type + "-name").innerText = document.getElementById("inputName").value;
-            document.getElementById(type + "-phone").innerText = document.getElementById("inputPhone").value;
-            document.getElementById(type + "-address").innerText = document.getElementById("inputAddress").value;
-            
-            closeModal();
-            alert("Address updated successfully!");
+            const formData = new FormData();
+            formData.append('type', type);
+            formData.append('full_name', name);
+            formData.append('phone', phone);
+            formData.append('address', address);
+            formData.append('ajax', '1'); 
+
+            fetch('../controllers/AuthController.php?action=save_address', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                alert("Cập nhật thành công!");
+                window.location.reload(); 
+            })
+            .catch(error => {
+                alert("Lỗi kết nối!");
+            });
         };
+
+        window.onclick = function(event) {
+            if (event.target == modal) closeModal();
+        }
     </script>
 </body>
 </html>

@@ -1,3 +1,7 @@
+<?php
+$current_page = basename($_SERVER['PHP_SELF']);
+?>
+
 <nav class="navbar">
     <div class="container navbar-container">
 
@@ -9,10 +13,10 @@
         <div class="logo">3legant.</div>
 
         <div class="menu">
-            <a href="#">Home</a>
-            <a href="#">Shop</a>
-            <a href="#">Product</a>
-            <a href="#">Contact Us</a>
+            <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
+            <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
+            <a href="product.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
+            <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
         </div>
 
         <div class="icons">

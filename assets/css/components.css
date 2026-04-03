@@ -201,7 +201,7 @@
 .promo-desc {
     line-height: 1.6;
     margin-bottom: 20px;
-    color: #6C7275;
+    color: #070707;
 }
 
 .promo-link {
@@ -395,20 +395,17 @@
         flex-direction: column;
     }
 
-    /* 2 cột thành full width */
     .category-left,
     .category-right {
         width: 100%;
     }
 
-    /* BÊN PHẢI: tách thành từng hàng */
     .category-right {
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
 
-    /* MỖI ITEM full ngang */
     .category-item {
         width: 100%;
     }
@@ -419,7 +416,7 @@
 
     .promo-img {
         width: 100%;
-        height: 220px; /* chỉnh nếu muốn cao/thấp */
+        height: 220px; 
     }
 
     .promo-content {
@@ -428,12 +425,28 @@
     }
 
     .promo-title {
-        font-size: 24px;
+        font-size: 30px;
     }
 
     .promo-desc {
         font-size: 14px;
     }
+
+    .article-card {
+  padding: 10px; /* tạo khoảng thở chung */
+}
+
+.article-card h3 {
+  margin-top: 16px;
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+
+.article-card a {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 14px;
+}
 
     .footer-bottom {
         display: flex;

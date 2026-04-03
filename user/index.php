@@ -251,27 +251,23 @@ require_once '../config/config.php';
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px;">
             <div>
                 <img src="../assets/images/a1.png" style="width:100%;border-radius:12px;">
+                <p style="margin-top:16px;margin-bottom:6px;">
                 <p>7 ways to decor your home</p>
-                <a href="#" class="link-animate">
-                <a href="#" class="link-primary">Read more →</a>
-                </a>
+                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
             </div>
 
             <div>
                 <img src="../assets/images/a2.png" style="width:100%;border-radius:12px;">
+                <p style="margin-top:16px;margin-bottom:6px;">
                 <p>Kitchen organization</p>
-                <a href="#" class="link-animate">
-                <a href="#" class="link-primary">Read more →</a>
-                </a>
+                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
             </div>
 
             <div>
                 <img src="../assets/images/a3.png" style="width:100%;border-radius:12px;">
+                <p style="margin-top:16px;margin-bottom:6px;">
                 <p>Decor your bedroom</p>
-                <a href="#" class="link-animate">
-                <a href="#" class="link-primary">Read more →</a>
-                </a>
-            </div>
+                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
         </div>
     </div>
 </section>
@@ -285,13 +281,12 @@ require_once '../config/config.php';
 
     <img src="../assets/images/image.png" style="
        position:absolute;
-    top:0;
-    left:50%;
-    transform:translateX(-50%);
-    height:100%;
-    width:auto;
-    min-width:100%;
-    ">
+       top:0;
+       left:50%;
+       transform:translateX(-50%);   
+       height:100%;
+       width:auto;
+       min-width:100%; ">
 
         <div style="max-width:500px;text-align:center;margin:auto;position:relative;z-index:2;">
             

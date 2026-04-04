@@ -7,7 +7,6 @@ html, body {
     padding: 0;
 }
 
-/* Topbar trên cùng */
 .topbar {
     position: fixed;
     top: 0;
@@ -22,20 +21,18 @@ html, body {
     justify-content: center;
 }
 
-/* Navbar nằm dưới topbar */
 .navbar {
     position: fixed;
-    top: -10px; /* 👈 QUAN TRỌNG */
-    padding-top: 60px; /* 👈 TĂNG PHẦN TRÊN */
+    top: -10px;
+    padding-top: 60px; 
     padding-bottom: 10px;
     width: 100%;
     background: white;
     z-index: 9999;
 }
 
-/* Đẩy nội dung xuống */
 body {
-    padding-top: 70px; /* 40 + navbar */
+    padding-top: 70px; 
 }
 </style>
 <nav class="navbar">

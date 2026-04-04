@@ -1,7 +1,43 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+}
 
+/* Topbar trên cùng */
+.topbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 40px;
+    background: #141718;
+    color: white;
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Navbar nằm dưới topbar */
+.navbar {
+    position: fixed;
+    top: -10px; /* 👈 QUAN TRỌNG */
+    padding-top: 60px; /* 👈 TĂNG PHẦN TRÊN */
+    padding-bottom: 10px;
+    width: 100%;
+    background: white;
+    z-index: 9999;
+}
+
+/* Đẩy nội dung xuống */
+body {
+    padding-top: 70px; /* 40 + navbar */
+}
+</style>
 <nav class="navbar">
     <div class="container navbar-container">
 

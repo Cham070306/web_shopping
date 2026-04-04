@@ -4,11 +4,14 @@ require_once '../config/config.php';
 
 <?php include '../includes/header.php'; ?>
 
-<div class="topbar">
+<div class="topbar" id="topbar">
     <span class="topbar-text">
         30% off storewide — Limited time!
     </span>
+
     <a href="#" class="topbar-link">Shop Now →</a>
+
+    <span class="topbar-close" onclick="closeTopbar()">✕</span>
 </div>
 
 <?php include '../includes/navbar.php'; ?>
@@ -186,25 +189,25 @@ require_once '../config/config.php';
     ">
 
         <div class="service-card">
-            <i class="fa-solid fa-truck"></i>
+            <img src="../assets/images/Vector.png" alt="Free Shipping">
             <h4>Free Shipping</h4>
             <p>Order above $200</p>
         </div>
 
         <div class="service-card">
-            <i class="fa-regular fa-money-bill-1"></i>
+            <img src="../assets/images/money.png" alt="Money-back">
             <h4>Money-back</h4>
             <p>30 days guarantee</p>
         </div>
 
         <div class="service-card">
-            <i class="fa-solid fa-lock"></i>
+            <img src="../assets/images/lock 01.png" alt="Secure Payments">
             <h4>Secure Payments</h4>
             <p>Secured by Stripe</p>
         </div>
 
         <div class="service-card">
-            <i class="fa-solid fa-phone"></i>
+            <img src="../assets/images/call.png" alt="Support">
             <h4>24/7 Support</h4>
             <p>Phone and Email support</p>
         </div>
@@ -348,5 +351,10 @@ prevBtn.addEventListener("click", () => {
     if (index < 0) index = images.length - 1;
     banner.src = images[index];
 });
+</script>
+<script>
+function closeTopbar() {
+    document.getElementById("topbar").style.display = "none";
+}
 </script>
 <?php include '../includes/footer.php'; ?>

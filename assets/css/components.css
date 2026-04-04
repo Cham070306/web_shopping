@@ -71,12 +71,11 @@
 .topbar {
     background: #141718; 
     padding: 10px 0;
-
+    top:0;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-
     font-size: 14px;
 }
 
@@ -92,6 +91,14 @@
 }
 .topbar-link:hover {
     text-decoration: underline;
+}
+
+.topbar-close {
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 10001;
 }
 
 .link-primary {
@@ -431,22 +438,6 @@
     .promo-desc {
         font-size: 14px;
     }
-
-    .article-card {
-  padding: 10px; /* tạo khoảng thở chung */
-}
-
-.article-card h3 {
-  margin-top: 16px;
-  margin-bottom: 6px;
-  font-size: 18px;
-}
-
-.article-card a {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 14px;
-}
 
     .footer-bottom {
         display: flex;

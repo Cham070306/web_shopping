@@ -30,7 +30,7 @@ require_once '../config/config.php';
 
         <div class="hero-content">
             <h1>
-                Simply Unique /<br>Simply Better.
+                Simply Unique/<br>Simply Better.
             </h1>
 
             <p>
@@ -185,7 +185,6 @@ require_once '../config/config.php';
         gap:24px;
     ">
 
-        <!-- ITEM -->
         <div class="service-card">
             <i class="fa-solid fa-truck"></i>
             <h4>Free Shipping</h4>
@@ -213,17 +212,34 @@ require_once '../config/config.php';
     </div>
 </section>
 
-<section style="background:#F3F5F7;">
+<section class="promo-section">
 
-    <div style="display:flex;align-items:center;">
-        <img src="../assets/images/promo.jpg" style="width:50%; height:400px; object-fit:cover;">
-        <div style="padding:40px; max-width:500px;">
-            <h5 style="color:#377DFF;">SALE UP TO 35% OFF</h5>
-            <h2>HUNDREDS of<br>New lower prices!</h2>
-            <p>It’s more affordable than ever to give every room in your home a stylish makeover</p>
-            <a href="#" class="link-primary">Shop Now →</a>
+    <div class="promo-container">
+
+        <img src="../assets/images/promo.jpg" class="promo-img">
+
+        <div class="promo-content">
+
+            <h5 class="promo-tag">
+                SALE UP TO 35% OFF
+            </h5>
+
+            <h2 class="promo-title">
+                HUNDREDS of<br>New lower prices!
+            </h2>
+
+            <p class="promo-desc">
+                It’s more affordable than ever to give every room in your home a stylish makeover
+            </p>
+
+            <a href="#" class="promo-link">
+                Shop Now →
+            </a>
+
         </div>
+
     </div>
+
 </section>
 
 <section style="padding:64px 0;">
@@ -235,27 +251,23 @@ require_once '../config/config.php';
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px;">
             <div>
                 <img src="../assets/images/a1.png" style="width:100%;border-radius:12px;">
+                <p style="margin-top:16px;margin-bottom:6px;">
                 <p>7 ways to decor your home</p>
-                <a href="#" class="link-animate">
-                <a href="#" class="link-primary">Read more →</a>
-                </a>
+                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
             </div>
 
             <div>
                 <img src="../assets/images/a2.png" style="width:100%;border-radius:12px;">
+                <p style="margin-top:16px;margin-bottom:6px;">
                 <p>Kitchen organization</p>
-                <a href="#" class="link-animate">
-                <a href="#" class="link-primary">Read more →</a>
-                </a>
+                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
             </div>
 
             <div>
                 <img src="../assets/images/a3.png" style="width:100%;border-radius:12px;">
+                <p style="margin-top:16px;margin-bottom:6px;">
                 <p>Decor your bedroom</p>
-                <a href="#" class="link-animate">
-                <a href="#" class="link-primary">Read more →</a>
-                </a>
-            </div>
+                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
         </div>
     </div>
 </section>
@@ -268,15 +280,15 @@ require_once '../config/config.php';
 ">
 
     <img src="../assets/images/image.png" style="
-        position:absolute;
-        left:0;
-        bottom:0;
-        width:100%;
-        height:100%;
-        object-fit:cover;
-    ">
+       position:absolute;
+       top:0;
+       left:50%;
+       transform:translateX(-50%);   
+       height:100%;
+       width:auto;
+       min-width:100%; ">
 
-        <div style="max-width:500px;margin:auto;position:relative;z-index:2;">
+        <div style="max-width:500px;text-align:center;margin:auto;position:relative;z-index:2;">
             
             <h2 style="font-size:32px;font-weight:600;">
                 Join Our Newsletter
@@ -292,12 +304,12 @@ require_once '../config/config.php';
                 align-items:center;
                 gap:10px;
             ">
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    border-bottom:1px solid #6C7275;
-                    padding:8px 0;
-                    width:280px;
+            <div style="
+                display:flex;
+                align-items:center;
+                border-bottom:1px solid #6C7275;
+                padding:8px 0;
+                width:280px;
                 ">
                     <i class="fa-regular fa-envelope" style="margin-right:10px;"></i>
                     <input placeholder="Email address" style="border:none;outline:none;background:none;width:100%;">

@@ -336,6 +336,44 @@ include "../includes/auth.php";
                 display: none !important;
             }
 
+            .container { 
+                max-width: 312px; 
+                margin: 30px; 
+                padding: 0 20px; 
+            }
+            .breadcrumb {
+                display: flex !important;
+                margin-bottom: 25px;
+                margin-top: -10px;
+                margin-left: -18px;
+                display: flex;
+            }
+            .back-link {
+                text-decoration: none;
+                color: #6C7275;  
+                font-size: 14px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 8px; 
+                transition: 0.3s;
+            }
+
+            .back-link:hover {
+                color: #1d2021; 
+            }
+            .account-layout { 
+                flex-direction: column;
+                gap: 10px; 
+                align-items: center;
+            }
+            body { 
+                padding-top: 20px; 
+            }
+            .desktop{
+                display: none !important;
+            }
+
             .navbar-container {
                 padding: 0 28px;
             }
@@ -408,31 +446,9 @@ include "../includes/auth.php";
             #menu-toggle:checked ~ .overlay {
                 display: block;
             }
-            .container { 
-                max-width: 312px; 
-                margin: 30px; 
-                padding: 0 20px; 
-            }
-            .breadcrumb {
-                display: flex !important;
-                margin-bottom: 25px;
-                margin-top: -10px;
-                margin-left: -18px;
-                display: flex;
-            }
-            .back-link {
-                text-decoration: none;
-                color: #6C7275;  
-                font-size: 14px;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 8px; 
-                transition: 0.3s;
-            }
-
-            .back-link:hover {
-                color: #1d2021; 
+            .page-header {
+                font-size: 28px;
+                margin-bottom: 30px;
             }
             .account-layout { 
                 flex-direction: column;

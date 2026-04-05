@@ -112,7 +112,7 @@
             font-size: 16px; 
             font-weight: 600;
             border: 1px solid #CBCBCB; 
-            border-radius: 8px;
+            border-radius: 12px;
             background-color: #fff;
             outline: none;
             appearance: none;
@@ -120,7 +120,43 @@
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 18px;
+            transition: all 0.3s ease;
         }
+        .mobile-dropdown select:focus {
+            border-color: #141718;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .address-card {
+            border: 1px solid #E8ECEF;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 16px;
+            background: #fff;
+        }
+
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .address-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .edit-link {
+            color: #6C7275;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
     }
 </style>
 

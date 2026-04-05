@@ -363,6 +363,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border-radius: 12px;
             transition: all 0.25s ease;
             cursor: pointer;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         .service-card img {
@@ -497,8 +500,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 display: flex;
                 box-sizing: border-box;
             }
-    
-
             .menu-header {
                 display: flex !important;
                 justify-content: space-between;
@@ -618,10 +619,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
             .service-card {
                 background: #F3F5F7; 
                 padding: 16px;
-                text-align: left; 
+                text-align: center;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 gap: 8px;
             }
             .service-card img, .service-card i {

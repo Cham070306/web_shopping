@@ -3,8 +3,22 @@ require_once '../config/config.php';
 ?>
 
 <?php include '../includes/header.php'; ?>
+<style>
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
 
+.topbar-icon {
+    width: 18px;  
+    height: 18px;
+}
+</style>
 <div class="topbar" id="topbar">
+    <img src="../assets/images/voucher.png" class="topbar-icon">
+
     <span class="topbar-text">
         30% off storewide — Limited time!
     </span>

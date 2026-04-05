@@ -199,7 +199,7 @@ if (!isset($_SESSION['reset_email'])) {
 
     <div class="auth-content">
         <div class="form-container">
-            <h2>Enter Code</h2>
+            <h2>Enter OTP</h2>
             <p class="sub-title">
                 A code has been sent to your email.<br>
                 Enter it below.

@@ -1,5 +1,7 @@
 <?php
-$current_page = basename($_SERVER['PHP_SELF']);
+require_once '../config/config.php';
+include '../includes/header.php';
+include '../includes/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -17,141 +19,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             --gray-200: #E8ECEF;
             --white: #FFFFFF;
         }
-        .navbar {
-            width: 100%;
-            height: 50px;
-            background: white;
-            display: flex;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
 
-        .navbar-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .logo { 
-            font-size: 24px; 
-            font-weight: 600; 
-            color: var(--black); 
-            text-decoration: none; 
-        }
-
-        .menu { 
-            display: flex; 
-            gap: 40px; 
-        }
-        .menu-header {
-            display: none !important; 
-        }
-
-        .menu a { 
-            font-size: 14px; 
-            font-weight: 500; 
-            color: var(--gray-400); 
-            text-decoration: none; 
-            padding: 8px 0;
-            border-bottom: 2px solid transparent;
-            transition: 0.2s; 
-        }
-        .menu a.active, .menu a:hover { 
-            color: var(--black); 
-        }
-        
-        .menu a.active { 
-            color: var(--black); 
-            border-bottom: 2px solid var(--black);
-        }
-
-        .icons { 
-            display: flex;
-            align-items: center; 
-            gap: 16px; 
-        }
-        .icons a {
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .icons img {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            cursor: pointer;
-        }
-        .icon-link, .cart-wrapper {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .cart-wrapper {
-            display: flex !important; 
-            align-items: center;
-            gap: 5px;
-            position: relative;
-        }
-
-        .cart-badge {
-            background-color: var(--black); 
-            color: white;
-            font-size: 12px;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white; 
-        }
-        .cart-wrapper img {
-            width: 24px;
-            height: 24px;
-        }
-        .desktop {
-            display: flex;
-        }
-
-        #menu-toggle, .menu-btn { 
-            display: none; 
-        }
-        #menu-toggle:checked ~ .menu {
-            left: 0;
-        }
-       
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: #1e2223;;
-            display: none;
-            z-index: 10000;
-        } 
-        #menu-toggle:checked ~ .overlay {
-            display: block;
-        }
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            font-size: 22px;
-            cursor: pointer;
-        }
-      
         body { 
             font-family: 'Inter', sans-serif; 
             margin: 0; 
@@ -159,7 +27,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             line-height: 1.5; 
             background-color: var(--white); 
             overflow-x: hidden;
-            padding-top: 30px;
         }
 
         .container { 
@@ -176,6 +43,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         .hero { 
             padding: 48px 0; 
         }
+
         .home { 
             font-size: 14px; 
             color: var(--gray-400); 
@@ -183,12 +51,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
             display: block;
             font-weight: 500; 
         }
+
         .hero h1 { 
             font-size: 54px; 
             font-weight: 500; 
             margin: 0; 
             line-height: 1.1; 
         }
+
         .hero p { 
             color: var(--gray-600); 
             margin-top: 24px; 
@@ -201,11 +71,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
             background: #F3F5F7; 
             margin: 48px 0; 
         }
+
         .about-image { 
             flex: 1; 
             min-height: 450px; 
             background: url('../assets/image/contact.png') center/cover no-repeat; 
         }
+
         .about-content { 
             flex: 1; 
             padding: 72px; 
@@ -213,15 +85,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
             flex-direction: column; 
             justify-content: center; 
         }
+
         .about-content h2 { 
             font-size: 40px; 
             margin-bottom: 16px; 
             font-weight: 500; 
         }
+
         .about-content p { 
             color: var(--gray-600); 
             margin-bottom: 24px; 
         }
+
         .shop-now { 
             font-weight: 600; 
             border-bottom: 1px solid var(--black); 
@@ -237,25 +112,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
             margin: 48px 0; 
             text-align: center; 
         }
+
         .card { 
             background: #F3F5F7; 
             padding: 30px; 
             border-radius: 4px; 
         }
+
         .card-icon { 
             font-size: 30px; 
             margin-bottom: 15px; 
         }
+
         .card h3 { 
             font-size: 16px; 
             color: var(--gray-400); 
             text-transform: uppercase; 
             margin-bottom: 8px; 
         }
+
         .card p { 
             font-weight: 600; 
             margin: 0; 
         }
+
         .card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
@@ -279,6 +159,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             flex: 1; 
             order: 1; 
         }
+
         .map-container { 
             flex: 1; 
             order: 2; 
@@ -287,6 +168,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border-radius: 4px; 
             overflow: hidden; 
         }
+
         .map-container iframe { 
             width: 100%; 
             height: 100%; 
@@ -297,6 +179,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         .form-group { 
             margin-bottom: 24px; 
         }
+
         .form-group label { 
             display: block; 
             font-size: 12px; 
@@ -305,16 +188,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
             text-transform: uppercase; 
             margin-bottom: 8px; 
         }
-        .form-group input { 
-            width: 100%; 
-            border: 1px solid var(--gray-200); 
-            border-radius: 6px; 
-            padding: 12px 16px; 
-            font-size: 16px; 
-            outline: none; 
-            font-family: inherit; 
-            box-sizing: border-box; 
-        } 
+
+        .form-group input,
         .form-group textarea { 
             width: 100%; 
             border: 1px solid var(--gray-200); 
@@ -325,20 +200,21 @@ $current_page = basename($_SERVER['PHP_SELF']);
             font-family: inherit; 
             box-sizing: border-box; 
         }
-        .form-group input:focus { 
-            border-color: var(--black); 
-        } 
+
+        .form-group input:focus,
         .form-group textarea:focus { 
             border-color: var(--black); 
         }
+
         .btn-submit { 
             background: var(--black); 
-            color: white; border: none; 
+            color: white;
+            border: none; 
             padding: 12px 40px; 
             border-radius: 40px; 
             font-weight: 500; 
             cursor: pointer; 
-            }
+        }
 
         .container, .footercontainer { 
             max-width: 1120px; 
@@ -383,195 +259,62 @@ $current_page = basename($_SERVER['PHP_SELF']);
             font-size: 14px;
             color: #6C7275;
         }
+
         .service-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
-        .footer { 
-            background: var(--black); 
-            color: #fff; 
-            padding: 80px 0 40px 0; 
-        }
-        .footercontainer { 
-            max-width: 1120px; 
-            margin: 0 auto; 
-            padding: 0 20px; 
-        }
-        .footer-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding-bottom: 40px; 
-            border-bottom: 1px solid var(--gray-600); 
-            margin-bottom: 32px; 
-        }
-        .footer-brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 20px; 
-        }
-        .logo-light { 
-            font-size: 24px; 
-            font-weight: 600; 
-        }
-        .footer-brand .line { 
-            width: 1px; 
-            height: 24px; 
-            background: var(--gray-600); 
-        }
-        .footer-nav a { 
-            color: #fff; 
-            margin-left: 40px; 
-            font-size: 14px;
-        }
-        
-        .footer-bottom { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-size: 12px; 
-            color: var(--gray-200); 
-        }
-        .footer-legal { 
-            display: flex; 
-            gap: 28px; 
-        }
-        .footer-legal a { 
-            color: #fff; 
-            font-weight: 600; 
-        }
-        .footer-social { 
-            display: flex; 
-            gap: 24px; 
-        }
-        .footer-social a { 
-            color: var(--white); 
-            font-size: 18px; 
-        }
-        
-
         @media (max-width: 768px) {
-            body { 
-                padding-top: 20px; 
-            }
-           
-            .desktop{
-                display: none !important;
-            }
-
-            .navbar-container {
-                padding: 0 28px;
-            }
-            .menu-btn { 
-                display: block; 
-                order: 1; 
-               
-            }
-            .menu-btn img {
-                width: 20px; 
-                height: 20px;
-                object-fit: contain; 
-            }
-            .navbar .logo { 
-                order: 2; 
-                flex: 1;
-                font-size: 25px; 
-                margin-left: 10px; 
-                padding-bottom: 5px;
-            }
-            .navbar .icons { 
-                order: 3; 
-                gap: 10px; 
-            }
-            .navbar .menu {
-                position: fixed; 
-                top: 0; 
-                left: -100%; 
-                width: 60%; 
-                height: 100%;
-                background: white; 
-                flex-direction: column; 
-                padding: 24px;
-                gap: 0; 
-                transition: 0.3s ease-in-out; 
-                box-shadow: 2px 0 10px #3d4243;
-                z-index: 10001;
-                display: flex;
-                box-sizing: border-box;
-            }
-            .menu-header {
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 32px;
-                font-size: 18px;
-                font-weight: 600;
-                color: var(--black);
-            }
-            .navbar .menu a { 
-                font-size: 16px; 
-                border-bottom: 1px solid #d1d1d1; 
-                padding-bottom: 10px; 
-            }
-            .navbar .menu a.active::after { 
-                display: none; 
-            }
-            
-            .overlay {
-                position: fixed; 
-                top: 0; left: 0; 
-                width: 100%; 
-                height: 100%;
-                background: #1b1e1f9a;; 
-                display: none; 
-                z-index: 10000;
-            }
-            #menu-toggle:checked ~ .overlay {
-                display: block;
-            }
-            
             .container {
                 padding: 0 28px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
             }
+
             .hero {
                 padding: 32px 0 28px 0; 
                 text-align: left;
             }
+
             .hero h1 { 
                 font-size: 28px; 
                 line-height: 34px;
                 letter-spacing: -0.5px;
                 margin-bottom: 16px;
             }
+
             .hero p {
                 font-size: 14px;
                 line-height: 22px;
                 color: var(--gray-600);
             }
-            .hero .home{
+
+            .hero .home {
                 display: flex;
                 gap: 15px;
-            } 
+            }
+
             .about-section { 
                 flex-direction: column;
                 width: 100%;
                 margin: 16px 0;
-                background: #F3F5F7 
+                background: #F3F5F7;
             }
+
             .about-image {
                 width: 100%;
                 min-height: 311px;
             }
+
             .about-content {
                 padding: 32px 16px;
                 gap: 14px;
                 box-sizing: border-box;
                 height: auto;
             }
+
             .about-content h2 {
                 font-size: 28px; 
                 margin: 0;
@@ -579,16 +322,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
             .contact-us-title {
                 width: 100%;
-                font-family: sans-serif; 
                 font-size: 28px; 
                 line-height: 28px;
                 text-align: center;
                 margin: 1px 0 10px 0; 
             }
+
             .contact-methods { 
-                grid-template-columns: 1fr; 
-            } 
-            .values-grid { 
                 grid-template-columns: 1fr; 
             }
 
@@ -598,170 +338,48 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 height: 715px;
                 margin-top: 8px;
             }
+
             .map-container { 
                 order: 1; 
                 min-height: 300px; 
             }
+
             .contact-form-wrapper { 
                 order: 2; 
             }
-        
-            .services-section {
-                padding: 48px 0;
-                background: #F3F5F7;
-            }
 
             .services-grid {
-                display: grid;
                 grid-template-columns: 1fr 1fr; 
                 gap: 16px;
             }
+
             .service-card {
-                background: #F3F5F7; 
                 padding: 16px;
-                text-align: center;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
             }
-            .service-card img, .service-card i {
-                font-size: 32px;
+
+            .service-card img {
                 margin-bottom: 8px;
                 width: 48px;
-                
             }
+
             .service-card h4 {
                 font-size: 14px;
                 margin: 0;
-                font-weight: 600;
             }
+
             .service-card p {
                 font-size: 12px;
-                color: var(--gray-400);
                 margin: 0;
             }
-
-            .footer .footercontainer {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                gap: 15px; 
-                padding-top: 10px;
-                padding-bottom: 35px;
-            }
-            .footer-top { 
-                display: flex;
-                flex-direction: column;
-                text-align: center;  
-                gap: 40px;
-                width: 100%; 
-                
-            } 
-            .footer-top .line {
-                width: 24px;    
-                height: 2px;  
-                margin: 10px;
-            }
-            .footer-bottom { 
-                flex-direction: column; 
-                gap: 30px; 
-                text-align: center; 
-            }
-            .footer-brand {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .footer-nav { 
-                display: flex; 
-                flex-direction: column; 
-                gap: 32px; 
-            }
-            .footer-nav a { 
-                margin: 0; 
-            }
-            .footer-legal { 
-                flex-direction: column; 
-                display: flex;
-                gap: 32px; 
-            }
-            .legal-links {
-                display: flex;
-                justify-content: center;
-                flex-wrap: wrap; 
-                gap: 32px; 
-                order: -2;
-            }
-            .legal-links a {
-                margin: 0;
-                color: var(--white);
-                font-weight: 600;
-                gap:28px; 
-            
-            }
-            .footer-social {
-                display: flex;
-                justify-content: center;
-                gap: 24px;
-                width: 100%;
-                order: -1;
-            
-            }
-            .footer-social a {
-                font-size: 20px;
-            }
-          
-        } 
+        }
     </style>
 </head>
 <body>
-<nav class="navbar">
-        <div class="navbar-container">
-            <input type="checkbox" id="menu-toggle">
-            <label for="menu-toggle" class="menu-btn">
-                <img src="../assets/image/menu.png" alt="menu">
-            </label>
-            <a href="index.php" class="logo">3legant.</a>
-
-            <div class="menu">
-                <div class="menu-header">
-                    <span>3Elegant</span>
-                    <label for="menu-toggle" class="close-btn">✕</label>
-                </div>
-                <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
-                <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
-                <a href="product.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
-                <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
-            </div>
-
-            <div class="icons">
-                <a href="shop.php" class="icon-link desktop">
-                    <img src="../assets/image/search 02.png" alt="search">
-                </a>
-
-                <a href="my_account.php" class="icon-link desktop">
-                    <img src="../assets/image/Vector1.png" alt="account">
-                </a>
-
-                <a href="cart.php" class="cart-wrapper">
-                    <img src="../assets/image/shopping bag.png" alt="bag">
-                    <span id="cart-count" class="cart-badge">
-                        <?php 
-                            $total = 0;
-                            if(isset($_SESSION['cart'])) {
-                                foreach($_SESSION['cart'] as $item) { $total += $item['quantity']; }
-                            }
-                            echo $total; 
-                        ?>
-                    </span>
-                </a>
-            </div>
-            <label for="menu-toggle" class="overlay"></label>
-        </div>
-    </nav>
 
 <div class="container">
     <section class="hero">

@@ -15,6 +15,16 @@ require_once '../config/config.php';
     width: 18px;  
     height: 18px;
 }
+.navbar {
+    position: fixed;
+    top: -10px;
+    ...
+}
+.navbar.scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 24px rgba(20, 23, 24, 0.08);
+    border-bottom: 1px solid rgba(232, 236, 239, 0.8);
+}
 </style>
 <div class="topbar" id="topbar">
     <img src="../assets/images/voucher.png" class="topbar-icon">

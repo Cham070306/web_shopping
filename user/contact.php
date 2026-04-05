@@ -2,6 +2,7 @@
 require_once '../config/config.php';
 include '../includes/header.php';
 include '../includes/navbar.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -477,39 +478,9 @@ include '../includes/navbar.php';
         </div>
     </section>
 
-<footer class="footer">
-    <div class="footercontainer">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <span class="logo-light">3legant.</span>
-                <span class="line"></span>
-                <span class="slogan">Gift & Decoration Store</span>
-            </div>
-            <nav class="footer-nav">
-                <a href="index.php">Home</a>
-                <a href="shop.php">Shop</a>
-                <a href="Product.php">Product</a>
-                <a href="blog.php">Blog</a>
-                <a href="contact.php">Contact Us</a>
-            </nav>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-legal">
-                <span>Copyright © 2026 3legant. All rights reserved</span>
-                <div class="legal-links">
-                    <a href="Privacy Policy">Privacy Policy</a>
-                    <a href="Terms of Use">Terms of Use</a>
-                </div>
-            </div>
-            <div class="footer-social">
-                <a href="Instagram"><img src="../assets/image/instagram.png" alt="Instagram"></a>  
-                <a href="Facebook"><img src="../assets/image/Vector 2998.png" alt="Facebook"></a>
-                <a href="Youtube"><img src="../assets/image/youtube.png" alt="Youtube"></a>
-            </div>
-        </div>
-    </div>
-</footer>
+<?php
+include '../includes/footer.php';   
+?>
 
 </body>
 </html>

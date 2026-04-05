@@ -3,6 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include "../includes/auth.php";
+include "../includes/navbar.php";
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -703,53 +704,7 @@ include "../includes/auth.php";
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <input type="checkbox" id="menu-toggle">
-            <label for="menu-toggle" class="menu-btn">
-                <img src="../assets/image/menu.png" alt="menu">
-            </label>
-            <a href="index.php" class="logo">3legant.</a>
-
-            <div class="menu">
-                <div class="menu-header">
-                    <span>3Elegant</span>
-                    <label for="menu-toggle" class="close-btn">✕</label>
-                </div>
-                <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
-                <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
-                <a href="product.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
-                <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
-            </div>
-
-            <div class="icons">
-                <a href="shop.php" class="icon-link desktop">
-                    <img src="../assets/image/search 02.png" alt="search">
-                </a>
-
-                <a href="my_account.php" class="icon-link desktop">
-                    <img src="../assets/image/Vector1.png" alt="account">
-                </a>
-
-                <a href="cart.php" class="cart-wrapper">
-                    <img src="../assets/image/shopping bag.png" alt="bag">
-                    <span id="cart-count" class="cart-badge">
-                        <?php
-                        $total = 0;
-                        if (isset($_SESSION['cart'])) {
-                            foreach ($_SESSION['cart'] as $item) {
-                                $total += $item['quantity'];
-                            }
-                        }
-                        echo $total;
-                        ?>
-                    </span>
-                </a>
-            </div>
-            <label for="menu-toggle" class="overlay"></label>
-        </div>
-    </nav>
-
+  
     <div class="container">
         <div class="breadcrumb">
             <a href="javascript:history.back()" class="back-link">

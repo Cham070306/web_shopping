@@ -13,7 +13,7 @@ Website bán hàng sử dụng PHP + MySQL.
 1. Clone repo về máy
 2. Đặt project trong thư mục `htdocs`
 3. Mở XAMPP, chạy Apache và MySQL
-4. Tạo database `shop_db`
+4. Tạo database `web_shopping`
 5. Import file `database.sql` bằng phpMyAdmin
 6. Truy cập `http://localhost/web_shopping/user/index.php`
 

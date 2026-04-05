@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | 3legant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         :root {
             --color-black: #141718; 
@@ -138,6 +139,32 @@
             background: #F4FDF9; 
             border-color: var(--color-green); 
         }
+        .password-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-input-wrapper input {
+            width: 100%;
+            padding-right: 40px !important; 
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--color-gray-400);
+            font-size: 18px;
+            z-index: 10;
+            padding: 10px 0;
+        }
+
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
 
         @media (max-width: 768px) { 
             .auth-wrapper { 
@@ -185,12 +212,18 @@
 
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Password" required>
+                    <div class="password-input-wrapper">
+                        <input type="password" class="password-field" name="password" placeholder="Password" required>
+                        <i class="fa-regular fa-eye toggle-password"></i>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Confirm Password</label>
-                    <input type="password" name="confirm_password" placeholder="Confirm password" required>
+                    <div class="password-input-wrapper">
+                        <input type="password" class="password-field" name="confirm_password" placeholder="Confirm password" required>
+                        <i class="fa-regular fa-eye toggle-password"></i>
+                    </div>
                 </div>
 
                 <div class="policy-row">
@@ -203,6 +236,19 @@
         </div>
     </div>
 </div>
+<script>
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.parentElement.querySelector('input');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+        
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
 
 </body>
 </html>

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập | 3legant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
         :root {
@@ -82,7 +83,8 @@
         .form-group { 
             display: flex; 
             flex-direction: column; 
-            margin-bottom: 24px; 
+            margin-bottom: 24px;
+            position: relative; 
         }
         .form-group label { 
             font-size: 12px; 
@@ -108,7 +110,39 @@
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 32px; 
+                }
+        .password-input-wrapper {
+            position: relative; 
+            width: 100%;
+            margin-top: 8px; 
         }
+
+        .password-input-wrapper input {
+            width: 100%;
+            padding: 12px 35px 12px 0 !important; 
+            border: none;
+            border-bottom: 1px solid var(--color-gray-200);
+            background: transparent;
+            outline: none;
+            font-size: 16px;
+            display: block; 
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0;
+            top: 50%; 
+            transform: translateY(-50%); 
+            cursor: pointer;
+            color: var(--color-gray-400);
+            font-size: 18px;
+            z-index: 100; 
+            padding: 5px; 
+        }
+        .password-input-wrapper input:focus {
+            border-bottom-color: var(--color-black);
+        }
+
         .remember-me { 
             display: flex; 
             align-items: center; 
@@ -122,6 +156,17 @@
             height: 18px; 
             cursor: pointer; 
             accent-color: var(--color-black); 
+        }
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+        input::-webkit-contacts-auto-fill-button,
+        input::-webkit-credentials-auto-fill-button {
+            visibility: hidden;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
         }
         
         .forgot-password { 
@@ -205,7 +250,10 @@
                 
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Password" required>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
                 </div>
 
                 <div class="form-options">
@@ -220,6 +268,18 @@
         </div>
     </div>
 </div>
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const passwordInput = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
 
 </body>
 </html>

@@ -1,19 +1,18 @@
 <?php $current_page = basename($_SERVER['PHP_SELF']); ?>
 <style>
-    /* Tổng thể Sidebar - Luôn có nền xám và bo góc cho cả Desk & Mobi */
     .sidebar-wrapper { 
-        width: 260px; 
+        width: 312px; 
         background: #F3F5F7; 
         border-radius: 16px; 
         padding: 40px 16px; 
-        height: fit-content; 
+        height: fit-content;
+        flex-shrink: 0; 
     }
 
-    /* Phần Avatar & Tên */
     .avatar-section { 
         text-align: center; 
         margin-bottom: 32px; 
-        display: block !important; /* Luôn hiển thị */
+        display: block !important; 
     }
 
     .avatar-container {
@@ -47,6 +46,12 @@
         font-size: 12px; 
         cursor: pointer;
     }
+    .camera-icon img {
+        width: 20px; 
+        height: 20px;
+        object-fit: contain;
+
+    }
 
     .user-name { 
         font-size: 20px; 
@@ -55,7 +60,6 @@
         margin: 0;
     }
 
-    /* Menu cho Desktop */
     .desktop-nav { 
         display: flex; 
         flex-direction: column; 
@@ -79,7 +83,6 @@
 
     .mobile-dropdown { display: none; }
 
-    /* --- RESPONSIVE CHO MOBILE (ĐÚNG HÌNH 3) --- */
     @media (max-width: 768px) {
         .sidebar-wrapper { 
             width: 100%; 
@@ -126,8 +129,10 @@
         <div class="avatar-container">
             <img src="../assets/uploads/<?= htmlspecialchars($user_avatar) ?>" id="avatar-preview" alt="Avatar">
             <form id="avatar-form" action="../controllers/AuthController.php?action=update_full" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="current_page" value="<?= basename($_SERVER['PHP_SELF']) ?>">
+                
                 <label for="avatar-upload" class="camera-icon">
-                    <i class="fa-solid fa-camera"></i>
+                    <img src="../assets/image/camera.png" alt="Camera" style="width: 16px; height: 16px;">
                 </label>
                 <input type="file" id="avatar-upload" name="avatar" hidden accept="image/*">
             </form>

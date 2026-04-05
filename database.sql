@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS `product_variants`;
 DROP TABLE IF EXISTS `product_images`;
 DROP TABLE IF EXISTS `products`;
 DROP TABLE IF EXISTS `categories`;
+DROP TABLE IF EXISTS `password_reset_otps`;
 DROP TABLE IF EXISTS `user_addresses`;
 DROP TABLE IF EXISTS `users`;
 
@@ -57,6 +58,29 @@ CREATE TABLE `users` (
   INDEX `idx_users_role` (`role`),
   INDEX `idx_users_active` (`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `password_reset_otps`;
+
+CREATE TABLE `password_reset_otps` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT UNSIGNED DEFAULT NULL,
+  `email` VARCHAR(150) NOT NULL,
+  `otp_code` VARCHAR(10) NOT NULL,
+  `attempt_count` INT NOT NULL DEFAULT 0,
+  `max_attempts` INT NOT NULL DEFAULT 5,
+  `is_used` TINYINT(1) NOT NULL DEFAULT 0,
+  `verified_at` DATETIME DEFAULT NULL,
+  `used_at` DATETIME DEFAULT NULL,
+  `expires_at` DATETIME NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_password_reset_otps_user`
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+  INDEX `idx_reset_email` (`email`),
+  INDEX `idx_reset_otp` (`otp_code`),
+  INDEX `idx_reset_expires` (`expires_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 CREATE TABLE `user_addresses` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

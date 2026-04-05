@@ -1,9 +1,12 @@
-<?php 
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-include "../includes/auth.php"; 
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include "../includes/auth.php";
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +21,7 @@ include "../includes/auth.php";
             --gray-200: #E8ECEF;
             --white: #FFFFFF;
         }
+
         .navbar {
             width: 100%;
             height: 50px;
@@ -39,44 +43,48 @@ include "../includes/auth.php";
             padding: 0 20px;
         }
 
-        .logo { 
-            font-size: 24px; 
-            font-weight: 600; 
-            color: var(--black); 
-            text-decoration: none; 
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--black);
+            text-decoration: none;
         }
 
-        .menu { 
-            display: flex; 
-            gap: 40px; 
+        .menu {
+            display: flex;
+            gap: 40px;
         }
+
         .menu-header {
-            display: none !important; 
+            display: none !important;
         }
 
-        .menu a { 
-            font-size: 14px; 
-            font-weight: 500; 
-            color: var(--gray-400); 
-            text-decoration: none; 
+        .menu a {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-400);
+            text-decoration: none;
             padding: 8px 0;
             border-bottom: 2px solid transparent;
-            transition: 0.2s; 
+            transition: 0.2s;
         }
-        .menu a.active, .menu a:hover { 
-            color: var(--black); 
+
+        .menu a.active,
+        .menu a:hover {
+            color: var(--black);
         }
-        
-        .menu a.active { 
-            color: var(--black); 
+
+        .menu a.active {
+            color: var(--black);
             border-bottom: 2px solid var(--black);
         }
 
-        .icons { 
+        .icons {
             display: flex;
-            align-items: center; 
-            gap: 16px; 
+            align-items: center;
+            gap: 16px;
         }
+
         .icons a {
             text-decoration: none;
             display: flex;
@@ -89,21 +97,24 @@ include "../includes/auth.php";
             object-fit: contain;
             cursor: pointer;
         }
-        .icon-link, .cart-wrapper {
+
+        .icon-link,
+        .cart-wrapper {
             display: flex;
             align-items: center;
             text-decoration: none;
             cursor: pointer;
         }
+
         .cart-wrapper {
-            display: flex !important; 
+            display: flex !important;
             align-items: center;
             gap: 5px;
             position: relative;
         }
 
         .cart-badge {
-            background-color: var(--black); 
+            background-color: var(--black);
             color: white;
             font-size: 12px;
             font-weight: 700;
@@ -113,33 +124,40 @@ include "../includes/auth.php";
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid white; 
+            border: 2px solid white;
         }
+
         .cart-wrapper img {
             width: 24px;
             height: 24px;
         }
+
         .desktop {
             display: flex;
         }
 
-        #menu-toggle, .menu-btn { 
-            display: none; 
+        #menu-toggle,
+        .menu-btn {
+            display: none;
         }
-        #menu-toggle:checked ~ .menu {
+
+        #menu-toggle:checked~.menu {
             left: 0;
         }
-       
+
         .overlay {
             position: fixed;
             inset: 0;
-            background: #1e2223;;
+            background: #1e2223;
+            ;
             display: none;
             z-index: 10000;
-        } 
-        #menu-toggle:checked ~ .overlay {
+        }
+
+        #menu-toggle:checked~.overlay {
             display: block;
         }
+
         .menu-header {
             display: flex;
             justify-content: space-between;
@@ -153,237 +171,263 @@ include "../includes/auth.php";
             cursor: pointer;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
             color: var(--black);
-            background: var(--white); 
+            background: var(--white);
             line-height: 1.5;
-            padding-top: 30px; 
+            padding-top: 30px;
         }
-        .container { 
-            max-width: 1120px; 
-            margin: 60px auto; 
-            padding: 0 20px; 
-            min-height: 70vh; 
+
+        .container {
+            max-width: 1120px;
+            margin: 60px auto;
+            padding: 0 20px;
+            min-height: 70vh;
         }
+
         .breadcrumb {
-            display: none !important; 
-        }
-        
-        .page-header { 
-            font-size: 54px; 
-            font-weight: 600; 
-            text-align: center; 
-            margin-bottom: 60px; 
-            letter-spacing: -1px; 
+            display: none !important;
         }
 
-        .account-layout { 
-            display: flex; 
-            gap: 64px; 
-        }
-        .address-content { 
-            flex: 1; 
-        }
-        .section-title { 
-            font-size: 20px; 
-            font-weight: 600; 
-            margin-bottom: 24px; 
+        .page-header {
+            font-size: 54px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 60px;
+            letter-spacing: -1px;
         }
 
-        .address-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 24px; 
-        }
-        .address-card { 
-            border: 1px solid var(--gray-400); 
-            border-radius: 8px; 
-            padding: 24px; 
-        }
-        .card-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 16px; 
-        }
-        .card-header h3 { 
-            font-size: 16px; 
-            font-weight: 600; 
-            margin: 0; 
-        }
-        .edit-btn { 
-            color: var(--gray-400); 
-            text-decoration: none; 
-            font-size: 16px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            border: none; 
-            background: none; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-        }
-        .edit-btn:hover { 
-            color: var(--black); 
+        .account-layout {
+            display: flex;
+            gap: 64px;
         }
 
-        .address-info strong { 
-            display: block; 
-            font-size: 16px; 
-            margin-bottom: 4px; 
-            min-height: 20px; 
-        }
-        .address-info span { 
-            display: block; 
-            font-size: 14px; 
-            color: var(--gray-400); 
-            min-height: 20px; 
-        }
-        .address-info p { 
-            margin: 12px 0 0; 
-            color: var(--gray-400); 
-            font-size: 14px; 
-            line-height: 22px; 
-            min-height: 44px; 
+        .address-content {
+            flex: 1;
         }
 
-        .modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0; 
-            top: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.5); 
-            align-items: center; 
-            justify-content: center; 
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
         }
-        .modal-content { 
-            background: white; 
-            padding: 32px; 
-            border-radius: 8px; 
-            width: 100%; 
-            max-width: 500px; 
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .address-card {
+            border: 1px solid var(--gray-400);
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .edit-btn {
+            color: var(--gray-400);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edit-btn:hover {
+            color: var(--black);
+        }
+
+        .address-info strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 4px;
+            min-height: 20px;
+        }
+
+        .address-info span {
+            display: block;
+            font-size: 14px;
+            color: var(--gray-400);
+            min-height: 20px;
+        }
+
+        .address-info p {
+            margin: 12px 0 0;
+            color: var(--gray-400);
+            font-size: 14px;
+            line-height: 22px;
+            min-height: 44px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 32px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
             position: relative;
         }
-        .modal-header { 
-            font-size: 20px; 
-            font-weight: 600; 
-            margin-bottom: 20px; 
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
-        .close-modal { 
-            position: absolute; 
-            top: 20px; 
-            right: 20px; 
-            font-size: 24px; 
-            cursor: pointer; 
-            color: var(--gray-400); 
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-400);
         }
-        
-        .form-group { 
-            margin-bottom: 16px; 
-            display: flex; 
-            flex-direction: column; 
+
+        .form-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
         }
-        .form-group label { 
-            font-size: 12px; 
-            font-weight: 700; 
-            color: var(--gray-400); 
-            text-transform: uppercase; 
-            margin-bottom: 6px; 
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
-        .form-group input { 
-            padding: 10px 14px; 
-            border: 1px solid var(--gray-200); 
-            border-radius: 6px; 
-            font-size: 14px; 
-            outline: none; 
+
+        .form-group input {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
         }
-        .form-group input:focus { 
-            border-color: var(--black); 
+
+        .form-group input:focus {
+            border-color: var(--black);
         }
-        .btn-save { 
-            background: var(--black); 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 40px; 
-            font-weight: 500; 
-            width: 100%; 
-            cursor: pointer; 
-            margin-top: 10px; 
+
+        .btn-save {
+            background: var(--black);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
         }
 
 
-       .footer { 
-            background: var(--black); 
-            color: #fff; 
-            padding: 80px 0 40px 0; 
-        }
-        .footercontainer { 
-            max-width: 1120px; 
-            margin: 0 auto; 
-            padding: 0 20px; 
-        }
-        
-        .footer-top { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding-bottom: 40px; 
-            border-bottom: 1px solid var(--gray-600); 
-            margin-bottom: 32px; 
+        .footer {
+            background: var(--black);
+            color: #fff;
+            padding: 80px 0 40px 0;
         }
 
-        .footer-brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 20px; 
+        .footercontainer {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .logo-light { 
-            font-size: 24px; 
-            font-weight: 600; 
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--gray-600);
+            margin-bottom: 32px;
         }
-        .footer-brand .line { 
-            width: 1px; 
-            height: 24px; 
-            background: var(--gray-600); 
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
-        .footer-nav a { 
-            color: #fff; 
-            margin-left: 40px; 
+
+        .logo-light {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .footer-brand .line {
+            width: 1px;
+            height: 24px;
+            background: var(--gray-600);
+        }
+
+        .footer-nav a {
+            color: #fff;
+            margin-left: 40px;
             font-size: 14px;
             text-decoration: none;
         }
-        
-        .footer-bottom { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-size: 12px; 
-            color: var(--gray-200); 
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-200);
         }
-        .footer-legal { 
-            display: flex; 
-            gap: 28px; 
+
+        .footer-legal {
+            display: flex;
+            gap: 28px;
         }
-        .footer-legal a { 
-            color: #fff; 
+
+        .footer-legal a {
+            color: #fff;
             font-weight: 600;
             text-decoration: none;
         }
-        .footer-social { 
-            display: flex; 
-            gap: 24px; 
+
+        .footer-social {
+            display: flex;
+            gap: 24px;
         }
-        .footer-social a { 
-            color: var(--white); 
-            font-size: 18px; 
+
+        .footer-social a {
+            color: var(--white);
+            font-size: 18px;
         }
+
         .alert-box {
             padding: 16px;
             border-radius: 8px;
@@ -391,99 +435,108 @@ include "../includes/auth.php";
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: opacity 0.5s ease; 
+            transition: opacity 0.5s ease;
         }
-        .success-alert { 
-            background: #E8F9EE; 
-            color: #38CB89; 
-            border: 1px solid #38CB89; 
+
+        .success-alert {
+            background: #E8F9EE;
+            color: #38CB89;
+            border: 1px solid #38CB89;
         }
-        .error-alert { 
-            background: #FFF0F0; 
-            color: #FF5630; 
-            border: 1px solid #FF5630; 
+
+        .error-alert {
+            background: #FFF0F0;
+            color: #FF5630;
+            border: 1px solid #FF5630;
         }
 
         @media (max-width: 768px) {
-            .container { 
-                max-width: 312px; 
-                margin: 30px; 
-                padding: 0 20px; 
+            .container {
+                width: 100%;
+                max-width: 100%;
+                margin: 24px auto 40px;
+                padding: 0 24px;
+                box-sizing: border-box;
             }
+
             .breadcrumb {
                 display: flex !important;
-                margin-bottom: 25px;
-                margin-top: -10px;
-                margin-left: -18px;
-                display: flex;
+                margin: 0 0 20px 0;
             }
+
             .back-link {
                 text-decoration: none;
-                color: #6C7275;  
+                color: #6C7275;
                 font-size: 14px;
                 font-weight: 500;
                 display: flex;
                 align-items: center;
-                gap: 8px; 
+                gap: 8px;
                 transition: 0.3s;
             }
 
             .back-link:hover {
-                color: #1d2021; 
+                color: #1d2021;
             }
-            .account-layout { 
+
+            .account-layout {
                 flex-direction: column;
-                gap: 10px; 
-                align-items: center;
+                gap: 24px;
+                align-items: stretch;
             }
-            body { 
-                padding-top: 20px; 
+
+            body {
+                padding-top: 20px;
             }
-            .desktop{
+
+            .desktop {
                 display: none !important;
             }
 
             .navbar-container {
-                padding: 0 28px;
+                padding: 0 20px;
             }
-            .menu-btn { 
-                display: block; 
-                order: 1; 
-               
+
+            .menu-btn {
+                display: block;
+                order: 1;
             }
+
             .menu-btn img {
-                width: 20px; 
+                width: 20px;
                 height: 20px;
-                object-fit: contain; 
+                object-fit: contain;
             }
-            .navbar .logo { 
-                order: 2; 
+
+            .navbar .logo {
+                order: 2;
                 flex: 1;
-                font-size: 25px; 
-                margin-left: 10px; 
+                font-size: 25px;
+                margin-left: 10px;
                 padding-bottom: 5px;
             }
-            .navbar .icons { 
-                order: 3; 
-                gap: 10px; 
+
+            .navbar .icons {
+                order: 3;
+                gap: 10px;
             }
+
             .navbar .menu {
-                position: fixed; 
-                top: 0; 
-                left: -100%; 
-                width: 60%; 
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 60%;
                 height: 100%;
-                background: white; 
-                flex-direction: column; 
+                background: white;
+                flex-direction: column;
                 padding: 24px;
-                gap: 0; 
-                transition: 0.3s ease-in-out; 
+                gap: 0;
+                transition: 0.3s ease-in-out;
                 box-shadow: 2px 0 10px #3d4243;
                 z-index: 10001;
                 display: flex;
                 box-sizing: border-box;
             }
-    
 
             .menu-header {
                 display: flex !important;
@@ -494,129 +547,161 @@ include "../includes/auth.php";
                 font-weight: 600;
                 color: var(--black);
             }
-            .navbar .menu a { 
-                font-size: 16px; 
-                border-bottom: 1px solid #d1d1d1; 
-                padding-bottom: 10px; 
+
+            .navbar .menu a {
+                font-size: 16px;
+                border-bottom: 1px solid #d1d1d1;
+                padding-bottom: 10px;
             }
-            .navbar .menu a.active::after { 
-                display: none; 
+
+            .navbar .menu a.active::after {
+                display: none;
             }
-            
+
             .overlay {
-                position: fixed; 
-                top: 0; left: 0; 
-                width: 100%; 
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
                 height: 100%;
-                background: #1b1e1f9a;; 
-                display: none; 
+                background: #1b1e1f9a;
+                display: none;
                 z-index: 10000;
             }
-            #menu-toggle:checked ~ .overlay {
+
+            #menu-toggle:checked~.overlay {
                 display: block;
             }
+
             .page-header {
-                font-size: 28px;
-                margin-bottom: 30px;
+                font-size: 36px;
+                margin-bottom: 36px;
+                text-align: center;
             }
+
             .address-content {
                 width: 100%;
             }
-            .form-group { 
-                display: flex;
-                flex-direction: column;
-                margin: 30px; 
-                margin-top: 1px;
+
+            .address-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
-            .address-grid { 
-                grid-template-columns: 1fr; 
+
+            .address-card {
+                width: 100%;
+                box-sizing: border-box;
             }
+
             .section-title {
                 font-size: 20px;
                 margin-top: 0;
                 margin-bottom: 16px;
             }
-            .address-info strong { 
-                font-size: 14px; 
+
+            .address-info strong {
+                font-size: 14px;
             }
-            .address-info span, .address-info p { 
-                font-size: 13px; 
+
+            .address-info span,
+            .address-info p {
+                font-size: 13px;
             }
-            
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                margin: 0 0 16px 0;
+            }
+
+            .modal-content {
+                width: calc(100% - 32px);
+                max-width: 500px;
+                padding: 24px;
+                box-sizing: border-box;
+            }
+
             .footer .footercontainer {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                gap: 15px; 
+                gap: 15px;
                 padding-top: 10px;
                 padding-bottom: 35px;
             }
-            .footer-top { 
+
+            .footer-top {
                 display: flex;
                 flex-direction: column;
-                text-align: center;  
+                text-align: center;
                 gap: 40px;
-                width: 100%; 
-                
-            } 
+                width: 100%;
+            }
+
             .footer-top .line {
-                width: 24px;    
-                height: 2px;  
+                width: 24px;
+                height: 2px;
                 margin: 10px;
             }
-            .footer-bottom { 
-                flex-direction: column; 
-                gap: 30px; 
-                text-align: center; 
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 30px;
+                text-align: center;
             }
+
             .footer-brand {
                 flex-direction: column;
                 gap: 8px;
             }
 
-            .footer-nav { 
-                display: flex; 
-                flex-direction: column; 
-                gap: 32px; 
-            }
-            .footer-nav a { 
-                margin: 0; 
-            }
-            .footer-legal { 
-                flex-direction: column; 
+            .footer-nav {
                 display: flex;
-                gap: 32px; 
+                flex-direction: column;
+                gap: 32px;
             }
+
+            .footer-nav a {
+                margin: 0;
+            }
+
+            .footer-legal {
+                flex-direction: column;
+                display: flex;
+                gap: 32px;
+            }
+
             .legal-links {
                 display: flex;
                 justify-content: center;
-                flex-wrap: wrap; 
-                gap: 32px; 
+                flex-wrap: wrap;
+                gap: 32px;
                 order: -2;
             }
+
             .legal-links a {
                 margin: 0;
                 color: var(--white);
                 font-weight: 600;
-                gap:28px; 
-            
+                gap: 28px;
             }
+
             .footer-social {
                 display: flex;
                 justify-content: center;
                 gap: 24px;
                 width: 100%;
                 order: -1;
-            
             }
+
             .footer-social a {
                 font-size: 20px;
             }
-
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
         <div class="navbar-container">
@@ -649,12 +734,14 @@ include "../includes/auth.php";
                 <a href="cart.php" class="cart-wrapper">
                     <img src="../assets/image/shopping bag.png" alt="bag">
                     <span id="cart-count" class="cart-badge">
-                        <?php 
-                            $total = 0;
-                            if(isset($_SESSION['cart'])) {
-                                foreach($_SESSION['cart'] as $item) { $total += $item['quantity']; }
+                        <?php
+                        $total = 0;
+                        if (isset($_SESSION['cart'])) {
+                            foreach ($_SESSION['cart'] as $item) {
+                                $total += $item['quantity'];
                             }
-                            echo $total; 
+                        }
+                        echo $total;
                         ?>
                     </span>
                 </a>
@@ -670,28 +757,31 @@ include "../includes/auth.php";
             </a>
         </div>
         <h1 class="page-header">My Account</h1>
-            <div id="notification-container">
+        <div id="notification-container">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="alert-box success-alert">
                     <i class="fa-solid fa-circle-check"></i>
-                    <span><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></span>
+                    <span><?php echo $_SESSION['success'];
+                    unset($_SESSION['success']); ?></span>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="alert-box error-alert">
                     <i class="fa-solid fa-circle-exclamation"></i>
-                    <span><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></span>
+                    <span><?php echo $_SESSION['error'];
+                    unset($_SESSION['error']); ?></span>
                 </div>
             <?php endif; ?>
         </div>
 
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert-box error-alert">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <span><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></span>
-                </div>
-            <?php endif; ?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert-box error-alert">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span><?php echo $_SESSION['error'];
+                unset($_SESSION['error']); ?></span>
+            </div>
+        <?php endif; ?>
 
         <div class="account-layout">
             <?php include "../includes/account_sidebar.php"; ?>
@@ -702,24 +792,34 @@ include "../includes/auth.php";
                     <div class="address-card">
                         <div class="card-header">
                             <h3>Billing Address</h3>
-                            <button class="edit-btn" onclick="openModal('billing')"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+                            <button class="edit-btn" onclick="openModal('billing')"><i
+                                    class="fa-regular fa-pen-to-square"></i> Edit</button>
                         </div>
                         <div class="address-info">
-                            <strong id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Chưa nhập tên') ?></strong>
-                            <span id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Chưa nhập SĐT') ?></span>
-                            <p id="billing-address"><?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Vui lòng cập nhật địa chỉ') ?></p>
+                            <strong
+                                id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Chưa nhập tên') ?></strong>
+                            <span
+                                id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                            <p id="billing-address">
+                                <?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Vui lòng cập nhật địa chỉ') ?>
+                            </p>
                         </div>
                     </div>
 
                     <div class="address-card">
                         <div class="card-header">
                             <h3>Shipping Address</h3>
-                            <button class="edit-btn" onclick="openModal('shipping')"><i class="fa-regular fa-pen-to-square"></i> Edit</button>
+                            <button class="edit-btn" onclick="openModal('shipping')"><i
+                                    class="fa-regular fa-pen-to-square"></i> Edit</button>
                         </div>
                         <div class="address-info">
-                            <strong id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Chưa nhập tên') ?></strong>
-                            <span id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Chưa nhập SĐT') ?></span>
-                            <p id="shipping-address"><?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Vui lòng cập nhật địa chỉ') ?></p>
+                            <strong
+                                id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Chưa nhập tên') ?></strong>
+                            <span
+                                id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                            <p id="shipping-address">
+                                <?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Vui lòng cập nhật địa chỉ') ?>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -751,38 +851,38 @@ include "../includes/auth.php";
     </div>
 
     <footer class="footer">
-    <div class="footercontainer">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <span class="logo-light">3legant.</span>
-                <span class="line"></span>
-                <span class="slogan">Gift & Decoration Store</span>
+        <div class="footercontainer">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <span class="logo-light">3legant.</span>
+                    <span class="line"></span>
+                    <span class="slogan">Gift & Decoration Store</span>
+                </div>
+                <nav class="footer-nav">
+                    <a href="index.php">Home</a>
+                    <a href="shop.php">Shop</a>
+                    <a href="Product.php">Product</a>
+                    <a href="blog.php">Blog</a>
+                    <a href="contact.php">Contact Us</a>
+                </nav>
             </div>
-            <nav class="footer-nav">
-                <a href="index.php">Home</a>
-                <a href="shop.php">Shop</a>
-                <a href="Product.php">Product</a>
-                <a href="blog.php">Blog</a>
-                <a href="contact.php">Contact Us</a>
-            </nav>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-legal">
-                <span>Copyright © 2026 3legant. All rights reserved</span>
-                <div class="legal-links">
-                    <a href="Privacy Policy">Privacy Policy</a>
-                    <a href="Terms of Use">Terms of Use</a>
+
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <span>Copyright © 2026 3legant. All rights reserved</span>
+                    <div class="legal-links">
+                        <a href="Privacy Policy">Privacy Policy</a>
+                        <a href="Terms of Use">Terms of Use</a>
+                    </div>
+                </div>
+                <div class="footer-social">
+                    <a href="Instagram"><img src="../assets/image/instagram.png" alt="Instagram"></a>
+                    <a href="Facebook"><img src="../assets/image/Vector 2998.png" alt="Facebook"></a>
+                    <a href="Youtube"><img src="../assets/image/youtube.png" alt="Youtube"></a>
                 </div>
             </div>
-            <div class="footer-social">
-                <a href="Instagram"><img src="../assets/image/instagram.png" alt="Instagram"></a>  
-                <a href="Facebook"><img src="../assets/image/Vector 2998.png" alt="Facebook"></a>
-                <a href="Youtube"><img src="../assets/image/youtube.png" alt="Youtube"></a>
-            </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
     <script>
         const modal = document.getElementById("addressModal");
@@ -790,7 +890,7 @@ include "../includes/auth.php";
             const prefix = type.toLowerCase();
             document.getElementById("modalTitle").innerText = "Edit " + (prefix === 'billing' ? 'Billing' : 'Shipping') + " Address";
             document.getElementById("addressType").value = prefix;
-            
+
             const currentName = document.getElementById(prefix + "-name").innerText.trim();
             const currentPhone = document.getElementById(prefix + "-phone").innerText.trim();
             const currentAddr = document.getElementById(prefix + "-address").innerText.trim();
@@ -798,7 +898,7 @@ include "../includes/auth.php";
             document.getElementById("inputName").value = (currentName === "Chưa nhập tên") ? "" : currentName;
             document.getElementById("inputPhone").value = (currentPhone === "Chưa nhập SĐT") ? "" : currentPhone;
             document.getElementById("inputAddress").value = (currentAddr === "Vui lòng cập nhật địa chỉ") ? "" : currentAddr;
-            
+
             modal.style.display = "flex";
         }
 
@@ -806,40 +906,40 @@ include "../includes/auth.php";
             modal.style.display = "none";
         }
 
-        document.getElementById("editAddressForm").onsubmit = function(e) {
+        document.getElementById("editAddressForm").onsubmit = function (e) {
             e.preventDefault();
             const type = document.getElementById("addressType").value;
             const name = document.getElementById("inputName").value;
             const phone = document.getElementById("inputPhone").value;
             const address = document.getElementById("inputAddress").value;
-            
+
             const formData = new FormData();
             formData.append('type', type);
             formData.append('full_name', name);
             formData.append('phone', phone);
             formData.append('address', address);
-            formData.append('ajax', '1'); 
+            formData.append('ajax', '1');
 
             fetch('../controllers/AuthController.php?action=save_address', {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                alert("Cập nhật thành công!");
-                window.location.reload(); 
-            })
-            .catch(error => {
-                alert("Lỗi kết nối!");
-            });
+                .then(response => {
+                    alert("Cập nhật thành công!");
+                    window.location.reload();
+                })
+                .catch(error => {
+                    alert("Lỗi kết nối!");
+                });
         };
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modal) closeModal();
         }
         //upload avt 
-        document.getElementById('avatar-upload').addEventListener('change', function(e) {
+        document.getElementById('avatar-upload').addEventListener('change', function (e) {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     document.getElementById('avatar-preview').src = event.target.result;
                 };
                 reader.readAsDataURL(this.files[0]);
@@ -847,15 +947,15 @@ include "../includes/auth.php";
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const alerts = document.querySelectorAll('.alert-box');
-            alerts.forEach(function(alert) {
-                setTimeout(function() {
-                    alert.style.opacity = '0'; 
-                    setTimeout(function() {
-                        alert.remove(); 
+            alerts.forEach(function (alert) {
+                setTimeout(function () {
+                    alert.style.opacity = '0';
+                    setTimeout(function () {
+                        alert.remove();
                     }, 500);
-                }, 1000); 
+                }, 1000);
             });
         });
         //giỏ hàng
@@ -871,4 +971,5 @@ include "../includes/auth.php";
         }
     </script>
 </body>
+
 </html>

@@ -32,11 +32,11 @@ class User {
         return $stmt->execute();
     }
 
-    public function updatePassword($id, $hash) {
-        $stmt = $this->conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $stmt->bind_param("si", $hash, $id);
-        return $stmt->execute();
-    }
+    public function updatePassword($email, $password) {
+    $sql = "UPDATE users SET password = ? WHERE email = ?";
+    $stmt = $this->conn->prepare($sql);
+    return $stmt->execute([$password, $email]);
+}
 
     public function updateAddress($userId, $type, $name, $phone, $address) {
         $check = $this->conn->prepare("SELECT id FROM user_addresses WHERE user_id = ? AND type = ?");
@@ -64,4 +64,10 @@ class User {
         $stmt->bind_param("sssss", $name, $email, $phone, $subject, $message);
         return $stmt->execute();
     }
+    public function updatePasswordByEmail($email, $password) {
+    $sql = "UPDATE users SET password = ? WHERE email = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("ss", $password, $email);
+    return $stmt->execute();
+}
 }

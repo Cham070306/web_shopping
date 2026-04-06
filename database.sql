@@ -1,7 +1,7 @@
 -- =========================================================
--- WEB_SHOPPING - TEAM READY DATABASE
+-- WEB_SHOPPING - FINAL CLEAN DATABASE
 -- Compatible: MySQL 8.0+ / XAMPP / phpMyAdmin
--- Purpose: import 1 file and run immediately
+-- Purpose: clean final schema + demo data, ready to import
 -- Spec source: web_shopping_design_spec.docx
 -- =========================================================
 
@@ -18,6 +18,8 @@ USE `web_shopping`;
 -- =========================================================
 -- DROP OLD TABLES (safe re-import for team dev)
 -- =========================================================
+DROP TABLE IF EXISTS `notification_subscribers`;
+DROP TABLE IF EXISTS `customer_notes`;
 DROP TABLE IF EXISTS `logs`;
 DROP TABLE IF EXISTS `settings`;
 DROP TABLE IF EXISTS `banners`;
@@ -50,13 +52,17 @@ CREATE TABLE `users` (
   `email` VARCHAR(150) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
   `phone` VARCHAR(20) DEFAULT NULL,
+  `gender` ENUM('male','female','other') DEFAULT NULL,
+  `date_of_birth` DATE DEFAULT NULL,
   `avatar` VARCHAR(255) NOT NULL DEFAULT 'default.jpg',
   `role` ENUM('user','admin') NOT NULL DEFAULT 'user',
   `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `last_login` DATETIME DEFAULT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX `idx_users_role` (`role`),
-  INDEX `idx_users_active` (`is_active`)
+  INDEX `idx_users_active` (`is_active`),
+  INDEX `idx_users_last_login` (`last_login`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `password_reset_otps`;
@@ -65,7 +71,9 @@ CREATE TABLE `password_reset_otps` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `user_id` INT UNSIGNED DEFAULT NULL,
   `email` VARCHAR(150) NOT NULL,
+  `request_ip` VARCHAR(45) DEFAULT NULL,
   `otp_code` VARCHAR(10) NOT NULL,
+  `purpose` ENUM('forgot_password','verify_email') NOT NULL DEFAULT 'forgot_password',
   `attempt_count` INT NOT NULL DEFAULT 0,
   `max_attempts` INT NOT NULL DEFAULT 5,
   `is_used` TINYINT(1) NOT NULL DEFAULT 0,
@@ -78,7 +86,8 @@ CREATE TABLE `password_reset_otps` (
     ON DELETE SET NULL ON UPDATE CASCADE,
   INDEX `idx_reset_email` (`email`),
   INDEX `idx_reset_otp` (`otp_code`),
-  INDEX `idx_reset_expires` (`expires_at`)
+  INDEX `idx_reset_expires` (`expires_at`),
+  INDEX `idx_reset_purpose` (`purpose`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -88,6 +97,8 @@ CREATE TABLE `user_addresses` (
   `full_name` VARCHAR(100) NOT NULL,
   `phone` VARCHAR(20) NOT NULL,
   `address` TEXT NOT NULL,
+  `ward` VARCHAR(100) DEFAULT NULL,
+  `district` VARCHAR(100) DEFAULT NULL,
   `city` VARCHAR(100) DEFAULT NULL,
   `province` VARCHAR(100) DEFAULT NULL,
   `country` VARCHAR(100) NOT NULL DEFAULT 'Vietnam',
@@ -133,6 +144,11 @@ CREATE TABLE `products` (
   `stock` INT NOT NULL DEFAULT 0,
   `sold` INT NOT NULL DEFAULT 0,
   `thumbnail` VARCHAR(255) DEFAULT NULL,
+  `brand` VARCHAR(100) DEFAULT NULL,
+  `material` VARCHAR(100) DEFAULT NULL,
+  `color` VARCHAR(100) DEFAULT NULL,
+  `size` VARCHAR(100) DEFAULT NULL,
+  `weight` DECIMAL(10,2) DEFAULT NULL,
   `meta_title` VARCHAR(255) DEFAULT NULL,
   `meta_description` VARCHAR(500) DEFAULT NULL,
   `is_featured` TINYINT(1) NOT NULL DEFAULT 0,
@@ -140,11 +156,18 @@ CREATE TABLE `products` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT `fk_products_category` FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `chk_products_price` CHECK (`price` >= 0),
+  CONSTRAINT `chk_products_sale_price` CHECK (`sale_price` IS NULL OR `sale_price` >= 0),
+  CONSTRAINT `chk_products_stock` CHECK (`stock` >= 0),
+  CONSTRAINT `chk_products_sold` CHECK (`sold` >= 0),
+  CONSTRAINT `chk_products_sale_logic` CHECK (`sale_price` IS NULL OR `sale_price` <= `price`),
   INDEX `idx_products_category` (`category_id`),
   INDEX `idx_products_active_featured` (`is_active`, `is_featured`),
   INDEX `idx_products_price` (`price`),
   INDEX `idx_products_sale_price` (`sale_price`),
-  INDEX `idx_products_created_at` (`created_at`)
+  INDEX `idx_products_created_at` (`created_at`),
+  INDEX `idx_products_name` (`name`),
+  INDEX `idx_products_brand` (`brand`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `product_images` (
@@ -159,11 +182,14 @@ CREATE TABLE `product_images` (
 CREATE TABLE `product_variants` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `product_id` INT UNSIGNED NOT NULL,
+  `sku` VARCHAR(80) DEFAULT NULL UNIQUE,
   `color` VARCHAR(50) DEFAULT NULL,
   `size` VARCHAR(20) DEFAULT NULL,
   `stock` INT NOT NULL DEFAULT 0,
   `price_diff` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `image` VARCHAR(255) DEFAULT NULL,
   CONSTRAINT `fk_product_variants_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_product_variants_stock` CHECK (`stock` >= 0),
   INDEX `idx_product_variants_product` (`product_id`),
   INDEX `idx_product_variants_combo` (`product_id`, `color`, `size`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -174,6 +200,7 @@ CREATE TABLE `reviews` (
   `user_id` INT UNSIGNED NOT NULL,
   `rating` TINYINT UNSIGNED NOT NULL,
   `comment` TEXT DEFAULT NULL,
+  `admin_reply` TEXT DEFAULT NULL,
   `is_approved` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -190,16 +217,25 @@ CREATE TABLE `reviews` (
 CREATE TABLE `coupons` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `code` VARCHAR(50) NOT NULL UNIQUE,
+  `description` VARCHAR(255) DEFAULT NULL,
   `type` ENUM('percent','fixed') NOT NULL DEFAULT 'percent',
   `value` DECIMAL(10,2) NOT NULL,
   `min_order` DECIMAL(12,2) NOT NULL DEFAULT 0,
+  `max_discount` DECIMAL(10,2) DEFAULT NULL,
   `max_uses` INT NOT NULL DEFAULT 0,
   `used_count` INT NOT NULL DEFAULT 0,
+  `starts_at` DATETIME DEFAULT NULL,
   `expires_at` DATETIME DEFAULT NULL,
   `is_active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX `idx_coupons_active_expire` (`is_active`, `expires_at`)
+  CONSTRAINT `chk_coupons_value` CHECK (`value` >= 0),
+  CONSTRAINT `chk_coupons_min_order` CHECK (`min_order` >= 0),
+  CONSTRAINT `chk_coupons_max_uses` CHECK (`max_uses` >= 0),
+  CONSTRAINT `chk_coupons_used_count` CHECK (`used_count` >= 0),
+  CONSTRAINT `chk_coupons_max_discount` CHECK (`max_discount` IS NULL OR `max_discount` >= 0),
+  INDEX `idx_coupons_active_expire` (`is_active`, `expires_at`),
+  INDEX `idx_coupons_starts_at` (`starts_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `orders` (
@@ -210,6 +246,7 @@ CREATE TABLE `orders` (
   `email` VARCHAR(150) NOT NULL,
   `phone` VARCHAR(20) NOT NULL,
   `address` TEXT NOT NULL,
+  `billing_address` TEXT DEFAULT NULL,
   `city` VARCHAR(100) DEFAULT NULL,
   `province` VARCHAR(100) DEFAULT NULL,
   `country` VARCHAR(100) NOT NULL DEFAULT 'Vietnam',
@@ -220,17 +257,24 @@ CREATE TABLE `orders` (
   `shipping_fee` DECIMAL(10,2) NOT NULL DEFAULT 0,
   `total` DECIMAL(12,2) NOT NULL,
   `coupon_code` VARCHAR(50) DEFAULT NULL,
+  `tracking_code` VARCHAR(100) DEFAULT NULL,
   `payment_method` ENUM('cod','bank_transfer','momo') NOT NULL DEFAULT 'cod',
   `payment_status` ENUM('pending','paid','failed','refunded') NOT NULL DEFAULT 'pending',
   `status` ENUM('pending','confirmed','shipping','delivered','cancelled') NOT NULL DEFAULT 'pending',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `delivered_at` DATETIME DEFAULT NULL,
   CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `chk_orders_subtotal` CHECK (`subtotal` >= 0),
+  CONSTRAINT `chk_orders_discount` CHECK (`discount` >= 0),
+  CONSTRAINT `chk_orders_shipping_fee` CHECK (`shipping_fee` >= 0),
+  CONSTRAINT `chk_orders_total` CHECK (`total` >= 0),
   INDEX `idx_orders_user` (`user_id`),
   INDEX `idx_orders_status` (`status`),
   INDEX `idx_orders_payment_status` (`payment_status`),
   INDEX `idx_orders_created_at` (`created_at`),
-  INDEX `idx_orders_order_code` (`order_code`)
+  INDEX `idx_orders_order_code` (`order_code`),
+  INDEX `idx_orders_tracking_code` (`tracking_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `order_items` (
@@ -239,6 +283,7 @@ CREATE TABLE `order_items` (
   `product_id` INT UNSIGNED DEFAULT NULL,
   `variant_id` INT UNSIGNED DEFAULT NULL,
   `product_name` VARCHAR(200) NOT NULL,
+  `product_sku` VARCHAR(80) DEFAULT NULL,
   `variant` VARCHAR(100) DEFAULT NULL,
   `price` DECIMAL(12,2) NOT NULL,
   `quantity` INT NOT NULL,
@@ -247,6 +292,9 @@ CREATE TABLE `order_items` (
   CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_order_items_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_order_items_variant` FOREIGN KEY (`variant_id`) REFERENCES `product_variants`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `chk_order_items_price` CHECK (`price` >= 0),
+  CONSTRAINT `chk_order_items_quantity` CHECK (`quantity` > 0),
+  CONSTRAINT `chk_order_items_subtotal` CHECK (`subtotal` >= 0),
   INDEX `idx_order_items_order` (`order_id`),
   INDEX `idx_order_items_product` (`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -258,10 +306,12 @@ CREATE TABLE `payments` (
   `amount` DECIMAL(12,2) NOT NULL,
   `transaction_id` VARCHAR(100) DEFAULT NULL,
   `status` ENUM('pending','success','failed','refunded') NOT NULL DEFAULT 'pending',
+  `note` VARCHAR(255) DEFAULT NULL,
   `paid_at` DATETIME DEFAULT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT `fk_payments_order` FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_payments_amount` CHECK (`amount` >= 0),
   UNIQUE KEY `uq_payments_transaction` (`transaction_id`),
   INDEX `idx_payments_order` (`order_id`),
   INDEX `idx_payments_status` (`status`)
@@ -311,8 +361,11 @@ CREATE TABLE `inventory_logs` (
   `product_id` INT UNSIGNED NOT NULL,
   `variant_id` INT UNSIGNED DEFAULT NULL,
   `change_qty` INT NOT NULL,
+  `stock_before` INT DEFAULT NULL,
+  `stock_after` INT DEFAULT NULL,
   `type` ENUM('import','order','adjust') NOT NULL,
   `note` VARCHAR(255) DEFAULT NULL,
+  `supplier_name` VARCHAR(150) DEFAULT NULL,
   `created_by` INT UNSIGNED DEFAULT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT `fk_inventory_logs_product` FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE,
@@ -339,7 +392,9 @@ CREATE TABLE `posts` (
   `title` VARCHAR(250) NOT NULL,
   `slug` VARCHAR(270) NOT NULL UNIQUE,
   `thumbnail` VARCHAR(255) DEFAULT NULL,
+  `meta_title` VARCHAR(255) DEFAULT NULL,
   `excerpt` VARCHAR(500) DEFAULT NULL,
+  `meta_description` VARCHAR(500) DEFAULT NULL,
   `content` LONGTEXT DEFAULT NULL,
   `views` INT NOT NULL DEFAULT 0,
   `is_published` TINYINT(1) NOT NULL DEFAULT 0,
@@ -360,9 +415,12 @@ CREATE TABLE `contacts` (
   `phone` VARCHAR(20) DEFAULT NULL,
   `subject` VARCHAR(200) DEFAULT NULL,
   `message` TEXT NOT NULL,
+  `reply_message` TEXT DEFAULT NULL,
+  `replied_at` DATETIME DEFAULT NULL,
   `is_read` TINYINT(1) NOT NULL DEFAULT 0,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX `idx_contacts_read` (`is_read`, `created_at`)
+  INDEX `idx_contacts_read` (`is_read`, `created_at`),
+  INDEX `idx_contacts_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `banners` (
@@ -371,11 +429,13 @@ CREATE TABLE `banners` (
   `subtitle` VARCHAR(300) DEFAULT NULL,
   `image` VARCHAR(255) NOT NULL,
   `link` VARCHAR(255) DEFAULT NULL,
+  `position` VARCHAR(50) NOT NULL DEFAULT 'homepage',
   `sort_order` INT NOT NULL DEFAULT 0,
   `is_active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX `idx_banners_active_sort` (`is_active`, `sort_order`)
+  INDEX `idx_banners_active_sort` (`is_active`, `sort_order`),
+  INDEX `idx_banners_position` (`position`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `settings` (
@@ -392,6 +452,25 @@ CREATE TABLE `logs` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT `fk_logs_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
   INDEX `idx_logs_user` (`user_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `customer_notes` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT UNSIGNED NOT NULL,
+  `admin_id` INT UNSIGNED DEFAULT NULL,
+  `note` TEXT NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_customer_notes_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_customer_notes_admin` FOREIGN KEY (`admin_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
+  INDEX `idx_customer_notes_user` (`user_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `notification_subscribers` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `email` VARCHAR(150) NOT NULL UNIQUE,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_notification_subscribers_active` (`is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
@@ -821,8 +900,80 @@ INSERT INTO `logs` (`user_id`, `action`, `created_at`) VALUES
 (15, 'Reviewed inventory imports for March batch', '2026-04-05 18:05:00'),
 (1, 'Confirmed multiple sample orders for admin testing', '2026-04-05 18:10:00');
 
+
+UPDATE `users` SET `last_login` = '2026-04-05 09:00:00' WHERE `id` = 1;
+UPDATE `users` SET `last_login` = '2026-04-04 20:30:00' WHERE `id` = 2;
+
+UPDATE `products` SET
+  `brand` = '3legant',
+  `material` = 'Wood',
+  `color` = 'Natural Oak',
+  `size` = 'Standard',
+  `weight` = 7.50
+WHERE `id` = 1;
+
+UPDATE `products` SET
+  `brand` = '3legant',
+  `material` = 'Fabric',
+  `color` = 'Gray',
+  `size` = '2-Seater',
+  `weight` = 28.00
+WHERE `id` = 2;
+
+UPDATE `products` SET
+  `brand` = '3legant',
+  `material` = 'Ceramic',
+  `color` = 'Neutral',
+  `size` = 'Set of 3',
+  `weight` = 1.80
+WHERE `id` = 13;
+
+UPDATE `product_variants` SET `sku` = 'TT-001-BLACK', `image` = 'tray-table-black.jpg' WHERE `id` = 1;
+UPDATE `product_variants` SET `sku` = 'TT-001-RED', `image` = 'tray-table-red.jpg' WHERE `id` = 2;
+UPDATE `product_variants` SET `sku` = 'LS-001-GRAY', `image` = 'loveseat-sofa-gray.jpg' WHERE `id` = 3;
+UPDATE `product_variants` SET `sku` = 'LS-001-BEIGE', `image` = 'loveseat-sofa-beige.jpg' WHERE `id` = 4;
+
+UPDATE `coupons`
+SET `description` = 'Discount for first-time customers', `max_discount` = 100.00, `starts_at` = '2026-01-01 00:00:00'
+WHERE `code` = 'WELCOME10';
+
+UPDATE `coupons`
+SET `description` = 'Fixed discount for higher-value carts', `max_discount` = NULL, `starts_at` = '2026-01-01 00:00:00'
+WHERE `code` = 'SAVE50';
+
+UPDATE `orders`
+SET `billing_address` = `address`, `tracking_code` = 'TRACK-ORD-00001'
+WHERE `id` = 1;
+
+UPDATE `order_items` SET `product_sku` = 'TT-001' WHERE `id` = 1;
+UPDATE `order_items` SET `product_sku` = 'LS-001' WHERE `id` = 2;
+
+UPDATE `inventory_logs`
+SET `stock_before` = 0, `stock_after` = 20, `supplier_name` = 'Warehouse Supplier A'
+WHERE `id` = 1;
+
+UPDATE `inventory_logs`
+SET `stock_before` = 20, `stock_after` = 18, `supplier_name` = 'Warehouse Supplier A'
+WHERE `id` = 2;
+
+UPDATE `posts`
+SET `meta_title` = `title`, `meta_description` = `excerpt`
+WHERE `meta_title` IS NULL;
+
+INSERT INTO `customer_notes` (`user_id`, `admin_id`, `note`) VALUES
+(2, 1, 'Frequent returning customer. Good sample account for order-history testing.'),
+(3, 1, 'Used for dashboard customer metrics and admin search demo.');
+
+INSERT INTO `notification_subscribers` (`email`) VALUES
+('newsletter1@example.com'),
+('newsletter2@example.com')
+ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
+
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- =========================================================
--- END OF FILE
+-- END OF FINAL CLEAN FILE
 -- =========================================================
+
+

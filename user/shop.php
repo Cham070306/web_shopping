@@ -27,23 +27,65 @@ if ($catSlug) {
 // Fetch categories for sidebar
 $allCategories = $conn->query("SELECT id, name, slug FROM categories ORDER BY id")->fetch_all(MYSQLI_ASSOC);
 
-// Fetch products (with optional category filter)
-if ($catId) {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE is_active = 1 AND category_id = ? ORDER BY id ASC LIMIT ? OFFSET ?");
-    $stmt->bind_param("iii", $catId, $limit, $offset);
-    $cntQ = $conn->prepare("SELECT COUNT(*) as total FROM products WHERE is_active = 1 AND category_id = ?");
-    $cntQ->bind_param("i", $catId);
-} else {
-    $stmt = $conn->prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY id ASC LIMIT ? OFFSET ?");
-    $stmt->bind_param("ii", $limit, $offset);
-    $cntQ = $conn->prepare("SELECT COUNT(*) as total FROM products WHERE is_active = 1");
-}
-$stmt->execute();
-$products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+// Price filter
+$priceFilter = isset($_GET['price']) ? trim($_GET['price']) : '';
+$minPrice = null;
+$maxPrice = null;
 
+if ($priceFilter) {
+    $parts = explode('-', $priceFilter);
+    if (count($parts) === 2) {
+        if ($parts[0] !== '') $minPrice = (int)$parts[0];
+        if ($parts[1] !== '') $maxPrice = (int)$parts[1];
+    }
+}
+
+// Build query conditions
+$conditions = ["is_active = 1"];
+$params = [];
+$types = "";
+
+if ($catId) {
+    $conditions[] = "category_id = ?";
+    $params[] = $catId;
+    $types .= "i";
+}
+
+if ($minPrice !== null) {
+    $conditions[] = "(COALESCE(sale_price, price) >= ?)";
+    $params[] = $minPrice;
+    $types .= "d";
+}
+if ($maxPrice !== null) {
+    $conditions[] = "(COALESCE(sale_price, price) <= ?)";
+    $params[] = $maxPrice;
+    $types .= "d";
+}
+
+$whereSql = implode(" AND ", $conditions);
+
+// Count query
+$cntSql = "SELECT COUNT(*) as total FROM products WHERE $whereSql";
+$cntQ = $conn->prepare($cntSql);
+if ($types) {
+    $cntQ->bind_param($types, ...$params);
+}
 $cntQ->execute();
 $totalProducts = $cntQ->get_result()->fetch_assoc()['total'];
-$totalPages    = ceil($totalProducts / $limit);
+$totalPages    = ceil($totalProducts / $limit) ?: 1;
+
+// Fetch query
+$sql = "SELECT * FROM products WHERE $whereSql ORDER BY id DESC LIMIT ? OFFSET ?";
+$stmt = $conn->prepare($sql);
+
+$fetchParams = $params;
+$fetchParams[] = $limit;
+$fetchParams[] = $offset;
+$fetchTypes = $types . "ii";
+
+$stmt->bind_param($fetchTypes, ...$fetchParams);
+$stmt->execute();
+$products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 
 function formatVND($price) {
@@ -501,9 +543,10 @@ function formatVND($price) {
         <div class="sb-section">
             <h4>Categories</h4>
             <ul class="category-list">
-                <li><a href="shop.php"<?= !$catSlug ? ' class="active"' : '' ?>>All Rooms</a></li>
+                <?php $priceParamStr = $priceFilter ? '&price=' . urlencode($priceFilter) : ''; ?>
+                <li><a href="shop.php?<?= ltrim($priceParamStr, '&') ?: '' ?>"<?= !$catSlug ? ' class="active"' : '' ?>>All Rooms</a></li>
                 <?php foreach ($allCategories as $cat): ?>
-                    <li><a href="shop.php?cat=<?= htmlspecialchars($cat['slug']) ?>"<?= $catSlug === $cat['slug'] ? ' class="active"' : '' ?>><?= htmlspecialchars($cat['name']) ?></a></li>
+                    <li><a href="shop.php?cat=<?= htmlspecialchars($cat['slug']) ?><?= $priceParamStr ?>"<?= $catSlug === $cat['slug'] ? ' class="active"' : '' ?>><?= htmlspecialchars($cat['name']) ?></a></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -511,30 +554,39 @@ function formatVND($price) {
         <div class="sb-section">
             <h4>Price</h4>
             <ul class="price-list">
+                <?php 
+                $prices = [
+                    '' => 'All Price',
+                    '0-500000' => 'Under 500K',
+                    '500000-1000000' => '500K – 1 triệu',
+                    '1000000-3000000' => '1 – 3 triệu',
+                    '3000000-5000000' => '3 – 5 triệu',
+                    '5000000-' => 'Trên 5 triệu'
+                ];
+                if (!function_exists('buildParams')) {
+                    function buildParams($cat, $price) {
+                        $query = [];
+                        if ($cat) $query['cat'] = $cat;
+                        if ($price) $query['price'] = $price;
+                        return $query ? 'shop.php?' . http_build_query($query) : 'shop.php';
+                    }
+                }
+                $i = 1;
+                foreach ($prices as $val => $label): 
+                    $isChecked = ($priceFilter === $val);
+                    $link = buildParams($catSlug, $val);
+                    if ($isChecked && $val !== '') {
+                        $link = buildParams($catSlug, '');
+                    }
+                ?>
                 <li>
-                    <label for="p_all">All Price</label>
-                    <input type="checkbox" id="p_all">
+                    <label for="p_<?= $i ?>" style="color: <?= $isChecked ? '#141718' : '#6C7275' ?>; font-weight: <?= $isChecked ? '600' : '400' ?>; cursor: pointer;"><?= $label ?></label>
+                    <input type="checkbox" id="p_<?= $i ?>" <?= $isChecked ? 'checked' : '' ?> onchange="applyFilter('<?= $link ?>')">
                 </li>
-                <li>
-                    <label for="p_1">Under 500K</label>
-                    <input type="checkbox" id="p_1">
-                </li>
-                <li>
-                    <label for="p_2">500K – 1 triệu</label>
-                    <input type="checkbox" id="p_2" checked>
-                </li>
-                <li>
-                    <label for="p_3">1 – 3 triệu</label>
-                    <input type="checkbox" id="p_3">
-                </li>
-                <li>
-                    <label for="p_4">3 – 5 triệu</label>
-                    <input type="checkbox" id="p_4">
-                </li>
-                <li>
-                    <label for="p_5">Trên 5 triệu</label>
-                    <input type="checkbox" id="p_5">
-                </li>
+                <?php 
+                $i++;
+                endforeach; 
+                ?>
             </ul>
         </div>
     </aside>
@@ -643,20 +695,27 @@ function formatVND($price) {
         <!-- Pagination -->
         <?php if ($totalPages > 1): ?>
         <div class="pagination-row">
-            <?php $catParam = $catSlug ? '&cat=' . urlencode($catSlug) : ''; ?>
+            <?php 
+            $catParam = $catSlug ? '&cat=' . urlencode($catSlug) : ''; 
+            $priceParamStr = $priceFilter ? '&price=' . urlencode($priceFilter) : '';
+            ?>
             <?php if ($page > 1): ?>
-                <a class="page-btn" href="shop.php?page=<?= $page - 1 ?><?= $catParam ?>">‹</a>
+                <a class="page-btn" href="shop.php?page=<?= $page - 1 ?><?= $catParam ?><?= $priceParamStr ?>">‹</a>
             <?php endif; ?>
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <a class="page-btn <?= $i === $page ? 'active' : '' ?>" href="shop.php?page=<?= $i ?><?= $catParam ?>"><?= $i ?></a>
+                <a class="page-btn <?= $i === $page ? 'active' : '' ?>" href="shop.php?page=<?= $i ?><?= $catParam ?><?= $priceParamStr ?>"><?= $i ?></a>
             <?php endfor; ?>
             <?php if ($page < $totalPages): ?>
-                <a class="page-btn" href="shop.php?page=<?= $page + 1 ?><?= $catParam ?>">›</a>
+                <a class="page-btn" href="shop.php?page=<?= $page + 1 ?><?= $catParam ?><?= $priceParamStr ?>">›</a>
             <?php endif; ?>
         </div>
         <?php elseif (count($products) >= $limit): ?>
         <div class="show-more-row">
-            <a class="btn-show-more" href="shop.php?page=<?= $page + 1 ?>">Show more</a>
+            <?php 
+            $catParam = $catSlug ? '&cat=' . urlencode($catSlug) : ''; 
+            $priceParamStr = $priceFilter ? '&price=' . urlencode($priceFilter) : '';
+            ?>
+            <a class="btn-show-more" href="shop.php?page=<?= $page + 1 ?><?= $catParam ?><?= $priceParamStr ?>">Show more</a>
         </div>
         <?php endif; ?>
 
@@ -680,5 +739,56 @@ function formatVND($price) {
 </section>
 
 <?php include '../includes/footer.php'; ?>
+
+<script>
+async function applyFilter(url) {
+    try {
+        const shopWrap = document.querySelector('.shop-wrap');
+        shopWrap.style.opacity = '0.5';
+        shopWrap.style.pointerEvents = 'none';
+
+        const res = await fetch(url);
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        
+        // Update URL dynamically
+        history.pushState(null, '', url);
+        
+        // Extract and inject targeted layout
+        const newWrap = doc.querySelector('.shop-wrap');
+        if (newWrap) {
+            shopWrap.innerHTML = newWrap.innerHTML;
+        }
+        
+        shopWrap.style.opacity = '1';
+        shopWrap.style.pointerEvents = 'auto';
+        
+        // Autoscroll upwards if user scrolled down far inside pagination
+        const rect = shopWrap.getBoundingClientRect();
+        if (rect.top < 0) {
+            window.scrollTo({ top: window.scrollY + rect.top - 100, behavior: 'smooth' });
+        }
+    } catch (e) {
+        console.error('AJAX filtering failed:', e);
+        window.location.href = url; // Fallback 
+    }
+}
+
+document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
+    // Intercept clicks on Category, Pagination and Show More Links
+    if (link.closest('.category-list') || link.closest('.pagination-row') || link.closest('.show-more-row')) {
+        e.preventDefault();
+        applyFilter(link.href);
+    }
+});
+
+// Sync layout with Browser Back/Forward buttons 
+window.addEventListener('popstate', function() {
+    applyFilter(window.location.href);
+});
+</script>
 </body>
 </html>

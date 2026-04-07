@@ -74,8 +74,17 @@ $cntQ->execute();
 $totalProducts = $cntQ->get_result()->fetch_assoc()['total'];
 $totalPages    = ceil($totalProducts / $limit) ?: 1;
 
+// Sort param
+$sortCode = isset($_GET['sort']) ? trim($_GET['sort']) : 'newest';
+$orderBy = "ORDER BY id DESC";
+if ($sortCode === 'price_asc') {
+    $orderBy = "ORDER BY COALESCE(sale_price, price) ASC";
+} elseif ($sortCode === 'price_desc') {
+    $orderBy = "ORDER BY COALESCE(sale_price, price) DESC";
+}
+
 // Fetch query
-$sql = "SELECT * FROM products WHERE $whereSql ORDER BY id DESC LIMIT ? OFFSET ?";
+$sql = "SELECT * FROM products WHERE $whereSql $orderBy LIMIT ? OFFSET ?";
 $stmt = $conn->prepare($sql);
 
 $fetchParams = $params;
@@ -87,11 +96,32 @@ $stmt->bind_param($fetchTypes, ...$fetchParams);
 $stmt->execute();
 $products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+// Fetch user wishlist
+$user_id = $_SESSION['user']['id'] ?? null;
+$wishedIds = [];
+if ($user_id) {
+    $ws_stmt = $conn->prepare("SELECT product_id FROM wishlist WHERE user_id = ?");
+    $ws_stmt->bind_param("i", $user_id);
+    $ws_stmt->execute();
+    $ws_res = $ws_stmt->get_result();
+    while ($row = $ws_res->fetch_assoc()) {
+        $wishedIds[] = $row['product_id'];
+    }
+}
+
 
 function formatVND($price) {
     if (!$price) return '0';
-    // Prices from Tiki are VND
     return number_format((int)$price, 0, ',', '.');
+}
+
+function getLinkUrl($overrides = []) {
+    $params = $_GET;
+    foreach ($overrides as $k => $v) {
+        if ($v === null || $v === '') unset($params[$k]);
+        else $params[$k] = $v;
+    }
+    return $params ? 'shop.php?' . http_build_query($params) : 'shop.php';
 }
 ?>
 <?php include '../includes/header.php'; ?>
@@ -266,6 +296,31 @@ function formatVND($price) {
     grid-template-columns: repeat(3, 1fr);
     gap: 28px;
     align-items: stretch; /* all cards in a row are equal height */
+}
+.product-grid.list-view {
+    grid-template-columns: 1fr;
+}
+.product-grid.list-view .product-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #E8ECEF;
+}
+.product-grid.list-view .product-img-box {
+    width: 260px;
+    height: 260px;
+    margin-bottom: 0;
+}
+.product-grid.list-view .card-info {
+    justify-content: center;
+}
+.product-grid.list-view .card-name {
+    font-size: 18px;
+    min-height: auto;
+}
+.product-grid.list-view .card-price {
+    font-size: 16px;
 }
 
 /* ── Product Card ── */
@@ -543,10 +598,9 @@ function formatVND($price) {
         <div class="sb-section">
             <h4>Categories</h4>
             <ul class="category-list">
-                <?php $priceParamStr = $priceFilter ? '&price=' . urlencode($priceFilter) : ''; ?>
-                <li><a href="shop.php?<?= ltrim($priceParamStr, '&') ?: '' ?>"<?= !$catSlug ? ' class="active"' : '' ?>>All Rooms</a></li>
+                <li><a href="<?= getLinkUrl(['cat' => null, 'page' => null]) ?>"<?= !$catSlug ? ' class="active"' : '' ?>>All Rooms</a></li>
                 <?php foreach ($allCategories as $cat): ?>
-                    <li><a href="shop.php?cat=<?= htmlspecialchars($cat['slug']) ?><?= $priceParamStr ?>"<?= $catSlug === $cat['slug'] ? ' class="active"' : '' ?>><?= htmlspecialchars($cat['name']) ?></a></li>
+                    <li><a href="<?= getLinkUrl(['cat' => $cat['slug'], 'page' => null]) ?>"<?= $catSlug === $cat['slug'] ? ' class="active"' : '' ?>><?= htmlspecialchars($cat['name']) ?></a></li>
                 <?php endforeach; ?>
             </ul>
         </div>
@@ -563,20 +617,12 @@ function formatVND($price) {
                     '3000000-5000000' => '3 – 5 triệu',
                     '5000000-' => 'Trên 5 triệu'
                 ];
-                if (!function_exists('buildParams')) {
-                    function buildParams($cat, $price) {
-                        $query = [];
-                        if ($cat) $query['cat'] = $cat;
-                        if ($price) $query['price'] = $price;
-                        return $query ? 'shop.php?' . http_build_query($query) : 'shop.php';
-                    }
-                }
                 $i = 1;
                 foreach ($prices as $val => $label): 
                     $isChecked = ($priceFilter === $val);
-                    $link = buildParams($catSlug, $val);
+                    $link = getLinkUrl(['price' => $val, 'page' => null]);
                     if ($isChecked && $val !== '') {
-                        $link = buildParams($catSlug, '');
+                        $link = getLinkUrl(['price' => null, 'page' => null]);
                     }
                 ?>
                 <li>
@@ -600,21 +646,21 @@ function formatVND($price) {
             <div class="toolbar-right">
                 <div class="sort-select-wrap">
                     Sort by
-                    <select id="sort-select">
-                        <option value="newest">Newest</option>
-                        <option value="price_asc">Price ↑</option>
-                        <option value="price_desc">Price ↓</option>
+                    <select id="sort-select" onchange="applySort(this.value)">
+                        <option value="newest" <?= $sortCode === 'newest' ? 'selected' : '' ?>>Newest</option>
+                        <option value="price_asc" <?= $sortCode === 'price_asc' ? 'selected' : '' ?>>Price ↑</option>
+                        <option value="price_desc" <?= $sortCode === 'price_desc' ? 'selected' : '' ?>>Price ↓</option>
                     </select>
                 </div>
                 <div class="view-icons">
-                    <div class="view-icon-btn active" title="Grid view">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <div class="view-icon-btn active" data-view="grid" title="Grid view" onclick="toggleView('grid')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="pointer-events:none;">
                             <rect x="0" y="0" width="7" height="7" rx="1"/><rect x="9" y="0" width="7" height="7" rx="1"/>
                             <rect x="0" y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/>
                         </svg>
                     </div>
-                    <div class="view-icon-btn" title="List view">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <div class="view-icon-btn" data-view="list" title="List view" onclick="toggleView('list')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;">
                             <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
                             <line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/>
                             <circle cx="3" cy="12" r="1.5" fill="currentColor"/><circle cx="3" cy="18" r="1.5" fill="currentColor"/>
@@ -657,13 +703,12 @@ function formatVND($price) {
                         </div>
 
                         <!-- Wishlist btn -->
-                        <form action="../controllers/WishlistController.php" method="POST" style="display:contents">
-                            <input type="hidden" name="action" value="add">
-                            <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
-                            <button class="card-wish-btn" title="Add to wishlist">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141718" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            </button>
-                        </form>
+                        <?php $isWished = in_array($p['id'], $wishedIds); ?>
+                        <button type="button" class="card-wish-btn" title="Toggle wishlist" onclick="toggleWishlist(this, <?= $p['id'] ?>)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="<?= $isWished ? '#FF3333' : 'none' ?>" stroke="<?= $isWished ? '#FF3333' : '#141718' ?>" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
 
                         <!-- Add to cart overlay -->
                         <div class="card-cart-overlay">
@@ -695,27 +740,19 @@ function formatVND($price) {
         <!-- Pagination -->
         <?php if ($totalPages > 1): ?>
         <div class="pagination-row">
-            <?php 
-            $catParam = $catSlug ? '&cat=' . urlencode($catSlug) : ''; 
-            $priceParamStr = $priceFilter ? '&price=' . urlencode($priceFilter) : '';
-            ?>
             <?php if ($page > 1): ?>
-                <a class="page-btn" href="shop.php?page=<?= $page - 1 ?><?= $catParam ?><?= $priceParamStr ?>">‹</a>
+                <a class="page-btn" href="<?= getLinkUrl(['page' => $page - 1]) ?>">‹</a>
             <?php endif; ?>
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <a class="page-btn <?= $i === $page ? 'active' : '' ?>" href="shop.php?page=<?= $i ?><?= $catParam ?><?= $priceParamStr ?>"><?= $i ?></a>
+                <a class="page-btn <?= $i === $page ? 'active' : '' ?>" href="<?= getLinkUrl(['page' => $i]) ?>"><?= $i ?></a>
             <?php endfor; ?>
             <?php if ($page < $totalPages): ?>
-                <a class="page-btn" href="shop.php?page=<?= $page + 1 ?><?= $catParam ?><?= $priceParamStr ?>">›</a>
+                <a class="page-btn" href="<?= getLinkUrl(['page' => $page + 1]) ?>">›</a>
             <?php endif; ?>
         </div>
         <?php elseif (count($products) >= $limit): ?>
         <div class="show-more-row">
-            <?php 
-            $catParam = $catSlug ? '&cat=' . urlencode($catSlug) : ''; 
-            $priceParamStr = $priceFilter ? '&price=' . urlencode($priceFilter) : '';
-            ?>
-            <a class="btn-show-more" href="shop.php?page=<?= $page + 1 ?><?= $catParam ?><?= $priceParamStr ?>">Show more</a>
+            <a class="btn-show-more" href="<?= getLinkUrl(['page' => $page + 1]) ?>">Show more</a>
         </div>
         <?php endif; ?>
 
@@ -763,6 +800,9 @@ async function applyFilter(url) {
         shopWrap.style.opacity = '1';
         shopWrap.style.pointerEvents = 'auto';
         
+        // Re-apply view settings after layout is overwritten
+        applyViewSetting();
+
         // Autoscroll upwards if user scrolled down far inside pagination
         const rect = shopWrap.getBoundingClientRect();
         if (rect.top < 0) {
@@ -772,6 +812,34 @@ async function applyFilter(url) {
         console.error('AJAX filtering failed:', e);
         window.location.href = url; // Fallback 
     }
+}
+
+function applySort(val) {
+    let url = new URL(window.location.href);
+    url.searchParams.set('sort', val);
+    url.searchParams.delete('page'); // Reset to page 1
+    applyFilter(url.toString());
+}
+
+function toggleView(viewType) {
+    localStorage.setItem('shop_view', viewType);
+    applyViewSetting();
+}
+
+function applyViewSetting() {
+    const viewType = localStorage.getItem('shop_view') || 'grid';
+    const grid = document.getElementById('productGrid');
+    const btns = document.querySelectorAll('.view-icon-btn');
+    
+    if (grid) {
+        if (viewType === 'list') grid.classList.add('list-view');
+        else grid.classList.remove('list-view');
+    }
+    
+    btns.forEach(btn => {
+        if (btn.dataset.view === viewType) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
 }
 
 document.addEventListener('click', function(e) {
@@ -789,6 +857,41 @@ document.addEventListener('click', function(e) {
 window.addEventListener('popstate', function() {
     applyFilter(window.location.href);
 });
+
+// Restore Grid/List view on refresh
+document.addEventListener('DOMContentLoaded', applyViewSetting);
+
+async function toggleWishlist(btn, productId) {
+    try {
+        const fd = new FormData();
+        fd.append('product_id', productId);
+        const res = await fetch('../controllers/ProductController.php?action=ajax_toggle_wishlist', {
+            method: 'POST',
+            body: fd
+        });
+        const data = await res.json();
+        
+        if (data.need_login) {
+            window.location.href = 'login.php';
+            return;
+        }
+        
+        if (data.success) {
+            const svg = btn.querySelector('svg');
+            if (data.is_wished) {
+                svg.setAttribute('fill', '#FF3333');
+                svg.setAttribute('stroke', '#FF3333');
+            } else {
+                svg.setAttribute('fill', 'none');
+                svg.setAttribute('stroke', '#141718');
+            }
+        } else {
+            console.error('Wishlist toggle error:', data.message);
+        }
+    } catch (e) {
+        console.error('Failed to toggle wishlist:', e);
+    }
+}
 </script>
 </body>
 </html>

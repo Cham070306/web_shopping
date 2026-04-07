@@ -30,6 +30,13 @@ if ($user_id) {
     $stmt->execute();
     $wishlist_items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
+
+if (!function_exists('formatVND')) {
+    function formatVND($price) {
+        if (!$price) return '0';
+        return number_format((int)$price, 0, ',', '.');
+    }
+}
 ?>
 
 <?php include '../includes/header.php'; ?>
@@ -54,7 +61,11 @@ if ($user_id) {
     font-weight: 500;
 }
 .wishlist-header .product-header {
-    margin-left: 10px;
+    /* align exactly with product card edge */
+}
+.wishlist-header div:nth-child(3),
+.wishlist-header div:nth-child(4) {
+    text-align: center;
 }
 
 .wishlist-item {
@@ -121,6 +132,7 @@ if ($user_id) {
     font-weight: 400; /* Normal weight as in image */
     font-size: 16px;
     color: #141718;
+    text-align: center;
 }
 
 .action-col {
@@ -243,7 +255,7 @@ if ($user_id) {
                             </form>
 
                             <!-- Product details (Image + Text) -->
-                            <div class="product-col">
+                            <a href="product_detail.php?id=<?= $item['product_id'] ?>" class="product-col" style="text-decoration: none; color: inherit;">
                                 <img src="<?= htmlspecialchars(strpos($item['thumbnail'], 'assets/product-images/') !== false || strpos($item['thumbnail'], 'http') === 0 ? $item['thumbnail'] : '../assets/product-images/' . $item['thumbnail']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" class="product-image">
                                 
                                 <div class="product-info">
@@ -251,13 +263,13 @@ if ($user_id) {
                                     <?php if($item['color']): ?>
                                         <div class="product-color">Color: <?= htmlspecialchars($item['color']) ?></div>
                                     <?php endif; ?>
-                                    <div class="product-price mobile-only">$<?= number_format($item['price'], 2) ?></div>
+                                    <div class="product-price mobile-only"><?= formatVND($item['price']) ?>₫</div>
                                 </div>
-                            </div>
+                            </a>
                             
                             <!-- Price (Middle - Desktop) -->
                             <div class="price-col desktop-only">
-                                $<?= number_format($item['price'], 2) ?>
+                                <?= formatVND($item['price']) ?>₫
                             </div>
                             
                             <!-- Action / Add to cart (Right) -->

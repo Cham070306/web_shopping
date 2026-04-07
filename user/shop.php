@@ -694,7 +694,9 @@ function getLinkUrl($overrides = []) {
                 ?>
                 <div class="product-card">
                     <div class="product-img-box">
-                        <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy" onerror="this.src='../assets/images/sofa.jpg'">
+                        <a href="product_detail.php?id=<?= $p['id'] ?>" style="display:block; width:100%; height:100%;">
+                            <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy" onerror="this.src='../assets/images/sofa.jpg'">
+                        </a>
 
                         <!-- Badges -->
                         <div class="card-badges">
@@ -724,7 +726,9 @@ function getLinkUrl($overrides = []) {
                     <!-- Info -->
                     <div class="card-info">
                         <div class="card-stars">★★★★☆</div>
-                        <div class="card-name" title="<?= htmlspecialchars($p['name']) ?>"><?= htmlspecialchars($p['name']) ?></div>
+                        <a href="product_detail.php?id=<?= $p['id'] ?>" style="text-decoration:none; color:inherit;">
+                            <div class="card-name" title="<?= htmlspecialchars($p['name']) ?>"><?= htmlspecialchars($p['name']) ?></div>
+                        </a>
                         <div class="card-price">
                             <span><?= formatVND($displayPrice) ?>₫</span>
                             <?php if ($hasSale): ?>

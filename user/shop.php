@@ -1,0 +1,684 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+require_once "../config/database.php";
+
+$current_page = 'shop.php';
+
+$page   = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit  = 9;
+$offset = ($page - 1) * $limit;
+
+// Category filter
+$catSlug    = isset($_GET['cat']) ? trim($_GET['cat']) : '';
+$catId      = 0;
+$catLabel   = 'All Rooms';
+
+if ($catSlug) {
+    $stmtCat = $conn->prepare("SELECT id, name FROM categories WHERE slug = ? LIMIT 1");
+    $stmtCat->bind_param("s", $catSlug);
+    $stmtCat->execute();
+    $catRow = $stmtCat->get_result()->fetch_assoc();
+    if ($catRow) {
+        $catId    = (int)$catRow['id'];
+        $catLabel = $catRow['name'];
+    }
+}
+
+// Fetch categories for sidebar
+$allCategories = $conn->query("SELECT id, name, slug FROM categories ORDER BY id")->fetch_all(MYSQLI_ASSOC);
+
+// Fetch products (with optional category filter)
+if ($catId) {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE is_active = 1 AND category_id = ? ORDER BY id ASC LIMIT ? OFFSET ?");
+    $stmt->bind_param("iii", $catId, $limit, $offset);
+    $cntQ = $conn->prepare("SELECT COUNT(*) as total FROM products WHERE is_active = 1 AND category_id = ?");
+    $cntQ->bind_param("i", $catId);
+} else {
+    $stmt = $conn->prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY id ASC LIMIT ? OFFSET ?");
+    $stmt->bind_param("ii", $limit, $offset);
+    $cntQ = $conn->prepare("SELECT COUNT(*) as total FROM products WHERE is_active = 1");
+}
+$stmt->execute();
+$products = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$cntQ->execute();
+$totalProducts = $cntQ->get_result()->fetch_assoc()['total'];
+$totalPages    = ceil($totalProducts / $limit);
+
+
+function formatVND($price) {
+    if (!$price) return '0';
+    // Prices from Tiki are VND
+    return number_format((int)$price, 0, ',', '.');
+}
+?>
+<?php include '../includes/header.php'; ?>
+<?php include '../includes/navbar.php'; ?>
+
+<style>
+/* ══════════════════════════════════════════
+   SHOP PAGE — 3legant Design
+   ══════════════════════════════════════════ */
+
+/* ── Banner ── */
+.shop-hero {
+    position: relative;
+    height: 280px;
+    background: url('../assets/images/banner.jpg') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 0;
+}
+.shop-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.55);
+}
+.shop-hero-inner { position: relative; z-index: 1; }
+.shop-breadcrumb {
+    font-size: 13px;
+    color: #6C7275;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+.shop-breadcrumb a { color: #6C7275; text-decoration: none; }
+.shop-breadcrumb a:hover { color: #141718; }
+.shop-hero h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 48px;
+    font-weight: 500;
+    color: #141718;
+    margin: 0 0 10px;
+}
+.shop-hero p { font-size: 18px; color: #141718; margin: 0; }
+
+/* ── Layout ── */
+.shop-wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* ── Sidebar ── */
+.shop-sidebar {}
+.sidebar-filter-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #141718;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E8ECEF;
+}
+.sb-section { margin-bottom: 36px; }
+.sb-section h4 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #141718;
+    margin: 0 0 16px;
+}
+.category-list { list-style: none; margin: 0; padding: 0; }
+.category-list li { margin-bottom: 10px; }
+.category-list a {
+    font-size: 14px;
+    color: #6C7275;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color .18s;
+}
+.category-list a:hover, .category-list a.active { color: #141718; font-weight: 600; }
+.category-list a.active { border-left: 2px solid #141718; padding-left: 8px; margin-left: -2px; }
+
+.price-list { list-style: none; margin: 0; padding: 0; }
+.price-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.price-list label {
+    font-size: 14px;
+    color: #6C7275;
+    cursor: pointer;
+    flex: 1;
+}
+.price-list input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    accent-color: #141718;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ── Main content ── */
+.shop-main {}
+
+/* ── Toolbar ── */
+.shop-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #E8ECEF;
+}
+.toolbar-cat { font-size: 20px; font-weight: 600; color: #141718; }
+.toolbar-right { display: flex; align-items: center; gap: 16px; }
+.sort-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #141718;
+}
+.sort-select-wrap select {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    background: transparent;
+    cursor: pointer;
+    color: #141718;
+}
+.view-icons { display: flex; gap: 6px; }
+.view-icon-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #E8ECEF;
+    border-radius: 4px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color .18s, background .18s;
+}
+.view-icon-btn.active, .view-icon-btn:hover {
+    border-color: #141718;
+    background: #F3F5F7;
+}
+
+/* ── Product Grid ── */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    align-items: stretch; /* all cards in a row are equal height */
+}
+
+/* ── Product Card ── */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    height: 100%;
+}
+.product-img-box {
+    position: relative;
+    background: #F3F5F7;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+    /* Fixed height so every card image is exactly the same size */
+    height: 260px;
+    flex-shrink: 0;
+    margin-bottom: 14px;
+}
+.product-img-box img {
+    width: 100%;
+    height: 100%;
+    /* contain keeps full image visible without cropping */
+    object-fit: contain;
+    padding: 12px;
+    transition: transform .4s ease;
+    box-sizing: border-box;
+}
+.product-card:hover .product-img-box img { transform: scale(1.04); }
+
+/* Card info grows to fill remaining space so price always at bottom */
+.card-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.card-name {
+    flex: 1;
+}
+
+/* badges */
+.card-badges {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 2;
+}
+.badge-new {
+    background: #fff;
+    color: #141718;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+    display: inline-block;
+}
+.badge-sale {
+    background: #38CB89;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+    display: inline-block;
+}
+
+/* wishlist heart */
+.card-wish-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    background: #fff;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    cursor: pointer;
+    transition: background .18s;
+}
+.card-wish-btn:hover { background: #F3F5F7; }
+
+/* add to cart overlay */
+.card-cart-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 14px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all .28s ease;
+    z-index: 2;
+}
+.product-img-box:hover .card-cart-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+.btn-cart {
+    width: 100%;
+    background: #141718;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px;
+    cursor: pointer;
+    transition: background .18s;
+}
+.btn-cart:hover { background: #343839; }
+
+/* card info */
+.card-stars { color: #141718; font-size: 11px; margin-bottom: 6px; letter-spacing: 1px; }
+.card-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #141718;
+    margin-bottom: 8px;
+    /* Allow 2 lines, then ellipsis */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.45;
+    min-height: 44px; /* reserve space for 2 lines always */
+}
+.card-price { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #141718; margin-top: auto; padding-top: 4px; }
+.card-price-old { color: #6C7275; text-decoration: line-through; font-weight: 400; font-size: 13px; }
+
+/* ── Show More ── */
+.show-more-row { text-align: center; margin-top: 48px; }
+.btn-show-more {
+    background: #fff;
+    color: #141718;
+    border: 1.5px solid #141718;
+    border-radius: 40px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 44px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+.btn-show-more:hover { background: #141718; color: #fff; }
+
+/* ── Newsletter ── */
+.newsletter {
+    background: #F3F5F7;
+    text-align: center;
+    padding: 80px 24px;
+}
+.newsletter-inner { max-width: 440px; margin: 0 auto; }
+.newsletter h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 36px;
+    font-weight: 500;
+    color: #141718;
+    margin: 0 0 10px;
+}
+.newsletter p { font-size: 15px; color: #141718; margin: 0 0 32px; }
+.newsletter-form {
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid #141718;
+    padding-bottom: 8px;
+    gap: 8px;
+}
+.newsletter-form svg { flex-shrink: 0; }
+.newsletter-form input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 15px;
+    color: #141718;
+}
+.newsletter-form input::placeholder { color: #9BA3AF; }
+.newsletter-form button {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: #141718;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* ── Pagination ── */
+.pagination-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 48px;
+}
+.page-btn {
+    min-width: 36px;
+    height: 36px;
+    border: 1.5px solid #E8ECEF;
+    border-radius: 6px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .18s;
+    color: #141718;
+    text-decoration: none;
+    padding: 0 10px;
+}
+.page-btn:hover, .page-btn.active { background: #141718; color: #fff; border-color: #141718; }
+
+/* ── No Products ── */
+.empty-state {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #6C7275;
+    font-size: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+    .shop-wrap { grid-template-columns: 190px 1fr; gap: 28px; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+@media (max-width: 700px) {
+    .shop-wrap { grid-template-columns: 1fr; }
+    .shop-sidebar { display: none; }
+    .shop-hero h1 { font-size: 36px; }
+    .shop-hero { height: 220px; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+</style>
+
+<!-- ── Hero Banner ── -->
+<section class="shop-hero">
+    <div class="shop-hero-inner">
+        <nav class="shop-breadcrumb" aria-label="breadcrumb">
+            <a href="index.php">Home</a>
+            <span>›</span>
+            <span>Shop</span>
+        </nav>
+        <h1>Shop Page</h1>
+        <p>Let's design the place you always imagined.</p>
+    </div>
+</section>
+
+<!-- ── Main Content ── -->
+<div class="shop-wrap">
+
+    <!-- Sidebar -->
+    <aside class="shop-sidebar">
+        <div class="sidebar-filter-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+            </svg>
+            Filter
+        </div>
+
+        <div class="sb-section">
+            <h4>Categories</h4>
+            <ul class="category-list">
+                <li><a href="shop.php"<?= !$catSlug ? ' class="active"' : '' ?>>All Rooms</a></li>
+                <?php foreach ($allCategories as $cat): ?>
+                    <li><a href="shop.php?cat=<?= htmlspecialchars($cat['slug']) ?>"<?= $catSlug === $cat['slug'] ? ' class="active"' : '' ?>><?= htmlspecialchars($cat['name']) ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+        <div class="sb-section">
+            <h4>Price</h4>
+            <ul class="price-list">
+                <li>
+                    <label for="p_all">All Price</label>
+                    <input type="checkbox" id="p_all">
+                </li>
+                <li>
+                    <label for="p_1">Under 500K</label>
+                    <input type="checkbox" id="p_1">
+                </li>
+                <li>
+                    <label for="p_2">500K – 1 triệu</label>
+                    <input type="checkbox" id="p_2" checked>
+                </li>
+                <li>
+                    <label for="p_3">1 – 3 triệu</label>
+                    <input type="checkbox" id="p_3">
+                </li>
+                <li>
+                    <label for="p_4">3 – 5 triệu</label>
+                    <input type="checkbox" id="p_4">
+                </li>
+                <li>
+                    <label for="p_5">Trên 5 triệu</label>
+                    <input type="checkbox" id="p_5">
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Products area -->
+    <main class="shop-main">
+
+        <!-- Toolbar -->
+        <div class="shop-toolbar">
+            <span class="toolbar-cat"><?= htmlspecialchars($catLabel) ?> (<?= $totalProducts ?>)</span>
+            <div class="toolbar-right">
+                <div class="sort-select-wrap">
+                    Sort by
+                    <select id="sort-select">
+                        <option value="newest">Newest</option>
+                        <option value="price_asc">Price ↑</option>
+                        <option value="price_desc">Price ↓</option>
+                    </select>
+                </div>
+                <div class="view-icons">
+                    <div class="view-icon-btn active" title="Grid view">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <rect x="0" y="0" width="7" height="7" rx="1"/><rect x="9" y="0" width="7" height="7" rx="1"/>
+                            <rect x="0" y="9" width="7" height="7" rx="1"/><rect x="9" y="9" width="7" height="7" rx="1"/>
+                        </svg>
+                    </div>
+                    <div class="view-icon-btn" title="List view">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/>
+                            <line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.5" fill="currentColor"/>
+                            <circle cx="3" cy="12" r="1.5" fill="currentColor"/><circle cx="3" cy="18" r="1.5" fill="currentColor"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="product-grid" id="productGrid">
+            <?php if (empty($products)): ?>
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <p>Chưa có sản phẩm nào. Vui lòng chạy crawler để import dữ liệu.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($products as $p):
+                    $thumb = trim($p['thumbnail'] ?? '');
+                    // Use direct URL if it starts with http, else fallback to local asset
+                    if (strpos($thumb, 'http') === 0) {
+                        $img = htmlspecialchars($thumb);
+                    } elseif ($thumb) {
+                        $img = '../assets/product-images/' . htmlspecialchars($thumb);
+                    } else {
+                        $img = '../assets/images/sofa.jpg';
+                    }
+                    $hasSale = $p['sale_price'] && $p['price'] > $p['sale_price'];
+                    $discount = $hasSale ? round((($p['price'] - $p['sale_price']) / $p['price']) * 100) : 0;
+                    $displayPrice = $hasSale ? $p['sale_price'] : $p['price'];
+                ?>
+                <div class="product-card">
+                    <div class="product-img-box">
+                        <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy" onerror="this.src='../assets/images/sofa.jpg'">
+
+                        <!-- Badges -->
+                        <div class="card-badges">
+                            <?php if ($p['is_featured']): ?><span class="badge-new">NEW</span><?php endif; ?>
+                            <?php if ($hasSale): ?><span class="badge-sale">-<?= $discount ?>%</span><?php endif; ?>
+                        </div>
+
+                        <!-- Wishlist btn -->
+                        <form action="../controllers/WishlistController.php" method="POST" style="display:contents">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
+                            <button class="card-wish-btn" title="Add to wishlist">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#141718" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            </button>
+                        </form>
+
+                        <!-- Add to cart overlay -->
+                        <div class="card-cart-overlay">
+                            <form action="../controllers/CartController.php" method="POST">
+                                <input type="hidden" name="action" value="add">
+                                <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                <button class="btn-cart" type="submit">Add to cart</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="card-info">
+                        <div class="card-stars">★★★★☆</div>
+                        <div class="card-name" title="<?= htmlspecialchars($p['name']) ?>"><?= htmlspecialchars($p['name']) ?></div>
+                        <div class="card-price">
+                            <span><?= formatVND($displayPrice) ?>₫</span>
+                            <?php if ($hasSale): ?>
+                                <span class="card-price-old"><?= formatVND($p['price']) ?>₫</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <!-- Pagination -->
+        <?php if ($totalPages > 1): ?>
+        <div class="pagination-row">
+            <?php $catParam = $catSlug ? '&cat=' . urlencode($catSlug) : ''; ?>
+            <?php if ($page > 1): ?>
+                <a class="page-btn" href="shop.php?page=<?= $page - 1 ?><?= $catParam ?>">‹</a>
+            <?php endif; ?>
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <a class="page-btn <?= $i === $page ? 'active' : '' ?>" href="shop.php?page=<?= $i ?><?= $catParam ?>"><?= $i ?></a>
+            <?php endfor; ?>
+            <?php if ($page < $totalPages): ?>
+                <a class="page-btn" href="shop.php?page=<?= $page + 1 ?><?= $catParam ?>">›</a>
+            <?php endif; ?>
+        </div>
+        <?php elseif (count($products) >= $limit): ?>
+        <div class="show-more-row">
+            <a class="btn-show-more" href="shop.php?page=<?= $page + 1 ?>">Show more</a>
+        </div>
+        <?php endif; ?>
+
+    </main>
+</div>
+
+<!-- Newsletter -->
+<section class="newsletter">
+    <div class="newsletter-inner">
+        <h2>Join Our Newsletter</h2>
+        <p>Sign up for deals, new products and promotions</p>
+        <form class="newsletter-form" onsubmit="return false">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9BA3AF" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <input type="email" placeholder="Email address" aria-label="Email address">
+            <button type="submit">Signup</button>
+        </form>
+    </div>
+</section>
+
+<?php include '../includes/footer.php'; ?>
+</body>
+</html>

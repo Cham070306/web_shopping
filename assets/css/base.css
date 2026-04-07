@@ -3,6 +3,10 @@ body {
     margin: 0;
 }
 
+button, input, select, textarea {
+    font-family: inherit;
+}
+
 .container {
     max-width: 1120px;
     margin: auto;

@@ -173,7 +173,7 @@ function getLinkUrl($overrides = []) {
 
 /* ── Layout ── */
 .shop-wrap {
-    max-width: 1280px;
+    max-width: 1120px;
     margin: 0 auto;
     padding: 48px 24px 80px;
     display: grid;

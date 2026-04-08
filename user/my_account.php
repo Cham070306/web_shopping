@@ -588,7 +588,7 @@ include "../includes/auth.php";
                 </div>
                 <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
                 <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
-                <a href="product.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
+                <a href="shop.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
                 <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
             </div>
 

@@ -182,26 +182,20 @@ $current_page = 'shop.php';
 .badge-new { background: #fff; color: #141718; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; border: 1px solid #E8ECEF;}
 .badge-sale { background: #38CB89; color: #fff; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px;}
 
+.pd-thumbs-wrap {
+    position: relative;
+    width: 100%;
+}
 .pd-thumbs {
     display: flex;
     gap: 16px;
     overflow-x: auto;
-    padding-bottom: 12px;
+    padding-bottom: 4px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
-/* Elegant slim scrollbar for gallery with many images */
 .pd-thumbs::-webkit-scrollbar {
-    height: 6px;
-}
-.pd-thumbs::-webkit-scrollbar-track {
-    background: #E8ECEF;
-    border-radius: 4px;
-}
-.pd-thumbs::-webkit-scrollbar-thumb {
-    background: #6C7275;
-    border-radius: 4px;
-}
-.pd-thumbs::-webkit-scrollbar-thumb:hover {
-    background: #141718;
+    display: none; /* Chrome, Safari and Opera */
 }
 .pd-thumb {
     width: 100px;
@@ -225,6 +219,33 @@ $current_page = 'shop.php';
 }
 .pd-thumb.active { border-color: #141718; }
 .pd-thumb:hover { border-color: #6C7275; }
+
+.thumb-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid #E8ECEF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: 0.2s;
+    font-size: 14px;
+    color: #141718;
+    z-index: 5;
+    margin-top: -6px; /* Offset for scrollbar height */
+}
+.thumb-nav:hover {
+    background: #141718;
+    color: #fff;
+}
+.thumb-nav.left { left: 8px; }
+.thumb-nav.right { right: 8px; }
 
 /* Info Column */
 .pd-info {
@@ -552,14 +573,18 @@ $current_page = 'shop.php';
                 <img id="mainGalleryImage" src="<?= $mainImg ?>" alt="<?= htmlspecialchars($product['name']) ?>">
             </div>
 
-            <div class="pd-thumbs">
-                <?php foreach($all_images as $index => $imgName): 
-                    $thumbSrc = getRealImage($imgName);
-                ?>
-                <div class="pd-thumb <?= $index === 0 ? 'active' : '' ?>" onclick="switchGalleryImage(this, '<?= $thumbSrc ?>')">
-                    <img src="<?= $thumbSrc ?>" alt="thumb">
+            <div class="pd-thumbs-wrap">
+                <button class="thumb-nav left" onclick="scrollThumbs(-1)">&#10094;</button>
+                <div class="pd-thumbs" id="pdThumbs">
+                    <?php foreach($all_images as $index => $imgName): 
+                        $thumbSrc = getRealImage($imgName);
+                    ?>
+                    <div class="pd-thumb <?= $index === 0 ? 'active' : '' ?>" onclick="switchGalleryImage(this, '<?= $thumbSrc ?>')">
+                        <img src="<?= $thumbSrc ?>" alt="thumb">
+                    </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
+                <button class="thumb-nav right" onclick="scrollThumbs(1)">&#10095;</button>
             </div>
         </div>
 
@@ -782,8 +807,15 @@ function switchGalleryImage(el, src) {
     document.querySelectorAll('.pd-thumb').forEach(thumb => {
         thumb.classList.remove('active');
     });
-    // Add active to clicked
+    // Add active state to thumbnail
     el.classList.add('active');
+}
+
+function scrollThumbs(direction) {
+    const container = document.getElementById('pdThumbs');
+    // Scroll amount is thumbnail width (100) + gap (16)
+    const scrollAmount = 116 * 2; 
+    container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
 }
 
 // 2. Select Color Option

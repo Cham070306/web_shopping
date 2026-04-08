@@ -80,6 +80,62 @@ $current_page = basename($_SERVER['PHP_SELF']);
     border-bottom: 2px solid var(--black);
 }
 
+/* ── Mega Menu Dropdown ── */
+.nav-has-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 8px 0;
+}
+.nav-has-dropdown > a {
+    padding: 0;
+    border-bottom: none !important;
+}
+.dropdown-icon {
+    font-size: 10px;
+    transition: 0.3s;
+    color: var(--gray-400);
+}
+.nav-has-dropdown:hover .dropdown-icon {
+    transform: rotate(180deg);
+    color: var(--black);
+}
+.nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    background: #fff;
+    min-width: 220px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 12px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10000;
+}
+/* Show dropdown on hover */
+.nav-has-dropdown:hover .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.nav-dropdown a {
+    display: block !important;
+    padding: 10px 24px !important;
+    border-bottom: none !important;
+    color: var(--gray-400) !important;
+    font-weight: 500 !important;
+}
+.nav-dropdown a:hover {
+    color: var(--black) !important;
+    background: #F3F5F7;
+    padding-left: 28px !important; /* Nice hover indent effect */
+}
+
 .icons {
     display: flex;
     align-items: center;
@@ -272,8 +328,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
 
             <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
-            <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
-            <a href="product.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
+            
+            <a href="shop.php" class="<?= ($current_page == 'shop.php' && !isset($_GET['cat'])) ? 'active' : '' ?>">Shop</a>
+            
+            <!-- Dropdown for Product/Categories -->
+            <div class="nav-has-dropdown">
+                <a href="javascript:void(0)" class="<?= (isset($_GET['cat']) || $current_page == 'product_detail.php') ? 'active' : '' ?>">Product</a>
+                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                <div class="nav-dropdown">
+                    <a href="shop.php">All Products</a>
+                    <a href="shop.php?cat=living-room">Living Room</a>
+                    <a href="shop.php?cat=bedroom">Bedroom</a>
+                    <a href="shop.php?cat=dining-room">Dining Room</a>
+                    <a href="shop.php?cat=outdoor">Outdoor</a>
+                    <a href="shop.php?cat=decor">Accessories & Decor</a>
+                </div>
+            </div>
+
             <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
         </div>
 

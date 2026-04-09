@@ -1,5 +1,39 @@
 <?php
 require_once '../config/config.php';
+require_once '../config/database.php';
+
+$user_id = $_SESSION['user']['id'] ?? null;
+
+// Fetch 8 newest products for homepage
+$newArrivals = [];
+$naStmt = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER BY id DESC LIMIT 4");
+if ($naStmt) {
+    $newArrivals = $naStmt->fetch_all(MYSQLI_ASSOC);
+}
+
+// Fetch 4 featured products for a separate "Featured" row
+$featuredProducts = [];
+$fpStmt = $conn->query("SELECT * FROM products WHERE is_active = 1 AND is_featured = 1 ORDER BY id DESC LIMIT 4");
+if ($fpStmt) {
+    $featuredProducts = $fpStmt->fetch_all(MYSQLI_ASSOC);
+}
+
+// User wishlist IDs
+$wishedIds = [];
+if ($user_id) {
+    $ws = $conn->prepare("SELECT product_id FROM wishlist WHERE user_id = ?");
+    $ws->bind_param("i", $user_id);
+    $ws->execute();
+    $wsRes = $ws->get_result();
+    while ($row = $wsRes->fetch_assoc()) {
+        $wishedIds[] = $row['product_id'];
+    }
+}
+
+function formatVND($price) {
+    if (!$price) return '0';
+    return number_format((int)$price, 0, ',', '.');
+}
 ?>
 
 <?php include '../includes/header.php'; ?>
@@ -104,102 +138,309 @@ require_once '../config/config.php';
     </div>
 </section>
 
-<section style="padding:64px 0;">
+<!-- ═══════════════════════════════════════════════
+     HOME PAGE — PRODUCT CARD STYLES
+═══════════════════════════════════════════════ -->
+<style>
+.home-products-section {
+    padding: 72px 0;
+    background: #fff;
+}
+.home-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 36px;
+}
+.home-section-header h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: #141718;
+    margin: 0;
+    line-height: 1.2;
+}
+.home-section-header .section-sub {
+    font-size: 14px;
+    color: #6C7275;
+    margin-top: 6px;
+}
+.home-section-header a.link-more {
+    font-size: 14px;
+    font-weight: 600;
+    color: #141718;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1.5px solid #141718;
+    padding-bottom: 2px;
+    transition: opacity .2s;
+    white-space: nowrap;
+}
+.home-section-header a.link-more:hover { opacity: 0.65; }
+
+/* Grid: 4 columns on desktop */
+.home-product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+@media (max-width: 1100px) {
+    .home-product-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 760px) {
+    .home-product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .home-section-header h2 { font-size: 24px; }
+}
+
+/* Card */
+.hp-card {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow .25s;
+}
+.hp-card:hover {
+    box-shadow: 0 8px 28px rgba(20,23,24,.10);
+}
+.hp-img-box {
+    position: relative;
+    background: #F3F5F7;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.hp-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 14px;
+    box-sizing: border-box;
+    transition: transform .4s ease;
+}
+.hp-card:hover .hp-img-box img { transform: scale(1.05); }
+
+/* Badges */
+.hp-badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 2;
+}
+.hp-badge-new {
+    background: #fff;
+    color: #141718;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+}
+.hp-badge-sale {
+    background: #38CB89;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+}
+
+/* Wishlist btn */
+.hp-wish-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    background: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    cursor: pointer;
+    transition: background .18s;
+}
+.hp-wish-btn:hover { background: #F3F5F7; }
+
+/* Cart overlay */
+.hp-cart-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all .26s ease;
+    z-index: 2;
+}
+.hp-img-box:hover .hp-cart-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+.hp-btn-cart {
+    width: 100%;
+    background: #141718;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px;
+    cursor: pointer;
+    transition: background .18s;
+}
+.hp-btn-cart:hover { background: #343839; }
+
+/* Info */
+.hp-info {
+    padding: 14px 10px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.hp-stars { color: #F7A928; font-size: 11px; margin-bottom: 5px; letter-spacing: 1px; }
+.hp-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #141718;
+    margin-bottom: 8px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 40px;
+    flex: 1;
+}
+.hp-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #141718;
+    margin-top: auto;
+}
+.hp-price-old {
+    color: #9BA3AF;
+    text-decoration: line-through;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+/* Empty state */
+.hp-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #9BA3AF;
+    font-size: 15px;
+}
+.hp-empty svg { margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto; }
+</style>
+
+<section class="home-products-section">
     <div class="container">
-        <div style="display:flex;justify-content:space-between;margin-bottom:24px;">
-            <h2>New Arrivals</h2>
-            <a href="#" class="link-primary">More product →</a>
+
+        <!-- New Arrivals -->
+        <div class="home-section-header">
+            <div>
+                <h2>New Arrivals</h2>
+                <p class="section-sub">Sản phẩm mới nhất từ cửa hàng</p>
+            </div>
+            <a href="shop.php" class="link-more">Xem tất cả →</a>
         </div>
 
-    <div class="product-grid">
-        <div style="border:1px solid #E8ECEF;border-radius:12px;padding:12px;">
-            <div style="position:relative;">
-                <img src="../assets/images/sofa.jpg" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">
-                    <span style="position:absolute;top:8px;left:8px;background:black;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">NEW</span>
-                    <span style="position:absolute;top:8px;left:50px;background:#38CB89;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">-50%</span>
-                    <span style="position:absolute;top:8px;right:8px;">♡</span>
-            </div>
-
-                <p style="margin-top:10px;">Loveseat Sofa</p>
-
-                <p>
-                    <b>$199.00</b>
-                    <span style="text-decoration:line-through;color:#aaa;margin-left:6px;">$400.00</span>
-                </p>
-
-                <button style="width:100%;padding:10px;background:black;color:white;border:none;border-radius:6px;">
-                    Add to cart
-                </button>
-            </div>
-
-            <div style="border:1px solid #E8ECEF;border-radius:12px;padding:12px;">
-                <div style="position:relative;">
-                    <img src="../assets/images/lamp.jpg" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">
-
-                    <span style="position:absolute;top:8px;left:8px;background:black;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">NEW</span>
-                    <span style="position:absolute;top:8px;left:50px;background:#38CB89;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">-50%</span>
+        <div class="home-product-grid">
+            <?php if (empty($newArrivals)): ?>
+                <div class="hp-empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <p>Chưa có sản phẩm nào. Vui lòng import dữ liệu vào DB.</p>
                 </div>
+            <?php else: ?>
+                <?php foreach ($newArrivals as $p):
+                    $thumb = trim($p['thumbnail'] ?? '');
+                    if (strpos($thumb, 'http') === 0) {
+                        $img = htmlspecialchars($thumb);
+                    } elseif ($thumb) {
+                        $img = '../assets/product-images/' . htmlspecialchars($thumb);
+                    } else {
+                        $img = '../assets/images/sofa.jpg';
+                    }
+                    $hasSale   = !empty($p['sale_price']) && $p['price'] > $p['sale_price'];
+                    $discount  = $hasSale ? round((($p['price'] - $p['sale_price']) / $p['price']) * 100) : 0;
+                    $dispPrice = $hasSale ? $p['sale_price'] : $p['price'];
+                    $isWished  = in_array($p['id'], $wishedIds);
+                    $rating    = !empty($p['rating']) ? (float)$p['rating'] : 4.0;
+                    $fullStars = min(5, (int)round($rating));
+                    $starsHtml = str_repeat('★', $fullStars) . str_repeat('☆', 5 - $fullStars);
+                ?>
+                <div class="hp-card">
+                    <div class="hp-img-box">
+                        <a href="product_detail.php?id=<?= $p['id'] ?>" style="display:block;width:100%;height:100%;">
+                            <img src="<?= $img ?>" alt="<?= htmlspecialchars($p['name']) ?>" loading="lazy"
+                                 onerror="this.src='../assets/images/sofa.jpg'">
+                        </a>
 
-                <p style="margin-top:10px;">Table Lamp</p>
+                        <!-- Badges -->
+                        <div class="hp-badges">
+                            <?php if (!empty($p['is_featured'])): ?>
+                                <span class="hp-badge-new">NEW</span>
+                            <?php endif; ?>
+                            <?php if ($hasSale): ?>
+                                <span class="hp-badge-sale">-<?= $discount ?>%</span>
+                            <?php endif; ?>
+                        </div>
 
-                <p><b>$24.99</b></p>
+                        <!-- Wishlist -->
+                        <button type="button" class="hp-wish-btn" title="Thêm vào yêu thích"
+                                onclick="toggleWishlistHome(this, <?= $p['id'] ?>)">
+                            <svg width="16" height="16" viewBox="0 0 24 24"
+                                 fill="<?= $isWished ? '#FF3333' : 'none' ?>"
+                                 stroke="<?= $isWished ? '#FF3333' : '#141718' ?>" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
 
-                <button style="width:100%;padding:10px;background:black;color:white;border:none;border-radius:6px;">
-                    Add to cart
-                </button>
-            </div>
+                        <!-- Add to cart overlay -->
+                        <div class="hp-cart-overlay">
+                            <form action="../controllers/CartController.php" method="POST">
+                                <input type="hidden" name="action" value="add">
+                                <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                <button class="hp-btn-cart" type="submit">Add to cart</button>
+                            </form>
+                        </div>
+                    </div>
 
-            <div style="border:1px solid #E8ECEF;border-radius:12px;padding:12px;">
-                <div style="position:relative;">
-                    <img src="../assets/images/lamp2.jpg" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">
-
-                    <span style="position:absolute;top:8px;left:8px;background:black;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">NEW</span>
-                    <span style="position:absolute;top:8px;left:50px;background:#38CB89;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">-50%</span>
+                    <!-- Info -->
+                    <div class="hp-info">
+                        <div class="hp-stars"><?= $starsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= $rating ?>)</span></div>
+                        <a href="product_detail.php?id=<?= $p['id'] ?>" style="text-decoration:none;color:inherit;">
+                            <div class="hp-name" title="<?= htmlspecialchars($p['name']) ?>"><?= htmlspecialchars($p['name']) ?></div>
+                        </a>
+                        <div class="hp-price">
+                            <span><?= formatVND($dispPrice) ?>₫</span>
+                            <?php if ($hasSale): ?>
+                                <span class="hp-price-old"><?= formatVND($p['price']) ?>₫</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-
-                <p style="margin-top:10px;">Beige Table Lamp</p>
-
-                <p><b>$24.99</b></p>
-
-                <button style="width:100%;padding:10px;background:black;color:white;border:none;border-radius:6px;">
-                    Add to cart
-                </button>
-            </div>
-
-            <div style="border:1px solid #E8ECEF;border-radius:12px;padding:12px;">
-                <div style="position:relative;">
-                    <img src="../assets/images/basket.jpg" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">
-
-                    <span style="position:absolute;top:8px;left:8px;background:black;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">NEW</span>
-                    <span style="position:absolute;top:8px;left:50px;background:#38CB89;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">-50%</span>
-                </div>
-
-                <p style="margin-top:10px;">Bamboo basket</p>
-
-                <p><b>$24.99</b></p>
-
-                <button style="width:100%;padding:10px;background:black;color:white;border:none;border-radius:6px;">
-                    Add to cart
-                </button>
-            </div>
-
-            <div style="border:1px solid #E8ECEF;border-radius:12px;padding:12px;">
-                <div style="position:relative;">
-                    <img src="../assets/images/kitchen.jpg" style="width:100%;height:160px;object-fit:cover;border-radius:8px;">
-
-                    <span style="position:absolute;top:8px;left:8px;background:black;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">NEW</span>
-                    <span style="position:absolute;top:8px;left:50px;background:#38CB89;color:white;padding:4px 6px;font-size:12px;border-radius:6px;">-50%</span>
-                </div>
-
-                <p style="margin-top:10px;">Toaster</p>
-
-                <p><b>$24.99</b></p>
-
-                <button style="width:100%;padding:10px;background:black;color:white;border:none;border-radius:6px;">
-                    Add to cart
-                </button>
-            </div>
-
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
     </div>
@@ -379,6 +620,35 @@ prevBtn.addEventListener("click", () => {
 <script>
 function closeTopbar() {
     document.getElementById("topbar").style.display = "none";
+}
+
+async function toggleWishlistHome(btn, productId) {
+    const svgEl = btn.querySelector('svg');
+    try {
+        const formData = new FormData();
+        formData.append('action', 'ajax_toggle_wishlist');
+        formData.append('product_id', productId);
+        const res = await fetch('../controllers/ProductController.php?action=ajax_toggle_wishlist', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (data.need_login) {
+            window.location.href = 'login.php';
+            return;
+        }
+        if (data.success) {
+            const color = data.is_wished ? '#FF3333' : 'none';
+            const stroke = data.is_wished ? '#FF3333' : '#141718';
+            svgEl.setAttribute('fill', color);
+            svgEl.setAttribute('stroke', stroke);
+            // Micro bounce animation
+            btn.style.transform = 'scale(1.35)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 220);
+        }
+    } catch (e) {
+        console.error('Wishlist error:', e);
+    }
 }
 </script>
 <?php include '../includes/footer.php'; ?>

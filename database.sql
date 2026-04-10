@@ -971,9 +971,213 @@ ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
 
 SET FOREIGN_KEY_CHECKS = 1;
+(5, 'momo', 567.60, 'MOMO-00005', 'success', '2026-03-08 19:21:00', '2026-03-08 19:21:00', '2026-03-08 19:21:00'),
+(6, 'cod', 144.00, NULL, 'failed', NULL, '2026-03-10 10:05:00', '2026-03-10 13:30:00'),
+(7, 'bank_transfer', 418.00, 'BANK-00007', 'success', '2026-03-11 16:45:00', '2026-03-11 16:45:00', '2026-03-11 16:45:00'),
+(8, 'cod', 455.00, NULL, 'pending', NULL, '2026-03-12 09:50:00', '2026-03-12 12:00:00'),
+(9, 'momo', 353.00, 'MOMO-00009', 'success', '2026-03-15 13:01:00', '2026-03-15 13:01:00', '2026-03-15 13:01:00'),
+(10, 'cod', 130.00, NULL, 'pending', NULL, '2026-03-17 18:22:00', '2026-03-17 18:22:00'),
+(11, 'bank_transfer', 710.30, 'BANK-00011', 'success', '2026-03-19 09:05:00', '2026-03-19 09:05:00', '2026-03-19 09:05:00'),
+(12, 'cod', 109.00, NULL, 'pending', NULL, '2026-03-21 14:10:00', '2026-03-21 16:20:00'),
+(13, 'momo', 538.00, 'MOMO-00013', 'success', '2026-03-23 12:36:00', '2026-03-23 12:36:00', '2026-03-23 12:36:00'),
+(14, 'cod', 119.00, NULL, 'pending', NULL, '2026-03-25 11:45:00', '2026-03-28 10:00:00'),
+(15, 'bank_transfer', 591.30, 'BANK-00015', 'success', '2026-03-27 09:13:00', '2026-03-27 09:13:00', '2026-03-27 09:13:00');
+
+INSERT INTO `order_status_logs` (`order_id`, `status`, `note`, `changed_by`, `changed_at`) VALUES
+(2, 'pending', 'Order created', 3, '2026-03-02 09:15:00'),
+(2, 'confirmed', 'Payment verified', 1, '2026-03-02 10:00:00'),
+(2, 'shipping', 'Shipped by warehouse', 15, '2026-03-03 09:00:00'),
+(2, 'delivered', 'Customer received order', 15, '2026-03-05 14:30:00'),
+
+(3, 'pending', 'Awaiting confirmation', 4, '2026-03-04 11:30:00'),
+
+(4, 'pending', 'Order created', 5, '2026-03-06 15:00:00'),
+(4, 'confirmed', 'Bank transfer received', 1, '2026-03-07 08:00:00'),
+
+(5, 'pending', 'Order created', 6, '2026-03-08 19:20:00'),
+(5, 'confirmed', 'Payment success', 1, '2026-03-08 19:22:00'),
+(5, 'shipping', 'Sent to courier', 15, '2026-03-09 09:10:00'),
+
+(6, 'pending', 'Order created', 7, '2026-03-10 10:05:00'),
+(6, 'cancelled', 'Customer cancelled after confirmation call', 1, '2026-03-10 13:30:00'),
+
+(7, 'pending', 'Order created', 8, '2026-03-11 16:40:00'),
+(7, 'confirmed', 'Payment success', 1, '2026-03-11 17:00:00'),
+(7, 'shipping', 'Handed over to carrier', 15, '2026-03-12 10:00:00'),
+(7, 'delivered', 'Completed delivery', 15, '2026-03-14 17:25:00'),
+
+(8, 'pending', 'Order created', 9, '2026-03-12 09:50:00'),
+(8, 'confirmed', 'Confirmed via phone', 1, '2026-03-12 12:00:00'),
+
+(9, 'pending', 'Order created', 10, '2026-03-15 13:00:00'),
+(9, 'confirmed', 'Payment success', 1, '2026-03-15 13:05:00'),
+(9, 'shipping', 'Courier picked up', 15, '2026-03-16 08:45:00'),
+
+(10, 'pending', 'Awaiting staff confirmation', 11, '2026-03-17 18:22:00'),
+
+(11, 'pending', 'Order created', 12, '2026-03-19 09:00:00'),
+(11, 'confirmed', 'Payment success', 1, '2026-03-19 09:05:00'),
+(11, 'shipping', 'Packed and dispatched', 15, '2026-03-20 08:30:00'),
+(11, 'delivered', 'Delivered successfully', 15, '2026-03-23 16:00:00'),
+
+(12, 'pending', 'Order created', 13, '2026-03-21 14:10:00'),
+(12, 'confirmed', 'Admin confirmed order', 1, '2026-03-21 16:20:00'),
+
+(13, 'pending', 'Order created', 14, '2026-03-23 12:35:00'),
+(13, 'confirmed', 'Payment success', 1, '2026-03-23 12:36:00'),
+(13, 'shipping', 'Ready for final-mile delivery', 15, '2026-03-24 09:30:00'),
+
+(14, 'pending', 'Order created', 3, '2026-03-25 11:45:00'),
+(14, 'confirmed', 'Confirmed by staff', 1, '2026-03-25 13:00:00'),
+(14, 'shipping', 'Dispatched to customer', 15, '2026-03-26 09:20:00'),
+(14, 'delivered', 'Delivered successfully', 15, '2026-03-28 10:00:00'),
+
+(15, 'pending', 'Order created', 4, '2026-03-27 09:12:00'),
+(15, 'confirmed', 'Payment received', 1, '2026-03-27 09:13:00'),
+(15, 'shipping', 'Sent to warehouse line haul', 15, '2026-03-28 08:30:00'),
+(15, 'delivered', 'Completed order', 15, '2026-03-30 15:30:00');
+
+INSERT INTO `cart` (`user_id`, `session_id`, `product_id`, `variant_id`, `quantity`, `added_at`) VALUES
+(3, NULL, 21, NULL, 1, '2026-04-01 09:00:00'),
+(5, NULL, 22, NULL, 2, '2026-04-01 10:00:00'),
+(NULL, 'guest_demo_001', 24, NULL, 3, '2026-04-02 08:30:00'),
+(NULL, 'guest_demo_002', 13, NULL, 1, '2026-04-02 08:35:00');
+
+INSERT INTO `wishlist` (`user_id`, `product_id`) VALUES
+(3, 5),
+(3, 20),
+(4, 9),
+(5, 14),
+(6, 21),
+(7, 24),
+(8, 8),
+(9, 19),
+(10, 22);
+
+INSERT INTO `inventory_logs` (`product_id`, `variant_id`, `change_qty`, `type`, `note`, `created_by`, `created_at`) VALUES
+(5, 5, 12, 'import', 'March warehouse restock', 15, '2026-03-01 08:00:00'),
+(7, 7, 25, 'import', 'Dining chair import batch A', 15, '2026-03-01 08:30:00'),
+(9, 9, 15, 'import', 'Office chair import batch A', 15, '2026-03-01 09:00:00'),
+(19, 11, 30, 'import', 'Blanket seasonal stock', 15, '2026-03-01 09:15:00'),
+(20, 13, 6, 'import', 'Accent chair restock', 15, '2026-03-01 09:30:00'),
+(22, NULL, 40, 'import', 'Desk lamp new shipment', 15, '2026-03-01 10:00:00'),
+(23, NULL, 60, 'import', 'Storage box warehouse refill', 15, '2026-03-01 10:15:00'),
+(24, NULL, 40, 'import', 'Candle trio monthly stock', 15, '2026-03-01 10:30:00'),
+(7, 7, -2, 'order', 'Sold by order ORD-00002', 1, '2026-03-02 09:15:00'),
+(24, NULL, -2, 'order', 'Sold by order ORD-00002', 1, '2026-03-02 09:15:00'),
+(18, NULL, -1, 'order', 'Sold by order ORD-00004', 1, '2026-03-06 15:00:00'),
+(20, 13, -1, 'order', 'Sold by order ORD-00005', 1, '2026-03-08 19:20:00'),
+(8, NULL, -1, 'order', 'Sold by order ORD-00007', 1, '2026-03-11 16:40:00'),
+(5, 6, -1, 'order', 'Sold by order ORD-00011', 1, '2026-03-19 09:00:00'),
+(9, 9, -2, 'order', 'Sold by order ORD-00013', 1, '2026-03-23 12:35:00'),
+(20, 14, -1, 'order', 'Sold by order ORD-00015', 1, '2026-03-27 09:12:00');
+
+INSERT INTO `posts` (`category_id`, `author_id`, `title`, `slug`, `thumbnail`, `excerpt`, `content`, `views`, `is_published`, `published_at`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Small living room ideas that still feel luxurious', 'small-living-room-ideas-that-still-feel-luxurious', 'post-4.jpg', 'Simple styling ideas for a small living room.', 'Expanded sample content for small living room styling and admin demo.', 74, 1, '2026-03-26 09:00:00', '2026-03-26 09:00:00', '2026-03-26 09:00:00'),
+(2, 1, 'How to choose the right dining set for your home', 'how-to-choose-the-right-dining-set-for-your-home', 'post-5.jpg', 'Practical tips to choose a dining table and chair set.', 'Expanded sample content for dining set guide and admin demo.', 61, 1, '2026-03-27 10:00:00', '2026-03-27 10:00:00', '2026-03-27 10:00:00'),
+(3, 15, '5 decor details that make your bedroom feel calm', '5-decor-details-that-make-your-bedroom-feel-calm', 'post-6.jpg', 'Bedroom styling tips with a calm and warm feeling.', 'Expanded sample content for bedroom styling article.', 49, 1, '2026-03-28 14:00:00', '2026-03-28 14:00:00', '2026-03-28 14:00:00'),
+(1, 15, 'Workspace refresh checklist for a more focused week', 'workspace-refresh-checklist-for-a-more-focused-week', 'post-7.jpg', 'Quick office refresh ideas for productivity.', 'Expanded sample content for workspace setup.', 37, 1, '2026-03-30 08:30:00', '2026-03-30 08:30:00', '2026-03-30 08:30:00');
+
+INSERT INTO `contacts` (`name`, `email`, `phone`, `subject`, `message`, `is_read`, `created_at`) VALUES
+('Tran My Linh', 'linh.contact@gmail.com', '0901112233', 'Order status', 'Can you help me check my order status for last week?', 1, '2026-03-18 10:10:00'),
+('Pham Van Duc', 'duc.ask@gmail.com', '0902223344', 'Return policy', 'I want to know your return policy for sale items.', 0, '2026-03-20 15:20:00'),
+('Le Thu Trang', 'trang.home@gmail.com', '0903334455', 'Product dimensions', 'Please send exact dimensions for the walnut desk.', 0, '2026-03-22 09:30:00'),
+('Bui Hoang Son', 'son.bui@gmail.com', '0904445566', 'Bulk order', 'Do you have discount for ordering 10 dining chairs?', 1, '2026-03-23 11:05:00'),
+('Ngo Minh Chau', 'chau.ngo@gmail.com', '0905556677', 'Shipping issue', 'My package arrived late. Please support.', 0, '2026-03-25 16:45:00'),
+('Dang Bao Ngoc', 'ngoc.dang@gmail.com', '0906667788', 'Warranty question', 'Does the office chair include a warranty period?', 0, '2026-03-28 13:10:00');
+
+INSERT INTO `banners` (`title`, `subtitle`, `image`, `link`, `sort_order`, `is_active`) VALUES
+('New Season Dining Collection', 'Modern dining sets for everyday moments', '/assets/images/banner-dining.jpg', '/user/shop.php?category=dining-room', 3, 1),
+('Work Better At Home', 'Office furniture that keeps your space productive', '/assets/images/banner-office.jpg', '/user/shop.php?category=office', 4, 1);
+
+INSERT INTO `logs` (`user_id`, `action`, `created_at`) VALUES
+(1, 'Seeded extended admin demo data', '2026-04-05 18:00:00'),
+(15, 'Reviewed inventory imports for March batch', '2026-04-05 18:05:00'),
+(1, 'Confirmed multiple sample orders for admin testing', '2026-04-05 18:10:00');
+
+
+UPDATE `users` SET `last_login` = '2026-04-05 09:00:00' WHERE `id` = 1;
+UPDATE `users` SET `last_login` = '2026-04-04 20:30:00' WHERE `id` = 2;
+
+UPDATE `products` SET
+  `brand` = '3legant',
+  `material` = 'Wood',
+  `color` = 'Natural Oak',
+  `size` = 'Standard',
+  `weight` = 7.50
+WHERE `id` = 1;
+
+UPDATE `products` SET
+  `brand` = '3legant',
+  `material` = 'Fabric',
+  `color` = 'Gray',
+  `size` = '2-Seater',
+  `weight` = 28.00
+WHERE `id` = 2;
+
+UPDATE `products` SET
+  `brand` = '3legant',
+  `material` = 'Ceramic',
+  `color` = 'Neutral',
+  `size` = 'Set of 3',
+  `weight` = 1.80
+WHERE `id` = 13;
+
+UPDATE `product_variants` SET `sku` = 'TT-001-BLACK', `image` = 'tray-table-black.jpg' WHERE `id` = 1;
+UPDATE `product_variants` SET `sku` = 'TT-001-RED', `image` = 'tray-table-red.jpg' WHERE `id` = 2;
+UPDATE `product_variants` SET `sku` = 'LS-001-GRAY', `image` = 'loveseat-sofa-gray.jpg' WHERE `id` = 3;
+UPDATE `product_variants` SET `sku` = 'LS-001-BEIGE', `image` = 'loveseat-sofa-beige.jpg' WHERE `id` = 4;
+
+UPDATE `coupons`
+SET `description` = 'Discount for first-time customers', `max_discount` = 100.00, `starts_at` = '2026-01-01 00:00:00'
+WHERE `code` = 'WELCOME10';
+
+UPDATE `coupons`
+SET `description` = 'Fixed discount for higher-value carts', `max_discount` = NULL, `starts_at` = '2026-01-01 00:00:00'
+WHERE `code` = 'SAVE50';
+
+UPDATE `orders`
+SET `billing_address` = `address`, `tracking_code` = 'TRACK-ORD-00001'
+WHERE `id` = 1;
+
+UPDATE `order_items` SET `product_sku` = 'TT-001' WHERE `id` = 1;
+UPDATE `order_items` SET `product_sku` = 'LS-001' WHERE `id` = 2;
+
+UPDATE `inventory_logs`
+SET `stock_before` = 0, `stock_after` = 20, `supplier_name` = 'Warehouse Supplier A'
+WHERE `id` = 1;
+
+UPDATE `inventory_logs`
+SET `stock_before` = 20, `stock_after` = 18, `supplier_name` = 'Warehouse Supplier A'
+WHERE `id` = 2;
+
+UPDATE `posts`
+SET `meta_title` = `title`, `meta_description` = `excerpt`
+WHERE `meta_title` IS NULL;
+
+INSERT INTO `customer_notes` (`user_id`, `admin_id`, `note`) VALUES
+(2, 1, 'Frequent returning customer. Good sample account for order-history testing.'),
+(3, 1, 'Used for dashboard customer metrics and admin search demo.');
+
+INSERT INTO `notification_subscribers` (`email`) VALUES
+('newsletter1@example.com'),
+('newsletter2@example.com')
+ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
+
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- =========================================================
 -- END OF FINAL CLEAN FILE
 -- =========================================================
 
+-- =========================================================
+-- OFFICIAL ADMIN ACCOUNT
+-- Email : admin@3legant.com
+-- Password: Admin@3legant
+-- Only @3legant.com emails with role=admin can access /admin
+-- =========================================================
+INSERT INTO `users` (`name`, `email`, `password`, `phone`, `avatar`, `role`, `is_active`) VALUES
+('3legant Admin', 'admin@3legant.com', '$2y$10$4G0O8Qn3TusLImzl2SWuJO9PF2R72djXn8Qbj8g5VlZelIxryNSLa', '0900000000', 'default.jpg', 'admin', 1);
 
+SET FOREIGN_KEY_CHECKS = 1;

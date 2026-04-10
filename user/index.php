@@ -73,18 +73,6 @@ function formatVND($price) {
     display: block;
 }
 </style>
-<div class="topbar" id="topbar">
-    <img src="../assets/images/voucher.png" class="topbar-icon">
-
-    <span class="topbar-text">
-        30% off storewide — Limited time!
-    </span>
-
-    <a href="#" class="topbar-link">Shop Now →</a>
-
-    <span class="topbar-close" onclick="closeTopbar()">✕</span>
-</div>
-
 <?php include '../includes/navbar.php'; ?>
 
 <section class="hero-section">
@@ -523,7 +511,7 @@ function formatVND($price) {
                 It’s more affordable than ever to give every room in your home a stylish makeover
             </p>
 
-            <a href="#" class="promo-link">
+            <a href="shop.php" class="promo-link">
                 Shop Now →
             </a>
 
@@ -537,28 +525,28 @@ function formatVND($price) {
     <div class="container">
         <div style="display:flex;justify-content:space-between;">
             <h2>Articles</h2>
-            <a href="#" class="link-primary">More Articles →</a>
+            <a href="blog.php" class="link-primary">More Articles →</a>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px;">
             <div>
                 <img src="../assets/images/a1.png" style="width:100%;border-radius:12px;">
                 <p style="margin-top:16px;margin-bottom:6px;">
                 <p>7 ways to decor your home</p>
-                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
+                <a href="blog.php" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
             </div>
 
             <div>
                 <img src="../assets/images/a2.png" style="width:100%;border-radius:12px;">
                 <p style="margin-top:16px;margin-bottom:6px;">
                 <p>Kitchen organization</p>
-                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
+                <a href="blog.php" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
             </div>
 
             <div>
                 <img src="../assets/images/a3.png" style="width:100%;border-radius:12px;">
                 <p style="margin-top:16px;margin-bottom:6px;">
                 <p>Decor your bedroom</p>
-                <a href="#" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
+                <a href="blog.php" class="link-primary link-animate" style="display:inline-block;margin-top:6px;">Read more →</a>
         </div>
     </div>
 </section>

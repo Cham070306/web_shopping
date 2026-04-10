@@ -1,15 +1,8 @@
 <?php 
 include "../includes/auth.php"; 
 ?>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account | 3legant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+<?php include '../includes/header.php'; ?>
+<style>
         :root {
             --black: #141718;
             --gray-600: #343839;
@@ -17,161 +10,9 @@ include "../includes/auth.php";
             --gray-200: #E8ECEF;
             --white: #FFFFFF;
         }
-        .navbar {
-            width: 100%;
-            height: 50px;
-            background: white;
-            display: flex;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .logo { 
-            font-size: 24px; 
-            font-weight: 600; 
-            color: var(--black); 
-            text-decoration: none; 
-        }
-
-        .menu { 
-            display: flex; 
-            gap: 40px; 
-        }
-        .menu-header {
-            display: none !important; 
-        }
-
-        .menu a { 
-            font-size: 14px; 
-            font-weight: 500; 
-            color: var(--gray-400); 
-            text-decoration: none; 
-            padding: 8px 0;
-            border-bottom: 2px solid transparent;
-            transition: 0.2s; 
-        }
-        .menu a.active, .menu a:hover { 
-            color: var(--black); 
-        }
+        .breadcrumb { display: none !important; }
         
-        .menu a.active { 
-            color: var(--black); 
-            border-bottom: 2px solid var(--black);
-        }
-
-        .icons { 
-            display: flex;
-            align-items: center; 
-            gap: 16px; 
-        }
-        .icons a {
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .icons img {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            cursor: pointer;
-        }
-        .icon-link, .cart-wrapper {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .cart-wrapper {
-            display: flex !important; 
-            align-items: center;
-            gap: 5px;
-            position: relative;
-        }
-
-        .cart-badge {
-            background-color: var(--black); 
-            color: white;
-            font-size: 12px;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white; 
-        }
-        .cart-wrapper img {
-            width: 24px;
-            height: 24px;
-        }
-        .desktop {
-            display: flex;
-        }
-
-        #menu-toggle, .menu-btn { 
-            display: none; 
-        }
-        #menu-toggle:checked ~ .menu {
-            left: 0;
-        }
-       
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: #1e2223;;
-            display: none;
-            z-index: 10000;
-        } 
-        #menu-toggle:checked ~ .overlay {
-            display: block;
-        }
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            color: var(--black); 
-            background: var(--white);
-            -webkit-font-smoothing: antialiased;
-            padding-top: 30px;
-        }
-
-        .container { 
-            max-width: 1120px; 
-            margin: 60px auto; 
-            padding: 0 20px; 
-            min-height: 75vh; 
-        }
-        .breadcrumb {
-            display: none !important; 
-        }
-        
-        .page-header { 
+        .page-header {
             font-size: 40px; 
             font-weight: 600; 
             text-align: center; 
@@ -182,6 +23,7 @@ include "../includes/auth.php";
         .account-layout { 
             display: flex; 
             gap: 60px; 
+            padding-bottom: 80px;
         }
         .account-main-content { 
             flex: 1; 
@@ -237,6 +79,7 @@ include "../includes/auth.php";
             padding: 12px 40px; 
             border: none; 
             border-radius: 8px; 
+            font-family: 'Inter', sans-serif;
             font-weight: 600; 
             font-size: 16px; 
             cursor: pointer; 
@@ -570,55 +413,11 @@ include "../includes/auth.php";
 
         }
     </style>
-</head>
+</style>
 
-<body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <input type="checkbox" id="menu-toggle">
-            <label for="menu-toggle" class="menu-btn">
-                <img src="../assets/image/menu.png" alt="menu">
-            </label>
-            <a href="index.php" class="logo">3legant.</a>
+<?php include '../includes/navbar.php'; ?>
 
-            <div class="menu">
-                <div class="menu-header">
-                    <span>3Elegant</span>
-                    <label for="menu-toggle" class="close-btn">✕</label>
-                </div>
-                <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
-                <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
-                <a href="shop.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
-                <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
-            </div>
-
-            <div class="icons">
-                <a href="shop.php" class="icon-link desktop">
-                    <img src="../assets/image/search 02.png" alt="search">
-                </a>
-
-                <a href="my_account.php" class="icon-link desktop">
-                    <img src="../assets/image/Vector1.png" alt="account">
-                </a>
-
-                <a href="cart.php" class="cart-wrapper">
-                    <img src="../assets/image/shopping bag.png" alt="bag">
-                    <span id="cart-count" class="cart-badge">
-                        <?php 
-                            $total = 0;
-                            if(isset($_SESSION['cart'])) {
-                                foreach($_SESSION['cart'] as $item) { $total += $item['quantity']; }
-                            }
-                            echo $total; 
-                        ?>
-                    </span>
-                </a>
-            </div>
-            <label for="menu-toggle" class="overlay"></label>
-        </div>
-    </nav>
-
-    <div class="container">
+    <div class="container" style="margin-top: 60px; min-height: 70vh;">
         <div class="breadcrumb">
             <a href="javascript:history.back()" class="back-link">
                 <i class="fa-solid fa-chevron-left"></i> back
@@ -654,7 +453,7 @@ include "../includes/auth.php";
             <?php include "../includes/account_sidebar.php"; ?>
 
             <div class="account-main-content">
-               <form action="../controllers/AuthController.php?action=update_full" method="POST" enctype="multipart/form-data">
+               <form id="profile-form" action="../controllers/AuthController.php?action=update_full" method="POST" enctype="multipart/form-data">
                     <h2 class="section-title">Account Details</h2>
                     
                     <div class="form-group">
@@ -696,42 +495,32 @@ include "../includes/auth.php";
         </div>
     </div>
 
-    <footer class="footer">
-    <div class="footercontainer">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <span class="logo-light">3legant.</span>
-                <span class="line"></span>
-                <span class="slogan">Gift & Decoration Store</span>
-            </div>
-            <nav class="footer-nav">
-                <a href="index.php">Home</a>
-                <a href="shop.php">Shop</a>
-                <a href="Product.php">Product</a>
-                <a href="blog.php">Blog</a>
-                <a href="contact.php">Contact Us</a>
-            </nav>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-legal">
-                <span>Copyright © 2026 3legant. All rights reserved</span>
-                <div class="legal-links">
-                    <a href="Privacy Policy">Privacy Policy</a>
-                    <a href="Terms of Use">Terms of Use</a>
-                </div>
-            </div>
-            <div class="footer-social">
-                <a href="Instagram"><img src="../assets/image/instagram.png" alt="Instagram"></a>  
-                <a href="Facebook"><img src="../assets/image/Vector 2998.png" alt="Facebook"></a>
-                <a href="Youtube"><img src="../assets/image/youtube.png" alt="Youtube"></a>
-            </div>
-        </div>
-    </div>
-</footer>
+    <?php include '../includes/footer.php'; ?>
 
 
     <script>
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            const alertBox = document.createElement('div');
+            if (type === 'success') {
+                alertBox.className = 'alert-box success-alert';
+                alertBox.innerHTML = '<i class="fa-solid fa-circle-check"></i><span>' + message + '</span>';
+            } else {
+                alertBox.className = 'alert-box error-alert';
+                alertBox.style.cssText = 'background: #FFF0F0; color: #FF5630; padding: 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #FF5630; display: flex; align-items: center; gap: 10px; transition: opacity 0.5s ease;';
+                alertBox.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i><span>' + message + '</span>';
+            }
+            container.innerHTML = '';
+            container.appendChild(alertBox);
+            
+            setTimeout(function() {
+                alertBox.style.opacity = '0'; 
+                setTimeout(function() {
+                    alertBox.remove(); 
+                }, 500);
+            }, 3000); 
+        }
+
         document.getElementById('avatar-upload').addEventListener('change', function(e) {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
@@ -739,8 +528,50 @@ include "../includes/auth.php";
                     document.getElementById('avatar-preview').src = event.target.result;
                 };
                 reader.readAsDataURL(this.files[0]);
-                document.getElementById('avatar-form').submit();
+                
+                const form = document.getElementById('avatar-form');
+                const formData = new FormData(form);
+                formData.append('ajax', '1');
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                })
+                .catch(error => {
+                    showNotification('Lỗi khi tải ảnh lên.', 'error');
+                });
             }
+        });
+
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const formData = new FormData(form);
+            formData.append('ajax', '1');
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                showNotification(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    const pwdInputs = form.querySelectorAll('input[type="password"]');
+                    pwdInputs.forEach(input => input.value = '');
+                    // Update header name if name was changed
+                    const newName = form.querySelector('input[name="display_name"]').value || form.querySelector('input[name="name"]').value;
+                    const userNameEls = document.querySelectorAll('.user-name');
+                    userNameEls.forEach(el => el.textContent = newName);
+                }
+            })
+            .catch(error => {
+                showNotification('Lỗi khi lưu thông tin.', 'error');
+            });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -751,10 +582,9 @@ include "../includes/auth.php";
                     setTimeout(function() {
                         alert.remove(); 
                     }, 500);
-                }, 1000); 
+                }, 3000); 
             });
         });
-        
     </script>
 
 </body>

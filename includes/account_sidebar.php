@@ -78,7 +78,6 @@
 
     .desktop-nav a.active { 
         color: #141718; 
-        border-bottom: 1.5px solid #141718; 
     }
 
     .mobile-dropdown { display: none; }

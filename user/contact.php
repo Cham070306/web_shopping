@@ -4,14 +4,6 @@ include '../includes/header.php';
 include '../includes/navbar.php';
 
 ?>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us | 3legant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --black: #141718;
@@ -379,8 +371,6 @@ include '../includes/navbar.php';
             }
         }
     </style>
-</head>
-<body>
 
 <div class="container">
     <section class="hero">
@@ -478,9 +468,4 @@ include '../includes/navbar.php';
         </div>
     </section>
 
-<?php
-include '../includes/footer.php';   
-?>
-
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>

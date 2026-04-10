@@ -44,8 +44,8 @@ if (!function_exists('formatVND')) {
 
 <style>
 /* Wishlist specific layout CSS */
-.page-header { font-size: 54px; font-weight: 600; text-align: center; margin-bottom: 60px; letter-spacing: -1px; font-family: 'Poppins', sans-serif;}
-.account-layout { display: flex; gap: 60px; margin-bottom: 60px; }
+.page-header { font-size: 40px; font-weight: 600; text-align: center; margin-bottom: 60px; letter-spacing: -0.5px; }
+.account-layout { display: flex; gap: 60px; padding-bottom: 80px; }
 .account-main-content { flex: 1; }
 .section-title { font-size: 20px; font-weight: 600; margin-bottom: 32px; font-family: 'Poppins', sans-serif;}
 
@@ -94,6 +94,20 @@ if (!function_exists('formatVND')) {
 }
 .btn-remove:hover {
     color: #141718;
+}
+
+/* Smooth remove animation */
+.wishlist-item {
+    transition: opacity 0.3s ease, transform 0.3s ease, max-height 0.4s ease, padding 0.3s ease;
+    overflow: hidden;
+    max-height: 200px;
+}
+.wishlist-item.removing {
+    opacity: 0;
+    transform: translateX(-12px);
+    max-height: 0;
+    padding: 0;
+    border-bottom: none;
 }
 
 .product-col {
@@ -247,12 +261,10 @@ if (!function_exists('formatVND')) {
                     <?php foreach($wishlist_items as $item): ?>
                         <div class="wishlist-item">
                             <!-- X Button -->
-                            <form action="../controllers/ProductController.php?action=remove_wishlist" method="POST" style="margin:0;">
-                                <input type="hidden" name="wishlist_id" value="<?= $item['wishlist_id'] ?>">
-                                <button type="submit" class="btn-remove">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </form>
+                            <button type="button" class="btn-remove"
+                                onclick="removeWishlistItem(this, <?= $item['wishlist_id'] ?>)">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
 
                             <!-- Product details (Image + Text) -->
                             <a href="product_detail.php?id=<?= $item['product_id'] ?>" class="product-col" style="text-decoration: none; color: inherit;">
@@ -289,3 +301,47 @@ if (!function_exists('formatVND')) {
 </div>
 
 <?php include '../includes/footer.php'; ?>
+
+<script>
+async function removeWishlistItem(btn, wishlistId) {
+    const item = btn.closest('.wishlist-item');
+
+    // Animate out
+    item.classList.add('removing');
+
+    try {
+        const formData = new FormData();
+        formData.append('wishlist_id', wishlistId);
+        formData.append('ajax', '1');
+
+        const res = await fetch('../controllers/ProductController.php?action=remove_wishlist', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            // Remove from DOM after animation
+            setTimeout(() => {
+                item.remove();
+
+                // If no items left, show empty state
+                const list = document.querySelector('.wishlist-list');
+                if (list && list.querySelectorAll('.wishlist-item').length === 0) {
+                    document.querySelector('.wishlist-header')?.remove();
+                    list.innerHTML = `
+                        <div class="empty-wishlist">
+                            Your wishlist is currently empty.<br><br>
+                            <a href="shop.php" class="btn-add-cart" style="text-decoration:none; display:inline-block; padding:10px 30px; width:auto;">Go to Shop</a>
+                        </div>`;
+                }
+            }, 350);
+        } else {
+            item.classList.remove('removing');
+        }
+    } catch (e) {
+        item.classList.remove('removing');
+        console.error('Remove error:', e);
+    }
+}
+</script>

@@ -107,7 +107,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     top: 100%;
     left: -20px;
     background: #fff;
-    min-width: 220px;
+    min-width: 240px; /* Slightly wider to fit Accessories & Decor on one line */
     box-shadow: 0 16px 40px rgba(0,0,0,0.08);
     border-radius: 8px;
     padding: 12px 0;
@@ -129,6 +129,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
     border-bottom: none !important;
     color: var(--gray-400) !important;
     font-weight: 500 !important;
+    white-space: nowrap; /* Prevent wrapping */
+    transition: all 0.2s;
 }
 .nav-dropdown a:hover {
     color: var(--black) !important;
@@ -339,6 +341,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a href="shop.php">All Products</a>
                     <a href="shop.php?cat=living-room">Living Room</a>
                     <a href="shop.php?cat=bedroom">Bedroom</a>
+                    <a href="shop.php?cat=kitchen">Kitchen</a>
                     <a href="shop.php?cat=dining-room">Dining Room</a>
                     <a href="shop.php?cat=outdoor">Outdoor</a>
                     <a href="shop.php?cat=decor">Accessories & Decor</a>

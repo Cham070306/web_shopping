@@ -79,7 +79,12 @@ switch ($action) {
                     }
                 }
 
-                header("Location: ../user/index.php");
+                // Redirect based on role
+                if (($user['role'] ?? '') === 'admin') {
+                    header("Location: ../admin/dashboard.php");
+                } else {
+                    header("Location: ../user/index.php");
+                }
                 exit();
             } else {
                 notify("../user/login.php", "error", "Email hoặc mật khẩu không chính xác.");

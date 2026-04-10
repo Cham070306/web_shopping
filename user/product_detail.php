@@ -647,23 +647,25 @@ $current_page = 'shop.php';
             </div>
             <?php endif; ?>
 
-            <!-- Colors (Mock implementation blending DB and static default) -->
+            <!-- Authentic Options from DB Variants -->
+            <?php if (!empty($variants)): ?>
             <div class="pd-color-select">
-                <?php $pColor = !empty($product['color']) ? $product['color'] : 'Black'; ?>
-                <label class="color-label">Choose Color > <span id="colorNameLabel"><?= htmlspecialchars($pColor) ?></span></label>
+                <?php 
+                    $firstVarTitle = !empty($variants[0]['color']) ? $variants[0]['color'] : (!empty($variants[0]['size']) ? $variants[0]['size'] : 'Tiêu chuẩn');
+                ?>
+                <label class="color-label">Choose Option > <span id="colorNameLabel"><?= htmlspecialchars($firstVarTitle) ?></span></label>
                 <div class="color-options">
-                    <!-- Base color variant -->
-                    <div class="c-option active" title="<?= htmlspecialchars($pColor) ?>" onclick="selectColor(this, '<?= htmlspecialchars($pColor) ?>')">
-                        <img src="<?= $mainImg ?>" alt="color" onerror="this.src='../assets/images/sofa.jpg'">
+                    <?php foreach($variants as $index => $var): 
+                        $varImg = !empty($var['image']) ? $var['image'] : (!empty($all_images[0]) ? $all_images[0] : 'placeholder.jpg');
+                        $varTitle = !empty($var['color']) ? $var['color'] : (!empty($var['size']) ? $var['size'] : 'Tiêu chuẩn');
+                    ?>
+                    <div class="c-option <?= $index === 0 ? 'active' : '' ?>" title="<?= htmlspecialchars($varTitle) ?>" onclick="selectColor(this, '<?= htmlspecialchars($varTitle) ?>')">
+                        <img src="<?= htmlspecialchars(getRealImage($varImg)) ?>" alt="<?= htmlspecialchars($varTitle) ?>" onerror="this.src='<?= htmlspecialchars(getRealImage($mainImg)) ?>'">
                     </div>
-                    <!-- Additional variants if any -->
-                    <?php foreach($variants as $var): if(!empty($var['color']) && $var['color'] !== (!empty($product['color']) ? $product['color'] : null)): ?>
-                    <div class="c-option" title="<?= htmlspecialchars($var['color']) ?>" onclick="selectColor(this, '<?= htmlspecialchars($var['color']) ?>')">
-                        <img src="<?= getRealImage(!empty($var['image']) ? $var['image'] : $all_images[0]) ?>" alt="<?= htmlspecialchars($var['color']) ?>" onerror="this.src='<?= htmlspecialchars(getRealImage($all_images[0])) ?>'">
-                    </div>
-                    <?php endif; endforeach; ?>
+                    <?php endforeach; ?>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Actions Form -->
             <form action="../controllers/CartController.php?action=add" method="POST" id="addToCartForm">

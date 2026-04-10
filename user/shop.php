@@ -84,7 +84,9 @@ if ($sortCode === 'price_asc') {
 }
 
 // Fetch query
-$sql = "SELECT * FROM products WHERE $whereSql $orderBy LIMIT ? OFFSET ?";
+$sql = "SELECT p.*, (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = p.id AND is_approved = 1) as avg_rating 
+        FROM products p 
+        WHERE $whereSql $orderBy LIMIT ? OFFSET ?";
 $stmt = $conn->prepare($sql);
 
 $fetchParams = $params;
@@ -432,11 +434,11 @@ function getLinkUrl($overrides = []) {
     background: #141718;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-family: inherit;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 500;
-    padding: 10px;
+    padding: 8px;
     cursor: pointer;
     transition: background .18s;
 }
@@ -691,6 +693,10 @@ function getLinkUrl($overrides = []) {
                     $hasSale = $p['sale_price'] && $p['price'] > $p['sale_price'];
                     $discount = $hasSale ? round((($p['price'] - $p['sale_price']) / $p['price']) * 100) : 0;
                     $displayPrice = $hasSale ? $p['sale_price'] : $p['price'];
+
+                    $rating    = !empty($p['avg_rating']) ? (float)$p['avg_rating'] : 0;
+                    $fullStars = min(5, (int)round($rating));
+                    $starsHtml = str_repeat('★', $fullStars) . str_repeat('☆', 5 - $fullStars);
                 ?>
                 <div class="product-card">
                     <div class="product-img-box">
@@ -725,7 +731,13 @@ function getLinkUrl($overrides = []) {
 
                     <!-- Info -->
                     <div class="card-info">
-                        <div class="card-stars">★★★★☆</div>
+                        <div class="card-stars">
+                            <?php if ($rating > 0): ?>
+                                <?= $starsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= number_format($rating, 1) ?>)</span>
+                            <?php else: ?>
+                                <span style="color:#6C7275;font-size:11px;">Chưa có đánh giá</span>
+                            <?php endif; ?>
+                        </div>
                         <a href="product_detail.php?id=<?= $p['id'] ?>" style="text-decoration:none; color:inherit;">
                             <div class="card-name" title="<?= htmlspecialchars($p['name']) ?>"><?= htmlspecialchars($p['name']) ?></div>
                         </a>

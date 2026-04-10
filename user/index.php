@@ -6,7 +6,7 @@ $user_id = $_SESSION['user']['id'] ?? null;
 
 // Fetch 8 newest products for homepage
 $newArrivals = [];
-$naStmt = $conn->query("SELECT * FROM products WHERE is_active = 1 ORDER BY id DESC LIMIT 4");
+$naStmt = $conn->query("SELECT p.*, (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = p.id AND is_approved = 1) as avg_rating FROM products p WHERE p.is_active = 1 ORDER BY p.id DESC LIMIT 4");
 if ($naStmt) {
     $newArrivals = $naStmt->fetch_all(MYSQLI_ASSOC);
 }
@@ -59,6 +59,19 @@ function formatVND($price) {
     box-shadow: 0 8px 24px rgba(20, 23, 24, 0.08);
     border-bottom: 1px solid rgba(232, 236, 239, 0.8);
 }
+/* Sliding hero animation styles */
+.hero-track {
+    display: flex;
+    width: 100%;
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.hero-slide-img {
+    width: 100%;
+    flex-shrink: 0;
+    height: 380px;
+    object-fit: cover;
+    display: block;
+}
 </style>
 <div class="topbar" id="topbar">
     <img src="../assets/images/voucher.png" class="topbar-icon">
@@ -78,7 +91,11 @@ function formatVND($price) {
     <div class="container">
 
         <div class="hero-slider">
-            <img id="hero-img" src="../assets/images/banner.jpg" class="hero-img">
+            <div class="hero-track" id="hero-track">
+                <img src="../assets/images/banner.jpg" class="hero-slide-img">
+                <img src="../assets/images/Image(1).jpg" class="hero-slide-img">
+                <img src="../assets/images/img(2).jpg" class="hero-slide-img">
+            </div>
 
             <div class="hero-btn left">
                 <i class="fa-solid fa-chevron-left"></i>
@@ -110,7 +127,7 @@ function formatVND($price) {
 
             <div class="category-text">
                 <h3>Living Room</h3>
-                <a href="#" class="link-primary">Shop Now →</a>
+                <a href="shop.php?cat=living-room" class="link-primary">Shop Now →</a>
             </div>
         </div>
 
@@ -120,7 +137,7 @@ function formatVND($price) {
                 
                 <div class="category-text">
                     <h3>Bedroom</h3>
-                    <a href="#" class="link-primary">Shop Now →</a>
+                    <a href="shop.php?cat=bedroom" class="link-primary">Shop Now →</a>
                 </div>
             </div>
 
@@ -129,7 +146,7 @@ function formatVND($price) {
 
                 <div class="category-text">
                     <h3>Kitchen</h3>
-                    <a href="#" class="link-primary">Shop Now →</a>
+                    <a href="shop.php?cat=kitchen" class="link-primary">Shop Now →</a>
                 </div>
             </div>
 
@@ -293,11 +310,11 @@ function formatVND($price) {
     background: #141718;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    padding: 10px;
+    padding: 8px;
     cursor: pointer;
     transition: background .18s;
 }
@@ -383,7 +400,7 @@ function formatVND($price) {
                     $discount  = $hasSale ? round((($p['price'] - $p['sale_price']) / $p['price']) * 100) : 0;
                     $dispPrice = $hasSale ? $p['sale_price'] : $p['price'];
                     $isWished  = in_array($p['id'], $wishedIds);
-                    $rating    = !empty($p['rating']) ? (float)$p['rating'] : 4.0;
+                    $rating    = !empty($p['avg_rating']) ? (float)$p['avg_rating'] : 0;
                     $fullStars = min(5, (int)round($rating));
                     $starsHtml = str_repeat('★', $fullStars) . str_repeat('☆', 5 - $fullStars);
                 ?>
@@ -427,7 +444,13 @@ function formatVND($price) {
 
                     <!-- Info -->
                     <div class="hp-info">
-                        <div class="hp-stars"><?= $starsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= $rating ?>)</span></div>
+                        <div class="hp-stars">
+                            <?php if ($rating > 0): ?>
+                                <?= $starsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= number_format($rating, 1) ?>)</span>
+                            <?php else: ?>
+                                <span style="color:#6C7275;font-size:11px;">Chưa có đánh giá</span>
+                            <?php endif; ?>
+                        </div>
                         <a href="product_detail.php?id=<?= $p['id'] ?>" style="text-decoration:none;color:inherit;">
                             <div class="hp-name" title="<?= htmlspecialchars($p['name']) ?>"><?= htmlspecialchars($p['name']) ?></div>
                         </a>
@@ -593,28 +616,23 @@ function formatVND($price) {
     </div>
 </section>
 <script>
-const images = [
-    "../assets/images/banner.jpg",
-    "../assets/images/Image(1).jpg",
-    "../assets/images/img(2).jpg"
-];
+const track = document.getElementById("hero-track");
+const nextBtn = document.querySelector(".hero-btn.right");
+const prevBtn = document.querySelector(".hero-btn.left");
+const totalSlides = 3;
 
 let index = 0;
 
-const banner = document.getElementById("hero-img");
-const nextBtn = document.querySelector(".hero-btn.right");
-const prevBtn = document.querySelector(".hero-btn.left");
-
 nextBtn.addEventListener("click", () => {
     index++;
-    if (index >= images.length) index = 0;
-    banner.src = images[index];
+    if (index >= totalSlides) index = 0;
+    track.style.transform = `translateX(-${index * 100}%)`;
 });
 
 prevBtn.addEventListener("click", () => {
     index--;
-    if (index < 0) index = images.length - 1;
-    banner.src = images[index];
+    if (index < 0) index = totalSlides - 1;
+    track.style.transform = `translateX(-${index * 100}%)`;
 });
 </script>
 <script>

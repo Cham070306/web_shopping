@@ -12,11 +12,11 @@
             </div>
 
             <div class="footer-menu">
-                <a href="#">Home</a>
-                <a href="#">Shop</a>
-                <a href="#">Product</a>
-                <a href="#">Blog</a>
-                <a href="#">Contact Us</a>
+                <a href="index.php">Home</a>
+                <a href="shop.php">Shop</a>
+                <a href="shop.php">Product</a>
+                <a href="blog.php">Blog</a>
+                <a href="contact.php">Contact Us</a>
             </div>
 
         </div>

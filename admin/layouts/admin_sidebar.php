@@ -305,7 +305,7 @@ body{
     <div class="menu-group">
         <span class="menu-title">Overview</span>
         <div class="sidebar-nav">
-            <a href="dashboard.php" class="sidebar-link <?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
+            <a href="<?php echo $base_url ?? ''; ?>dashboard.php" class="sidebar-link <?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Dashboard</span>
             </a>
@@ -315,12 +315,12 @@ body{
     <div class="menu-group">
         <span class="menu-title">Catalog</span>
         <div class="sidebar-nav">
-            <a href="categories.php" class="sidebar-link <?php echo $currentPage == 'categories' ? 'active' : ''; ?>">
+            <a href="<?php echo $base_url ?? ''; ?>categories/index.php" class="sidebar-link <?php echo $currentPage == 'categories' ? 'active' : ''; ?>">
                 <i class="fa-solid fa-layer-group"></i>
                 <span>Categories</span>
             </a>
 
-            <a href="products.php" class="sidebar-link <?php echo $currentPage == 'products' ? 'active' : ''; ?>">
+            <a href="<?php echo $base_url ?? ''; ?>products/index.php" class="sidebar-link <?php echo $currentPage == 'products' ? 'active' : ''; ?>">
                 <i class="fa-solid fa-box-open"></i>
                 <span>Products</span>
             </a>

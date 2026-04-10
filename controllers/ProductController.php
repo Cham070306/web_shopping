@@ -11,6 +11,10 @@ $user_id = $_SESSION['user']['id'] ?? null;
 
 if ($action === 'remove_wishlist') {
     if (!$user_id) {
+        if (isset($_POST['ajax'])) {
+            echo json_encode(['success' => false, 'message' => 'Not logged in']);
+            exit;
+        }
         $_SESSION['error'] = 'Please log in to manage your wishlist.';
         header('Location: ../user/login.php');
         exit;
@@ -21,15 +25,17 @@ if ($action === 'remove_wishlist') {
     if ($wishlist_id) {
         $stmt = $conn->prepare("DELETE FROM wishlist WHERE id = ? AND user_id = ?");
         $stmt->bind_param("ii", $wishlist_id, $user_id);
-        
-        if ($stmt->execute()) {
-            $_SESSION['success'] = 'Item removed from wishlist successfully.';
-        } else {
-            $_SESSION['error'] = 'Failed to remove item from wishlist.';
+        $stmt->execute();
+
+        if (isset($_POST['ajax'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            exit;
         }
+
+        $_SESSION['success'] = 'Item removed from wishlist successfully.';
     }
-    
-    // Redirect back to wishlist page
+
     header('Location: ../user/wishlist.php');
     exit;
 }

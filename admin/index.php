@@ -1,6 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
+$_user = $_SESSION['user'] ?? [];
+if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user['email'] ?? '', '@3legant.com')) {
     header("Location: ../user/login.php");
     exit;
 }

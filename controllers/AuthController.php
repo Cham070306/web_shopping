@@ -79,8 +79,8 @@ switch ($action) {
                     }
                 }
 
-                // Redirect based on role
-                if (($user['role'] ?? '') === 'admin') {
+                // Redirect based on role and email domain
+                if (($user['role'] ?? '') === 'admin' && str_ends_with($user['email'] ?? '', '@3legant.com')) {
                     header("Location: ../admin/dashboard.php");
                 } else {
                     header("Location: ../user/index.php");
@@ -235,6 +235,10 @@ switch ($action) {
                     }
                 } else {
                     $hasError = true;
+                    if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                        echo json_encode(['success' => false, 'message' => 'Email không hợp lệ!']);
+                        exit;
+                    }
                     notify("../user/my_account.php", "error", "Email không hợp lệ!");
                 }
             }
@@ -246,6 +250,10 @@ switch ($action) {
 
                 if (!in_array($ext, $allowedExtensions)) {
                     $hasError = true;
+                    if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                        echo json_encode(['success' => false, 'message' => 'Đuôi file không hỗ trợ!']);
+                        exit;
+                    }
                     notify($redirectUrl, "error", "Đuôi file không hỗ trợ!");
                 }
 
@@ -260,6 +268,10 @@ switch ($action) {
                         $_SESSION['user']['avatar'] = $fileName;
 
                         if (count($_POST) <= 1) {
+                            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                                echo json_encode(['success' => true, 'message' => 'Cập nhật ảnh đại diện thành công.', 'avatar' => $fileName]);
+                                exit;
+                            }
                             notify($redirectUrl, "success", "Cập nhật ảnh đại diện thành công.");
                         }
                     }
@@ -274,11 +286,19 @@ switch ($action) {
                     $userModel->updatePassword($userId, $newHash);
                 } else {
                     $hasError = true;
+                    if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                        echo json_encode(['success' => false, 'message' => 'Mật khẩu hiện tại không đúng.']);
+                        exit;
+                    }
                     notify("../user/my_account.php", "error", "Mật khẩu hiện tại không đúng.");
                 }
             }
 
             if (!$hasError) {
+                if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                    echo json_encode(['success' => true, 'message' => 'Cập nhật thông tin thành công.']);
+                    exit;
+                }
                 notify($redirectUrl, "success", "Cập nhật thông tin thành công.");
             }
         }

@@ -1,6 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
+$_user = $_SESSION['user'] ?? [];
+if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user['email'] ?? '', '@3legant.com')) {
     header("Location: ../user/login.php");
     exit;
 }
@@ -380,8 +381,9 @@ if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') 
             <a href="#" class="menu-item"><i class="fa-solid fa-users"></i> Customers</a>
             
             <p class="menu-title">System</p>
+            <a href="../user/index.php" class="menu-item" target="_blank"><i class="fa-solid fa-store"></i> View Store</a>
             <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i> Settings</a>
-            <a href="#" class="menu-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+            <a href="../controllers/LogoutController.php" class="menu-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
         </nav>
     </aside>
 

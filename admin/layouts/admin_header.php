@@ -16,8 +16,8 @@ $_nav_items = [
     ['page' => 'dashboard',   'href' => 'dashboard.php',          'icon' => 'fa-chart-pie',      'label' => 'Dashboard',  'group' => 'Overview'],
     ['page' => 'categories',  'href' => 'categories/index.php',   'icon' => 'fa-layer-group',    'label' => 'Categories', 'group' => 'Catalog'],
     ['page' => 'products',    'href' => 'products/index.php',     'icon' => 'fa-box-open',       'label' => 'Products',   'group' => 'Catalog'],
-    ['page' => 'orders',      'href' => '#',                      'icon' => 'fa-bag-shopping',   'label' => 'Orders',     'group' => 'Sales'],
-    ['page' => 'customers',   'href' => '#',                      'icon' => 'fa-users',          'label' => 'Customers',  'group' => 'Sales'],
+    ['page' => 'orders',      'href' => 'orders.php',             'icon' => 'fa-bag-shopping',   'label' => 'Orders',     'group' => 'Sales'],
+    ['page' => 'customers',   'href' => 'customers.php',          'icon' => 'fa-users',          'label' => 'Customers',  'group' => 'Sales'],
     ['page' => 'store',       'href' => '../user/index.php',      'icon' => 'fa-store',          'label' => 'View Store', 'group' => 'System'],
     ['page' => 'logout',      'href' => '../controllers/LogoutController.php', 'icon' => 'fa-arrow-right-from-bracket', 'label' => 'Logout', 'group' => 'System'],
 ];
@@ -39,9 +39,12 @@ foreach ($_nav_items as $item) {
 </head>
 <body>
 
+<!-- ═══════════════ SIDEBAR OVERLAY (mobile) ═══════════════════ -->
+<div class="adm-sidebar-overlay" id="sidebarOverlay"></div>
+
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
 <?php $sidebarThemeClass = ($currentPage === 'dashboard') ? 'adm-sidebar-light' : 'adm-sidebar-dark'; ?>
-<aside class="adm-sidebar <?= $sidebarThemeClass ?>">
+<aside class="adm-sidebar <?= $sidebarThemeClass ?>" id="adminSidebar">
     <a href="<?= $base_path ?>../user/index.php" class="adm-sidebar-logo">
         3legant.<span>Admin</span>
     </a>
@@ -78,13 +81,49 @@ foreach ($_nav_items as $item) {
 <div class="adm-main">
     <!-- Topbar -->
     <header class="adm-topbar">
+        <!-- Hamburger (mobile only) -->
+        <button class="adm-hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
         <div class="adm-breadcrumb">
             Admin / <span><?= htmlspecialchars($breadcrumb ?? ($pageTitle ?? '')) ?></span>
         </div>
         <div class="adm-topbar-right">
-            <a href="<?= $base_path ?>../user/index.php"><i class="fa-solid fa-store"></i> View Store</a>
+            <a href="<?= $base_path ?>../user/index.php">
+                <i class="fa-solid fa-store"></i>
+                <span> View Store</span>
+            </a>
         </div>
     </header>
 
     <!-- Content -->
     <div class="adm-content">
+
+<script>
+(function() {
+    const sidebar  = document.getElementById('adminSidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+    const hamburger = document.getElementById('hamburgerBtn');
+
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    hamburger?.addEventListener('click', openSidebar);
+    overlay?.addEventListener('click', closeSidebar);
+
+    // Close on nav link click (mobile UX)
+    document.querySelectorAll('.adm-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) closeSidebar();
+        });
+    });
+})();
+</script>

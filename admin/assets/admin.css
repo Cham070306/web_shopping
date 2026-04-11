@@ -302,3 +302,162 @@ input[type="file"]::file-selector-button:hover, input[type="file"]::-webkit-file
 .adm-stat-card .stat-label { font-size: 13px; color: var(--gray-400); margin-bottom: 8px; }
 .adm-stat-card .stat-value { font-family: 'Poppins', sans-serif; font-size: 28px; font-weight: 600; }
 .adm-stat-card .stat-note  { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
+
+/* ─── PAGINATION ────────────────────── */
+.adm-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-top: 1px solid var(--gray-300);
+}
+.adm-pagination-info { font-size: 13px; color: var(--gray-400); }
+.adm-pagination-btns { display: flex; gap: 6px; }
+.adm-page-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500;
+    color: var(--black); text-decoration: none;
+    transition: all .18s;
+}
+.adm-page-btn:hover { border-color: var(--black); background: var(--gray-100); }
+.adm-page-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+
+/* ─── ACTION BUTTONS ────────────────── */
+.adm-action-group { display: inline-flex; gap: 6px; }
+.adm-action-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--gray-400);
+    cursor: pointer; transition: all .18s;
+}
+.adm-action-btn:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+
+/* ─── BADGES (extended) ─────────────── */
+.adm-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 12px; font-weight: 600;
+    white-space: nowrap;
+}
+.badge-green  { background: #dcfce7; color: #166534; }
+.badge-red    { background: #fee2e2; color: #991b1b; }
+.badge-orange { background: #FFF7ED; color: #C2410C; }
+.badge-blue   { background: #dbeafe; color: #1e40af; }
+.badge-sky    { background: #e0f2fe; color: #0369a1; }
+.badge-gray   { background: var(--gray-100); color: var(--gray-400); }
+.badge-purple { background: #ede9fe; color: #6d28d9; }
+.badge-pink   { background: #fce7f3; color: #be185d; }
+
+/* ─── TABLE WRAP ────────────────────── */
+.adm-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ─── CELL HELPERS ──────────────────── */
+.adm-cell-main { font-weight: 600; font-size: 14px; margin: 0 0 2px; color: var(--black); }
+.adm-cell-sub  { font-size: 12px; color: var(--gray-400); margin: 0; }
+
+/* ─── HAMBURGER BUTTON ──────────────── */
+.adm-hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    color: var(--black);
+    font-size: 20px;
+    line-height: 1;
+    transition: background .18s;
+}
+.adm-hamburger:hover { background: var(--gray-100); }
+
+/* ─── SIDEBAR OVERLAY (mobile) ──────── */
+.adm-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20,23,24,.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+}
+.adm-sidebar-overlay.open { display: block; }
+
+/* ════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════ */
+
+/* ── Tablet: ≤ 1024px ── */
+@media (max-width: 1024px) {
+    .adm-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .adm-content { padding: 20px; }
+    .adm-topbar { padding: 0 20px; }
+}
+
+/* ── Mobile: ≤ 768px ── */
+@media (max-width: 768px) {
+    /* Sidebar slides off-screen by default */
+    .adm-sidebar {
+        transform: translateX(-100%);
+        transition: transform .28s cubic-bezier(.4,0,.2,1);
+        z-index: 200;
+        width: 280px;
+    }
+    .adm-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0,0,0,.2);
+    }
+
+    /* Show hamburger */
+    .adm-hamburger { display: flex; align-items: center; justify-content: center; }
+
+    /* Main no longer needs left margin */
+    .adm-main { margin-left: 0; }
+
+    /* Topbar */
+    .adm-topbar { padding: 0 16px; gap: 12px; }
+    .adm-breadcrumb { font-size: 13px; }
+    .adm-topbar-right a span { display: none; } /* hide text, show icon only */
+
+    /* Content padding */
+    .adm-content { padding: 16px; }
+
+    /* Page header stacks */
+    .adm-page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .adm-page-header h1 { font-size: 20px; }
+
+    /* Stats: 2 cols on phone */
+    .adm-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+    .adm-stat-card { padding: 14px 16px; }
+    .adm-stat-card .stat-value { font-size: 22px; }
+
+    /* Tables: allow horizontal scroll */
+    .adm-table-wrap { border-radius: 0 0 12px 12px; }
+    .adm-table th, .adm-table td { padding: 12px 14px; font-size: 13px; }
+
+    /* Pagination */
+    .adm-pagination { flex-direction: column; gap: 12px; align-items: center; }
+
+    /* Toolbar stacks */
+    .adm-toolbar { flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 16px; }
+    .adm-search-form { flex-wrap: wrap; gap: 8px; width: 100%; }
+    .adm-search-box input { width: 100%; }
+    .adm-search-box { width: 100%; }
+
+    /* Cards */
+    .adm-card { border-radius: 10px; }
+}
+
+/* ── Small mobile: ≤ 480px ── */
+@media (max-width: 480px) {
+    .adm-stats-grid { grid-template-columns: 1fr 1fr; }
+    .adm-page-header h1 { font-size: 18px; }
+    .adm-btn { padding: 8px 14px; font-size: 12px; }
+    .adm-select-sm { font-size: 12px; padding: 8px 10px; }
+}

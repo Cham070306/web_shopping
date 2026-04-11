@@ -77,15 +77,11 @@ if ($action === 'ajax_toggle_wishlist') {
 if ($action === 'add_wishlist') {
     if (!$user_id) {
         $_SESSION['error'] = 'Please log in to add items to your wishlist.';
-        // Redirect back to where they came from
         header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '../user/shop.php'));
         exit;
     }
-
     $product_id = $_POST['product_id'] ?? null;
-
     if ($product_id) {
-        // Check if already in wishlist
         $check_stmt = $conn->prepare("SELECT id FROM wishlist WHERE user_id = ? AND product_id = ?");
         $check_stmt->bind_param("ii", $user_id, $product_id);
         $check_stmt->execute();
@@ -93,7 +89,6 @@ if ($action === 'add_wishlist') {
         if ($check_stmt->get_result()->num_rows > 0) {
             $_SESSION['success'] = 'Product is already in your wishlist.';
         } else {
-            // Insert
             $stmt = $conn->prepare("INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)");
             $stmt->bind_param("ii", $user_id, $product_id);
             if ($stmt->execute()) {
@@ -103,8 +98,115 @@ if ($action === 'add_wishlist') {
             }
         }
     }
-    
     header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '../user/wishlist.php'));
+    exit;
+}
+
+// ==========================================
+// ADMIN ACTIONS
+// ==========================================
+$admin_action = $_POST['action'] ?? '';
+
+if ($admin_action === 'create_product') {
+    if (empty($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+        die('Unauthorized');
+    }
+    require_once "../models/Product.php";
+    $productModel = new Product($conn);
+
+    $thumbnail = '';
+    // Handle image upload
+    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['thumbnail']['tmp_name'];
+        $file_name = time() . '_' . $_FILES['thumbnail']['name'];
+        $upload_dir = '../assets/product-images/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        if (move_uploaded_file($file_tmp, $upload_dir . $file_name)) {
+            $thumbnail = $file_name;
+        }
+    }
+
+    $data = [
+        'category_id' => $_POST['category_id'] ?? null,
+        'name' => trim($_POST['name'] ?? ''),
+        'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['name'] ?? ''))),
+        'sku' => !empty(trim($_POST['sku'] ?? '')) ? trim($_POST['sku']) : strtoupper(uniqid('PRD-')),
+        'price' => $_POST['price'] ?? 0,
+        'sale_price' => !empty($_POST['sale_price']) ? $_POST['sale_price'] : null,
+        'stock' => $_POST['stock'] ?? 0,
+        'thumbnail' => $thumbnail,
+        'description' => trim($_POST['description'] ?? ''),
+        'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+        'is_active' => isset($_POST['is_active']) ? 1 : 0
+    ];
+
+    if ($productModel->create($data)) {
+        $_SESSION['success'] = "Thêm sản phẩm thành công!";
+    } else {
+        $_SESSION['error'] = "Có lỗi xảy ra khi thêm sản phẩm.";
+    }
+    header("Location: ../admin/products/index.php");
+    exit;
+}
+
+if ($admin_action === 'delete_product') {
+    if (empty($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+        die('Unauthorized');
+    }
+    require_once "../models/Product.php";
+    $productModel = new Product($conn);
+    $id = $_POST['id'] ?? 0;
+    
+    if ($productModel->delete($id)) {
+        $_SESSION['success'] = "Đã xoá sản phẩm khỏi hệ thống.";
+    } else {
+        $_SESSION['error'] = "Không thể xoá sản phẩm này (có thể do ràng buộc dữ liệu).";
+    }
+    header("Location: ../admin/products/index.php");
+    exit;
+}
+
+if ($admin_action === 'update_product') {
+    if (empty($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+        die('Unauthorized');
+    }
+    require_once "../models/Product.php";
+    $productModel = new Product($conn);
+    
+    $id = $_POST['id'] ?? 0;
+    
+    // Default to the current thumbnail
+    $thumbnail = $_POST['current_thumbnail'] ?? '';
+    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['thumbnail']['tmp_name'];
+        $file_name = time() . '_' . $_FILES['thumbnail']['name'];
+        $upload_dir = '../assets/product-images/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        if (move_uploaded_file($file_tmp, $upload_dir . $file_name)) {
+            $thumbnail = $file_name;
+        }
+    }
+
+    $data = [
+        'category_id' => $_POST['category_id'] ?? null,
+        'name' => trim($_POST['name'] ?? ''),
+        'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['name'] ?? ''))),
+        'sku' => trim($_POST['sku'] ?? ''),
+        'price' => $_POST['price'] ?? 0,
+        'sale_price' => !empty($_POST['sale_price']) ? $_POST['sale_price'] : null,
+        'stock' => $_POST['stock'] ?? 0,
+        'thumbnail' => $thumbnail,
+        'description' => trim($_POST['description'] ?? ''),
+        'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
+        'is_active' => isset($_POST['is_active']) ? 1 : 0
+    ];
+
+    if ($productModel->update($id, $data)) {
+        $_SESSION['success'] = "Cập nhật sản phẩm thành công!";
+    } else {
+        $_SESSION['error'] = "Không thể cập nhật sản phẩm.";
+    }
+    header("Location: ../admin/products/index.php");
     exit;
 }
 

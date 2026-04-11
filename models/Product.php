@@ -110,7 +110,7 @@ class Product {
         $is_featured = isset($data['is_featured']) ? (int)$data['is_featured'] : 0;
         $is_active = isset($data['is_active']) ? (int)$data['is_active'] : 1;
 
-        $stmt->bind_param("isssssddissssiii", 
+        $stmt->bind_param("isssssddisssiii", 
             $category_id, $name, $slug, $sku, $description, $short_desc, 
             $price, $sale_price, $stock, $thumbnail, 
             $meta_title, $meta_description, $is_featured, $is_active, $id

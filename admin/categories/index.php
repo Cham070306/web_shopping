@@ -76,7 +76,7 @@ include '../layouts/admin_header.php';
                             <i class="fa-solid fa-pen"></i> Edit
                         </a>
                         <form action="../../controllers/CategoryController.php" method="POST" style="display:inline-block; margin-left: 6px;"
-                              onsubmit="return confirm('Bạn có chắc muốn xoá danh mục này không?')">
+                              class="delete-form" data-msg="Bạn có chắc muốn xoá danh mục này không? Các sản phẩm bên trong có thể bị mất tuỳ thuộc vào quy tắc dữ liệu.">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?= $cat['id'] ?>">
                             <button type="submit" class="btn btn-danger btn-sm">

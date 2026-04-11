@@ -35,7 +35,7 @@ foreach ($_nav_items as $item) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'Admin') ?> | 3legant</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?= $base_path ?>assets/admin.css">
+    <link rel="stylesheet" href="<?= $base_path ?>assets/admin.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -83,7 +83,6 @@ foreach ($_nav_items as $item) {
         </div>
         <div class="adm-topbar-right">
             <a href="<?= $base_path ?>../user/index.php"><i class="fa-solid fa-store"></i> View Store</a>
-            <a href="<?= $base_path ?>../controllers/LogoutController.php" style="color: #FF3333;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
         </div>
     </header>
 

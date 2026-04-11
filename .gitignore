@@ -19,6 +19,9 @@ __pycache__/
 /assets/uploads/users/*
 /assets/uploads/banners/*
 
+/assets/product-images/*
+!/assets/product-images/.gitkeep
+
 !/assets/uploads/products/.gitkeep
 !/assets/uploads/posts/.gitkeep
 !/assets/uploads/users/.gitkeep

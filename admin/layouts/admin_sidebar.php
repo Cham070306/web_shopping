@@ -287,7 +287,7 @@ body{
     <div class="sidebar-logo">
         <div class="logo-icon"><span>3</span></div>
         <div class="logo-text">
-            <h2>3legant</h2>
+            <h2>3legant.</h2>
         </div>
     </div>
 

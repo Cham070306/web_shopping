@@ -969,6 +969,13 @@ INSERT INTO `notification_subscribers` (`email`) VALUES
 ('newsletter2@example.com')
 ON DUPLICATE KEY UPDATE `email` = VALUES(`email`);
 
+INSERT INTO users (name, email, password, role, is_active)
+VALUES
+('Admin Manager', 'manager@3legant.com', 'PASTE_HASH_VAO_DAY', 'admin', 1),
+('Admin Product', 'product@3legant.com', 'PASTE_HASH_VAO_DAY', 'admin', 1),
+('Admin Order', 'order@3legant.com', 'PASTE_HASH_VAO_DAY', 'admin', 1),
+('Admin Marketing', 'marketing@3legant.com', 'PASTE_HASH_VAO_DAY', 'admin', 1),
+('Super Admin', 'admin@3legant.com', 'PASTE_HASH_VAO_DAY', 'admin', 1);
 
 SET FOREIGN_KEY_CHECKS = 1;
 

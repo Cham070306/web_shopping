@@ -12,8 +12,9 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Reset và seed lại bảng categories
-TRUNCATE TABLE `categories`;
+-- Reset và seed lại bảng categories (Dùng DELETE để tránh lỗi FK)
+DELETE FROM `categories`;
+ALTER TABLE `categories` AUTO_INCREMENT = 1;
 
 INSERT INTO `categories` (`id`, `name`, `slug`, `parent_id`, `image`, `description`, `sort_order`, `is_active`) VALUES
 (1, 'Living Room',  'living-room',  NULL, 'living-room.jpg',  'Sofa, ghế thư giãn, kệ tivi, bàn trà phòng khách', 1, 1),

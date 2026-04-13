@@ -138,7 +138,6 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     border-bottom: 2px solid var(--black);
 }
 
-/* ── Mega Menu Dropdown ── */
 .nav-has-dropdown {
     position: relative;
     display: inline-flex;
@@ -165,7 +164,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     top: 100%;
     left: -20px;
     background: #fff;
-    min-width: 240px; /* Slightly wider to fit Accessories & Decor on one line */
+    min-width: 240px; 
     box-shadow: 0 16px 40px rgba(0,0,0,0.08);
     border-radius: 8px;
     padding: 12px 0;
@@ -175,7 +174,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 10000;
 }
-/* Show dropdown on hover */
+
 .nav-has-dropdown:hover .nav-dropdown {
     opacity: 1;
     visibility: visible;
@@ -193,7 +192,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 .nav-dropdown a:hover {
     color: var(--black) !important;
     background: #F3F5F7;
-    padding-left: 28px !important; /* Nice hover indent effect */
+    padding-left: 28px !important; 
 }
 
 .icons {
@@ -296,7 +295,9 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 
     .navbar {
         height: 64px;
-        background: rgba(255, 255, 255, 0.95);
+        background: #ffffff !important; 
+        backdrop-filter: none !important; 
+        -webkit-backdrop-filter: none !important;
     }
 
     .navbar-container {
@@ -359,6 +360,15 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
         font-size: 16px;
         border-bottom: 1px solid #d1d1d1;
         padding: 14px 0;
+    }
+    .nav-has-dropdown {
+        border-bottom: 1px solid #d1d1d1;
+        padding: 10px 0;
+    }
+
+    .nav-has-dropdown > a {
+        border-bottom: none !important;
+        padding: 0;
     }
 
     .navbar .menu a.active {
@@ -485,4 +495,4 @@ if (
 <a href="../admin/dashboard.php" class="admin-fab">
     <i class="fa-solid fa-gauge"></i> Admin Panel
 </a>
-<?php endif; ?>
+<?php endif; ?>

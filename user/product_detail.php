@@ -651,13 +651,13 @@ $current_page = 'shop.php';
             <?php if (!empty($variants)): ?>
             <div class="pd-color-select">
                 <?php 
-                    $firstVarTitle = !empty($variants[0]['color']) ? $variants[0]['color'] : (!empty($variants[0]['size']) ? $variants[0]['size'] : 'Tiêu chuẩn');
+                    $firstVarTitle = !empty($variants[0]['color']) ? $variants[0]['color'] : (!empty($variants[0]['size']) ? $variants[0]['size'] : 'Standard');
                 ?>
                 <label class="color-label">Choose Option > <span id="colorNameLabel"><?= htmlspecialchars($firstVarTitle) ?></span></label>
                 <div class="color-options">
                     <?php foreach($variants as $index => $var): 
                         $varImg = !empty($var['image']) ? $var['image'] : (!empty($all_images[0]) ? $all_images[0] : 'placeholder.jpg');
-                        $varTitle = !empty($var['color']) ? $var['color'] : (!empty($var['size']) ? $var['size'] : 'Tiêu chuẩn');
+                        $varTitle = !empty($var['color']) ? $var['color'] : (!empty($var['size']) ? $var['size'] : 'Standard');
                     ?>
                     <div class="c-option <?= $index === 0 ? 'active' : '' ?>" title="<?= htmlspecialchars($varTitle) ?>" onclick="selectColor(this, '<?= htmlspecialchars($varTitle) ?>')">
                         <img src="<?= htmlspecialchars(getRealImage($varImg)) ?>" alt="<?= htmlspecialchars($varTitle) ?>" onerror="this.src='<?= htmlspecialchars(getRealImage($mainImg)) ?>'">

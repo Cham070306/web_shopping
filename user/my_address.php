@@ -580,11 +580,11 @@ include "../includes/auth.php";
                         </div>
                         <div class="address-info">
                             <strong
-                                id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Chưa nhập tên') ?></strong>
+                                id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Not entered') ?></strong>
                             <span
-                                id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                                id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Not entered') ?></span>
                             <p id="billing-address">
-                                <?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Vui lòng cập nhật địa chỉ') ?>
+                                <?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Please update your address') ?>
                             </p>
                         </div>
                     </div>
@@ -597,11 +597,11 @@ include "../includes/auth.php";
                         </div>
                         <div class="address-info">
                             <strong
-                                id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Chưa nhập tên') ?></strong>
+                                id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Not entered') ?></strong>
                             <span
-                                id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                                id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Not entered') ?></span>
                             <p id="shipping-address">
-                                <?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Vui lòng cập nhật địa chỉ') ?>
+                                <?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Please update your address') ?>
                             </p>
                         </div>
                     </div>
@@ -618,15 +618,15 @@ include "../includes/auth.php";
                 <input type="hidden" id="addressType">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="inputName" placeholder="Nhập họ và tên..." required>
+                    <input type="text" id="inputName" placeholder="Enter full name..." required>
                 </div>
                 <div class="form-group">
                     <label>Phone Number</label>
-                    <input type="text" id="inputPhone" placeholder="Nhập số điện thoại..." required>
+                    <input type="text" id="inputPhone" placeholder="Enter phone number..." required>
                 </div>
                 <div class="form-group">
                     <label>Address</label>
-                    <input type="text" id="inputAddress" placeholder="Nhập địa chỉ đầy đủ..." required>
+                    <input type="text" id="inputAddress" placeholder="Enter full address..." required>
                 </div>
                 <button type="submit" class="btn-save">Save Changes</button>
             </form>
@@ -646,9 +646,9 @@ include "../includes/auth.php";
             const currentPhone = document.getElementById(prefix + "-phone").innerText.trim();
             const currentAddr = document.getElementById(prefix + "-address").innerText.trim();
 
-            document.getElementById("inputName").value = (currentName === "Chưa nhập tên") ? "" : currentName;
-            document.getElementById("inputPhone").value = (currentPhone === "Chưa nhập SĐT") ? "" : currentPhone;
-            document.getElementById("inputAddress").value = (currentAddr === "Vui lòng cập nhật địa chỉ") ? "" : currentAddr;
+            document.getElementById("inputName").value = (currentName === "Not entered") ? "" : currentName;
+            document.getElementById("inputPhone").value = (currentPhone === "Not entered") ? "" : currentPhone;
+            document.getElementById("inputAddress").value = (currentAddr === "Please update your address") ? "" : currentAddr;
 
             modal.style.display = "flex";
         }
@@ -676,11 +676,11 @@ include "../includes/auth.php";
                 body: formData
             })
                 .then(response => {
-                    alert("Cập nhật thành công!");
+                    alert("Updated successfully!");
                     window.location.reload();
                 })
                 .catch(error => {
-                    alert("Lỗi kết nối!");
+                    alert("Connection error!");
                 });
         };
         window.onclick = function (event) {

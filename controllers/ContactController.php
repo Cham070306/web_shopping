@@ -15,9 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             VALUES ('$name', '$email', '$phone', '$subject', '$message')";
 
     if ($db->query($sql)) {
-        $_SESSION['success'] = "Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm.";
+        $_SESSION['success'] = "Contact sent successfully! We will reply soon.";
     } else {
-        $_SESSION['error'] = "Có lỗi xảy ra, vui lòng thử lại sau.";
+        $_SESSION['error'] = "An error occurred, please try again.";
     }
 
     header("Location: ../user/contact.php");

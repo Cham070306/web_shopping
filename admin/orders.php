@@ -83,7 +83,7 @@ include 'layouts/admin_header.php';
 <div class="adm-page-header">
     <div>
         <h1>Orders</h1>
-        <p>Quản lý đơn hàng của cửa hàng</p>
+        <p>Manage store orders</p>
     </div>
     <div style="display:flex; gap:10px;">
         <button class="adm-btn adm-btn-outline" onclick="exportOrders()">
@@ -96,12 +96,12 @@ include 'layouts/admin_header.php';
 <div class="adm-order-tabs">
     <?php
     $tabs = [
-        ''          => ['label' => 'Tất cả',       'cls' => ''],
-        'pending'   => ['label' => 'Chờ xử lý',    'cls' => 'tab-orange'],
-        'confirmed' => ['label' => 'Đã xác nhận',  'cls' => 'tab-blue'],
-        'shipping'  => ['label' => 'Đang giao',    'cls' => 'tab-sky'],
-        'delivered' => ['label' => 'Đã giao',      'cls' => 'tab-green'],
-        'cancelled' => ['label' => 'Đã hủy',       'cls' => 'tab-red'],
+        ''          => ['label' => 'All',          'cls' => ''],
+        'pending'   => ['label' => 'Pending',      'cls' => 'tab-orange'],
+        'confirmed' => ['label' => 'Confirmed',    'cls' => 'tab-blue'],
+        'shipping'  => ['label' => 'Shipping',     'cls' => 'tab-sky'],
+        'delivered' => ['label' => 'Delivered',    'cls' => 'tab-green'],
+        'cancelled' => ['label' => 'Cancelled',    'cls' => 'tab-red'],
     ];
     $cntKey = ['' => 'all', 'pending' => 'pending', 'confirmed' => 'confirmed',
                'shipping' => 'shipping', 'delivered' => 'delivered', 'cancelled' => 'cancelled'];
@@ -126,14 +126,14 @@ include 'layouts/admin_header.php';
             <?php endif; ?>
             <div class="adm-search-box">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" name="search" placeholder="Tìm mã đơn, tên, email KH..." value="<?= htmlspecialchars($search) ?>">
+                <input type="text" name="search" placeholder="Search order code, name, customer email..." value="<?= htmlspecialchars($search) ?>">
             </div>
-            <button type="submit" class="adm-btn adm-btn-primary">Tìm kiếm</button>
+            <button type="submit" class="adm-btn adm-btn-primary">Search</button>
             <?php if ($search || $status): ?>
-                <a href="orders.php" class="adm-btn adm-btn-outline">Xóa lọc</a>
+                <a href="orders.php" class="adm-btn adm-btn-outline">Clear Filter</a>
             <?php endif; ?>
         </form>
-        <span style="color:var(--gray-400); font-size:13px;"><?= number_format($total_rows) ?> đơn hàng</span>
+        <span style="color:var(--gray-400); font-size:13px;"><?= number_format($total_rows) ?> orders</span>
     </div>
 </div>
 
@@ -143,14 +143,14 @@ include 'layouts/admin_header.php';
         <table class="adm-table">
             <thead>
                 <tr>
-                    <th>Mã đơn</th>
-                    <th>Khách hàng</th>
-                    <th>Ngày đặt</th>
-                    <th>Sản phẩm</th>
-                    <th>Tổng tiền</th>
-                    <th>Thanh toán</th>
-                    <th>Trạng thái</th>
-                    <th style="text-align:center;">Thao tác</th>
+                    <th>Order Code</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th style="text-align:center;">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -158,22 +158,22 @@ include 'layouts/admin_header.php';
                 <tr>
                     <td colspan="8" style="text-align:center; padding:48px; color:var(--gray-400);">
                         <i class="fa-solid fa-inbox" style="font-size:32px; margin-bottom:10px; display:block;"></i>
-                        Không có đơn hàng nào
+                        No orders found
                     </td>
                 </tr>
             <?php else: ?>
                 <?php
                 $statusCfg = [
-                    'pending'   => ['label' => 'Chờ xử lý',   'class' => 'badge-orange'],
-                    'confirmed' => ['label' => 'Đã xác nhận', 'class' => 'badge-blue'],
-                    'shipping'  => ['label' => 'Đang giao',   'class' => 'badge-sky'],
-                    'delivered' => ['label' => 'Đã giao',     'class' => 'badge-green'],
-                    'cancelled' => ['label' => 'Đã hủy',      'class' => 'badge-red'],
+                    'pending'   => ['label' => 'Pending',     'class' => 'badge-orange'],
+                    'confirmed' => ['label' => 'Confirmed',   'class' => 'badge-blue'],
+                    'shipping'  => ['label' => 'Shipping',    'class' => 'badge-sky'],
+                    'delivered' => ['label' => 'Delivered',   'class' => 'badge-green'],
+                    'cancelled' => ['label' => 'Cancelled',   'class' => 'badge-red'],
                 ];
                 $paymentCfg = [
-                    'cod'           => ['label' => 'COD',          'class' => 'badge-gray'],
-                    'bank_transfer' => ['label' => 'Chuyển khoản', 'class' => 'badge-blue'],
-                    'momo'          => ['label' => 'MoMo',         'class' => 'badge-pink'],
+                    'cod'           => ['label' => 'COD',             'class' => 'badge-gray'],
+                    'bank_transfer' => ['label' => 'Bank Transfer',   'class' => 'badge-blue'],
+                    'momo'          => ['label' => 'MoMo',            'class' => 'badge-pink'],
                 ];
                 foreach ($orders as $o):
                     $sc = $statusCfg[$o['status']]          ?? ['label' => $o['status'],          'class' => 'badge-gray'];
@@ -188,16 +188,16 @@ include 'layouts/admin_header.php';
                         <p class="adm-cell-sub"><?= htmlspecialchars($o['email']) ?></p>
                     </td>
                     <td class="adm-cell-sub"><?= date('d/m/Y H:i', strtotime($o['created_at'])) ?></td>
-                    <td><?= (int)$o['item_count'] ?> sp</td>
+                    <td><?= (int)$o['item_count'] ?> items</td>
                     <td><strong><?= number_format((int)$o['total'], 0, ',', '.') ?>₫</strong></td>
                     <td><span class="adm-badge <?= $pc['class'] ?>"><?= $pc['label'] ?></span></td>
                     <td><span class="adm-badge <?= $sc['class'] ?>"><?= $sc['label'] ?></span></td>
                     <td style="text-align:center;">
                         <div class="adm-action-group">
-                            <button class="adm-action-btn" title="Chi tiết" onclick="openOrderModal(<?= $o['id'] ?>)">
+                            <button class="adm-action-btn" title="Details" onclick="openOrderModal(<?= $o['id'] ?>)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button class="adm-action-btn" title="Cập nhật trạng thái" onclick="openStatusModal(<?= $o['id'] ?>, '<?= $o['status'] ?>')">
+                            <button class="adm-action-btn" title="Update status" onclick="openStatusModal(<?= $o['id'] ?>, '<?= $o['status'] ?>')">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                         </div>
@@ -213,7 +213,7 @@ include 'layouts/admin_header.php';
     <?php if ($total_pages > 1): ?>
     <div class="adm-pagination">
         <span class="adm-pagination-info">
-            Trang <?= $page_num ?> / <?= $total_pages ?>
+            Page <?= $page_num ?> / <?= $total_pages ?>
         </span>
         <div class="adm-pagination-btns">
             <?php if ($page_num > 1): ?>
@@ -239,14 +239,14 @@ include 'layouts/admin_header.php';
 <div class="adm-modal-overlay" id="orderModal">
     <div class="adm-modal adm-modal-lg">
         <div class="adm-modal-header">
-            <h3 id="orderModalTitle">Chi tiết đơn hàng</h3>
+            <h3 id="orderModalTitle">Order Details</h3>
             <button class="adm-modal-close" onclick="closeModal('orderModal')">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <div class="adm-modal-body" id="orderModalBody">
             <div class="adm-loading">
-                <i class="fa-solid fa-spinner fa-spin"></i> Đang tải...
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
             </div>
         </div>
     </div>
@@ -256,7 +256,7 @@ include 'layouts/admin_header.php';
 <div class="adm-modal-overlay" id="statusModal">
     <div class="adm-modal" style="max-width:440px;">
         <div class="adm-modal-header">
-            <h3>Cập nhật trạng thái đơn</h3>
+            <h3>Update Order Status</h3>
             <button class="adm-modal-close" onclick="closeModal('statusModal')">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -265,22 +265,22 @@ include 'layouts/admin_header.php';
             <form id="statusForm">
                 <input type="hidden" id="statusOrderId">
                 <div class="adm-form-group">
-                    <label class="adm-label">Trạng thái mới</label>
+                    <label class="adm-label">New Status</label>
                     <select id="statusSelect" class="adm-select">
-                        <option value="pending">Chờ xử lý</option>
-                        <option value="confirmed">Đã xác nhận</option>
-                        <option value="shipping">Đang giao hàng</option>
-                        <option value="delivered">Đã giao thành công</option>
-                        <option value="cancelled">Đã hủy</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipping">Shipping</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
                 <div class="adm-form-group">
-                    <label class="adm-label">Ghi chú (tuỳ chọn)</label>
-                    <input type="text" id="statusNote" class="adm-input" placeholder="Lý do cập nhật...">
+                    <label class="adm-label">Note (optional)</label>
+                    <input type="text" id="statusNote" class="adm-input" placeholder="Update reason...">
                 </div>
                 <div style="display:flex; gap:10px; justify-content:flex-end;">
-                    <button type="button" class="adm-btn adm-btn-outline" onclick="closeModal('statusModal')">Hủy</button>
-                    <button type="submit" class="adm-btn adm-btn-primary">Lưu thay đổi</button>
+                    <button type="button" class="adm-btn adm-btn-outline" onclick="closeModal('statusModal')">Cancel</button>
+                    <button type="submit" class="adm-btn adm-btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
@@ -468,8 +468,8 @@ include 'layouts/admin_header.php';
 <script>
 // ── Order detail modal ──
 async function openOrderModal(id) {
-    document.getElementById('orderModalTitle').textContent = 'Đang tải...';
-    document.getElementById('orderModalBody').innerHTML = '<div class="adm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải...</div>';
+    document.getElementById('orderModalTitle').textContent = 'Loading...';
+    document.getElementById('orderModalBody').innerHTML = '<div class="adm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
     openModal('orderModal');
 
     try {
@@ -478,10 +478,10 @@ async function openOrderModal(id) {
         if (!data.success) throw new Error();
 
         const o = data.order, items = data.items;
-        document.getElementById('orderModalTitle').textContent = 'Đơn hàng ' + o.order_code;
+        document.getElementById('orderModalTitle').textContent = 'Order ' + o.order_code;
 
-        const statusMap = { pending:'Chờ xử lý', confirmed:'Đã xác nhận', shipping:'Đang giao', delivered:'Đã giao', cancelled:'Đã hủy' };
-        const payMap    = { cod:'COD', bank_transfer:'Chuyển khoản', momo:'MoMo' };
+        const statusMap = { pending:'Pending', confirmed:'Confirmed', shipping:'Shipping', delivered:'Delivered', cancelled:'Cancelled' };
+        const payMap    = { cod:'COD', bank_transfer:'Bank Transfer', momo:'MoMo' };
 
         let rows = items.map(i => {
             const th = i.thumbnail?.startsWith('http') ? i.thumbnail : '../assets/images/' + (i.thumbnail || 'placeholder.jpg');
@@ -489,7 +489,7 @@ async function openOrderModal(id) {
                 <td><img src="${th}" style="width:44px;height:44px;border-radius:6px;object-fit:contain;background:#f3f5f7;" onerror="this.src='../assets/images/placeholder.jpg'"></td>
                 <td>
                     <p style="font-weight:600;font-size:13px;">${i.product_name}</p>
-                    <p style="font-size:12px;color:var(--gray-400);">${i.variant || ''} · SL: ${i.quantity}</p>
+                    <p style="font-size:12px;color:var(--gray-400);">${i.variant || ''} · Qty: ${i.quantity}</p>
                 </td>
                 <td style="font-weight:600;">${Number(i.price).toLocaleString('vi-VN')}₫</td>
                 <td style="font-weight:700;">${Number(i.subtotal).toLocaleString('vi-VN')}₫</td>
@@ -498,24 +498,24 @@ async function openOrderModal(id) {
 
         document.getElementById('orderModalBody').innerHTML = `
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
-            <div class="adm-info-block"><span>Khách hàng</span><strong>${o.full_name}</strong></div>
+            <div class="adm-info-block"><span>Customer</span><strong>${o.full_name}</strong></div>
             <div class="adm-info-block"><span>Email</span><strong>${o.email}</strong></div>
-            <div class="adm-info-block"><span>SĐT</span><strong>${o.phone}</strong></div>
-            <div class="adm-info-block"><span>Ngày đặt</span><strong>${new Date(o.created_at).toLocaleDateString('vi-VN')}</strong></div>
-            <div class="adm-info-block" style="grid-column:1/-1;"><span>Địa chỉ</span><strong>${o.address}, ${o.city || ''} ${o.province || ''}</strong></div>
-            <div class="adm-info-block"><span>Thanh toán</span><strong>${payMap[o.payment_method] || o.payment_method}</strong></div>
-            <div class="adm-info-block"><span>Trạng thái</span><strong>${statusMap[o.status] || o.status}</strong></div>
+            <div class="adm-info-block"><span>Phone</span><strong>${o.phone}</strong></div>
+            <div class="adm-info-block"><span>Order Date</span><strong>${new Date(o.created_at).toLocaleDateString('en-US')}</strong></div>
+            <div class="adm-info-block" style="grid-column:1/-1;"><span>Address</span><strong>${o.address}, ${o.city || ''} ${o.province || ''}</strong></div>
+            <div class="adm-info-block"><span>Payment</span><strong>${payMap[o.payment_method] || o.payment_method}</strong></div>
+            <div class="adm-info-block"><span>Status</span><strong>${statusMap[o.status] || o.status}</strong></div>
         </div>
         <table class="adm-table" style="margin-bottom:16px;">
-            <thead><tr><th>Ảnh</th><th>Sản phẩm</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead>
+            <thead><tr><th>Image</th><th>Product</th><th>Unit Price</th><th>Subtotal</th></tr></thead>
             <tbody>${rows}</tbody>
         </table>
         <div style="text-align:right; font-size:16px;">
-            <span style="color:var(--gray-400);">Tổng cộng: </span>
+            <span style="color:var(--gray-400);">Total: </span>
             <strong style="font-size:18px;">${Number(o.total).toLocaleString('vi-VN')}₫</strong>
         </div>`;
     } catch {
-        document.getElementById('orderModalBody').innerHTML = '<p style="text-align:center;color:var(--red);">Không tải được dữ liệu.</p>';
+        document.getElementById('orderModalBody').innerHTML = '<p style="text-align:center;color:var(--red);">Failed to load data.</p>';
     }
 }
 
@@ -545,10 +545,10 @@ document.getElementById('statusForm').addEventListener('submit', async function(
             closeModal('statusModal');
             location.reload();
         } else {
-            alert('Cập nhật thất bại: ' + (data.message || ''));
+            alert('Update failed: ' + (data.message || ''));
         }
     } catch {
-        alert('Lỗi kết nối!');
+        alert('Connection error!');
     }
 });
 
@@ -561,7 +561,7 @@ document.querySelectorAll('.adm-modal-overlay').forEach(el => {
 
 // ── Export CSV (placeholder) ──
 function exportOrders() {
-    alert('Tính năng export sẽ được triển khai qua OrderController.');
+    alert('Export feature will be implemented in OrderController.');
 }
 </script>
 

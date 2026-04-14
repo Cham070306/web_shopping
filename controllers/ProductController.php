@@ -141,9 +141,9 @@ if ($admin_action === 'create_product') {
     ];
 
     if ($productModel->create($data)) {
-        $_SESSION['success'] = "Thêm sản phẩm thành công!";
+        $_SESSION['success'] = "Product added successfully!";
     } else {
-        $_SESSION['error'] = "Có lỗi xảy ra khi thêm sản phẩm.";
+        $_SESSION['error'] = "Error adding product.";
     }
     header("Location: ../admin/products/index.php");
     exit;
@@ -158,9 +158,9 @@ if ($admin_action === 'delete_product') {
     $id = $_POST['id'] ?? 0;
     
     if ($productModel->delete($id)) {
-        $_SESSION['success'] = "Đã xoá sản phẩm khỏi hệ thống.";
+        $_SESSION['success'] = "Product deleted from system.";
     } else {
-        $_SESSION['error'] = "Không thể xoá sản phẩm này (có thể do ràng buộc dữ liệu).";
+        $_SESSION['error'] = "Cannot delete product (possible data constraint).";
     }
     header("Location: ../admin/products/index.php");
     exit;
@@ -202,9 +202,9 @@ if ($admin_action === 'update_product') {
     ];
 
     if ($productModel->update($id, $data)) {
-        $_SESSION['success'] = "Cập nhật sản phẩm thành công!";
+        $_SESSION['success'] = "Product updated successfully!";
     } else {
-        $_SESSION['error'] = "Không thể cập nhật sản phẩm.";
+        $_SESSION['error'] = "Cannot update product.";
     }
     header("Location: ../admin/products/index.php");
     exit;

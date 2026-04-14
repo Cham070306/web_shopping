@@ -542,7 +542,7 @@ include "../includes/auth.php";
                     showNotification(data.message, data.success ? 'success' : 'error');
                 })
                 .catch(error => {
-                    showNotification('Lỗi khi tải ảnh lên.', 'error');
+                    showNotification('Error uploading image.', 'error');
                 });
             }
         });
@@ -570,7 +570,7 @@ include "../includes/auth.php";
                 }
             })
             .catch(error => {
-                showNotification('Lỗi khi lưu thông tin.', 'error');
+                showNotification('Error saving information.', 'error');
             });
         });
 

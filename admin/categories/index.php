@@ -24,7 +24,7 @@ include '../layouts/admin_header.php';
 <div class="adm-page-header">
     <div>
         <h1>Categories</h1>
-        <p>Quản lý danh mục sản phẩm</p>
+        <p>Manage product categories</p>
     </div>
     <a href="create.php" class="btn btn-dark"><i class="fa-solid fa-plus"></i> Add Category</a>
 </div>
@@ -43,18 +43,18 @@ include '../layouts/admin_header.php';
         <thead>
             <tr>
                 <th>#</th>
-                <th>Tên danh mục</th>
+                <th>Category Name</th>
                 <th>Slug</th>
-                <th>Thứ tự</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th>Sort Order</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($categories)): ?>
                 <tr>
                     <td colspan="6" style="text-align:center; padding: 48px; color: var(--gray-400);">
-                        Chưa có danh mục nào. <a href="create.php" style="color: var(--black); font-weight: 600;">Thêm ngay →</a>
+                        No categories found. <a href="create.php" style="color: var(--black); font-weight: 600;">Add one →</a>
                     </td>
                 </tr>
             <?php else: ?>
@@ -66,9 +66,9 @@ include '../layouts/admin_header.php';
                     <td><?= $cat['sort_order'] ?></td>
                     <td>
                         <?php if ($cat['is_active']): ?>
-                            <span class="badge badge-green">Hiển thị</span>
+                            <span class="badge badge-green">Visible</span>
                         <?php else: ?>
-                            <span class="badge badge-red">Đã ẩn</span>
+                            <span class="badge badge-red">Hidden</span>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -76,7 +76,7 @@ include '../layouts/admin_header.php';
                             <i class="fa-solid fa-pen"></i> Edit
                         </a>
                         <form action="../../controllers/CategoryController.php" method="POST" style="display:inline-block; margin-left: 6px;"
-                              class="delete-form" data-msg="Bạn có chắc muốn xoá danh mục này không? Các sản phẩm bên trong có thể bị mất tuỳ thuộc vào quy tắc dữ liệu.">
+                              class="delete-form" data-msg="Are you sure you want to delete this category? Products inside may be affected depending on the data rules.">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?= $cat['id'] ?>">
                             <button type="submit" class="btn btn-danger btn-sm">

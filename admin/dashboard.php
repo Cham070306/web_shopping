@@ -17,7 +17,7 @@ include 'layouts/admin_header.php';
 <div class="adm-page-header">
     <div>
         <h1>Dashboard Overview</h1>
-        <p>Thống kê tổng quan hoạt động kinh doanh</p>
+        <p>Business overview statistics</p>
     </div>
 </div>
 

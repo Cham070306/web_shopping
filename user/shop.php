@@ -617,7 +617,7 @@ function getLinkUrl($overrides = []) {
                     '500000-1000000' => '500K – 1 triệu',
                     '1000000-3000000' => '1 – 3 triệu',
                     '3000000-5000000' => '3 – 5 triệu',
-                    '5000000-' => 'Trên 5 triệu'
+                    '5000000-' => 'Over 5 million'
                 ];
                 $i = 1;
                 foreach ($prices as $val => $label): 
@@ -677,7 +677,7 @@ function getLinkUrl($overrides = []) {
             <?php if (empty($products)): ?>
                 <div class="empty-state">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <p>Chưa có sản phẩm nào. Vui lòng chạy crawler để import dữ liệu.</p>
+                    <p>No products found. Please import data into DB.</p>
                 </div>
             <?php else: ?>
                 <?php foreach ($products as $p):
@@ -735,7 +735,7 @@ function getLinkUrl($overrides = []) {
                             <?php if ($rating > 0): ?>
                                 <?= $starsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= number_format($rating, 1) ?>)</span>
                             <?php else: ?>
-                                <span style="color:#6C7275;font-size:11px;">Chưa có đánh giá</span>
+                                <span style="color:#6C7275;font-size:11px;">No reviews yet</span>
                             <?php endif; ?>
                         </div>
                         <a href="product_detail.php?id=<?= $p['id'] ?>" style="text-decoration:none; color:inherit;">

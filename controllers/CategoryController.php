@@ -25,9 +25,9 @@ if ($action === 'create') {
     }
 
     if ($categoryModel->create($data)) {
-        $_SESSION['success'] = "Danh mục đã được tạo thành công.";
+        $_SESSION['success'] = "Category created successfully.";
     } else {
-        $_SESSION['error'] = "Lỗi khi tạo danh mục.";
+        $_SESSION['error'] = "Error creating category.";
     }
     header("Location: ../admin/categories/index.php");
     exit;
@@ -55,9 +55,9 @@ if ($action === 'update') {
     }
 
     if ($categoryModel->update($id, $data)) {
-        $_SESSION['success'] = "Danh mục đã được cập nhật.";
+        $_SESSION['success'] = "Category updated successfully.";
     } else {
-        $_SESSION['error'] = "Lỗi khi cập nhật danh mục.";
+        $_SESSION['error'] = "Error updating category.";
     }
     header("Location: ../admin/categories/index.php");
     exit;
@@ -67,9 +67,9 @@ if ($action === 'delete') {
     $id = $_POST['id'] ?? 0;
     
     if ($categoryModel->delete($id)) {
-        $_SESSION['success'] = "Đã xoá danh mục thành công.";
+        $_SESSION['success'] = "Category deleted successfully.";
     } else {
-        $_SESSION['error'] = "Không thể xoá danh mục này.";
+        $_SESSION['error'] = "Cannot delete this category.";
     }
     header("Location: " . $_SERVER['HTTP_REFERER']);
     exit;

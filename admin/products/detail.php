@@ -29,12 +29,12 @@ include '../layouts/admin_header.php';
 
 <div class="adm-page-header">
     <div>
-        <h1>Chi tiết sản phẩm</h1>
-        <p>Xem thông tin chi tiết</p>
+        <h1>Product Details</h1>
+        <p>View full product information</p>
     </div>
     <div style="display:flex; gap: 8px;">
-        <a href="index.php" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Danh sách</a>
-        <a href="edit.php?id=<?= $product['id'] ?>" class="btn btn-dark"><i class="fa-solid fa-pen"></i> Chỉnh sửa</a>
+        <a href="index.php" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to List</a>
+        <a href="edit.php?id=<?= $product['id'] ?>" class="btn btn-dark"><i class="fa-solid fa-pen"></i> Edit</a>
     </div>
 </div>
 
@@ -57,17 +57,17 @@ include '../layouts/admin_header.php';
         <div>
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                 <?php if ($product['is_active']): ?>
-                    <span class="badge badge-green">Đang hiển thị</span>
+                    <span class="badge badge-green">Visible</span>
                 <?php else: ?>
-                    <span class="badge badge-gray">Đã ẩn</span>
+                    <span class="badge badge-gray">Hidden</span>
                 <?php endif; ?>
                 
                 <?php if ($product['is_featured']): ?>
-                    <span class="badge" style="background:var(--black); color:white;">Nổi bật</span>
+                    <span class="badge" style="background:var(--black); color:white;">Featured</span>
                 <?php endif; ?>
                 
-                <span class="badge badge-blue">Kho: <?= $product['stock'] ?></span>
-                <span class="badge badge-gray">Đã bán: <?= $product['sold'] ?></span>
+                <span class="badge badge-blue">Stock: <?= $product['stock'] ?></span>
+                <span class="badge badge-gray">Sold: <?= $product['sold'] ?></span>
             </div>
 
             <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 8px; font-family:'Poppins', sans-serif;"><?= htmlspecialchars($product['name']) ?></h2>
@@ -82,9 +82,9 @@ include '../layouts/admin_header.php';
                 <?php endif; ?>
             </div>
 
-            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Mô tả chi tiết</h4>
+            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Description</h4>
             <div style="line-height: 1.6; color: var(--gray-400); white-space: pre-line;">
-                <?= htmlspecialchars($product['description'] ?? 'Chưa có cập nhật mô tả.') ?>
+                <?= htmlspecialchars($product['description'] ?? 'No description available.') ?>
             </div>
             
         </div>

@@ -24,7 +24,7 @@ include '../layouts/admin_header.php';
 <div class="adm-page-header">
     <div>
         <h1>Products</h1>
-        <p>Kho hàng và sản phẩm</p>
+        <p>Product catalog &amp; inventory</p>
     </div>
     <a href="create.php" class="btn btn-dark"><i class="fa-solid fa-plus"></i> Add Product</a>
 </div>
@@ -42,20 +42,20 @@ include '../layouts/admin_header.php';
     <table class="adm-table">
         <thead>
             <tr>
-                <th style="width: 80px;">Ảnh</th>
-                <th>Sản phẩm</th>
-                <th>Danh mục</th>
-                <th>Giá</th>
-                <th>Tồn kho</th>
-                <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th style="width: 80px;">Image</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($products)): ?>
                 <tr>
                     <td colspan="7" style="text-align:center; padding: 48px; color: var(--gray-400);">
-                        Chưa có sản phẩm nào. <a href="create.php" style="color: var(--black); font-weight: 600;">Thêm ngay →</a>
+                        No products yet. <a href="create.php" style="color: var(--black); font-weight: 600;">Add one →</a>
                     </td>
                 </tr>
             <?php else: ?>
@@ -75,7 +75,7 @@ include '../layouts/admin_header.php';
                         <div style="font-weight: 600; font-size: 14px;"><?= htmlspecialchars($p['name']) ?></div>
                         <div style="font-size: 12px; color: var(--gray-400); margin-top: 4px;">SKU: <?= htmlspecialchars($p['sku'] ?? 'N/A') ?></div>
                     </td>
-                    <td style="color: var(--gray-400); font-size: 13px;"><?= htmlspecialchars($p['category_name'] ?? 'Không có') ?></td>
+                    <td style="color: var(--gray-400); font-size: 13px;"><?= htmlspecialchars($p['category_name'] ?? 'None') ?></td>
                     <td style="white-space: nowrap;">
                         <?php if(!empty($p['sale_price'])): ?>
                             <div style="font-weight: 600; color: var(--red);"><?= number_format($p['sale_price'], 0, ',', '.') ?>đ</div>
@@ -87,14 +87,14 @@ include '../layouts/admin_header.php';
                     <td style="white-space: nowrap;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="font-weight: 600; font-size: 14px; color: <?= $p['stock'] < 10 ? 'var(--red)' : 'var(--black)' ?>"><?= $p['stock'] ?></span>
-                            <span style="font-size: 12px; color: var(--gray-400);">(Đã bán: <?= $p['sold'] ?>)</span>
+                            <span style="font-size: 12px; color: var(--gray-400);">(Sold: <?= $p['sold'] ?>)</span>
                         </div>
                     </td>
                     <td style="white-space: nowrap;">
                         <?php if ($p['is_active']): ?>
-                            <span class="badge badge-green">Hiển thị</span>
+                            <span class="badge badge-green">Visible</span>
                         <?php else: ?>
-                            <span class="badge badge-gray" style="text-decoration: line-through;">Đã ẩn</span>
+                            <span class="badge badge-gray" style="text-decoration: line-through;">Hidden</span>
                         <?php endif; ?>
                     </td>
                     <td style="white-space: nowrap;">
@@ -102,7 +102,7 @@ include '../layouts/admin_header.php';
                             <a href="detail.php?id=<?= $p['id'] ?>" class="btn btn-outline btn-sm" title="View Detail"><i class="fa-solid fa-eye"></i></a>
                             <a href="edit.php?id=<?= $p['id'] ?>" class="btn btn-outline btn-sm" title="Edit"><i class="fa-solid fa-pen"></i></a>
                             <form action="../../controllers/ProductController.php" method="POST" style="display:inline-block;"
-                                  class="delete-form" data-msg="Bạn có chắc muốn xoá sản phẩm này không? Hành động này không thể hoàn tác.">
+                                  class="delete-form" data-msg="Are you sure you want to delete this product? This action cannot be undone.">
                                 <input type="hidden" name="action" value="delete_product">
                                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                 <button type="submit" class="btn btn-danger btn-sm" title="Delete">

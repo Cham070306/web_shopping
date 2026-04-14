@@ -2,7 +2,7 @@
 </div><!-- /adm-main -->
 
     <script>
-        // Tự động mở rộng Textarea (Không có thanh cuộn)
+        // Auto-expand textarea (no scrollbar)
         document.querySelectorAll('.adm-textarea, .form-control').forEach(el => {
             if(el.tagName.toLowerCase() !== 'textarea') return;
             
@@ -11,39 +11,39 @@
                 el.style.height = el.scrollHeight + 'px';
             };
             
-            // Xử lý khi trang vừa load xong có sẵn data
+            // Handle existing data on page load
             el.style.overflowY = 'hidden';
-            el.style.resize = 'none'; // Không cho kéo thủ công
+            el.style.resize = 'none'; // Disable manual resize
             
-            // Timeout nhỏ để đảm bảo render DOM xong mới lấy height chuẩn
+            // Small timeout to ensure DOM is rendered before computing height
             setTimeout(resize, 0); 
             
-            // Xử lý khi user gõ phím
+            // Handle user input
             el.addEventListener('input', resize);
         });
     </script>
 
-    <!-- SweetAlert2 cho các hộp thoại xác nhận đẹp mắt -->
+    <!-- SweetAlert2 for beautiful confirmation dialogs -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.querySelectorAll('.delete-form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                const msg = this.dataset.msg || 'Bạn có chắc chắn muốn xoá mục này không? Hành động này không thể hoàn tác.';
+                const msg = this.dataset.msg || 'Are you sure you want to delete this item? This action cannot be undone.';
                 Swal.fire({
-                    title: 'Xác nhận xoá',
+                    title: 'Confirm Delete',
                     text: msg,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: '<i class="fa-solid fa-trash"></i> Đồng ý xoá',
-                    cancelButtonText: 'Hủy bỏ',
+                    confirmButtonText: '<i class="fa-solid fa-trash"></i> Yes, delete',
+                    cancelButtonText: 'Cancel',
                     customClass: {
                         popup: 'adm-card',
                         confirmButton: 'btn btn-dark',
                         cancelButton: 'btn btn-outline',
                         title: 'swal-custom-title'
                     },
-                    buttonsStyling: false // Loại bỏ style mặc định của thư viện để dùng style của dự án
+                    buttonsStyling: false // Use project's custom button styles instead of SweetAlert defaults
                 }).then((result) => {
                     if (result.isConfirmed) {
                         form.submit();

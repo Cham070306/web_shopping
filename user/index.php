@@ -100,7 +100,7 @@ function formatVND($price) {
             </h1>
 
             <p>
-                <strong>3legant</strong> là cửa hàng quà tặng và trang trí nội thất có trụ sở tại TP.HCM, Việt Nam. Thành lập từ năm 2019.
+                <strong>3legant</strong> is a gift & decorations store based in HCMC, Vietnam. Est since 2019.
             </p>
         </div>
 
@@ -363,16 +363,16 @@ function formatVND($price) {
         <div class="home-section-header">
             <div>
                 <h2>New Arrivals</h2>
-                <p class="section-sub">Sản phẩm mới nhất từ cửa hàng</p>
+                <p class="section-sub">Newest products from our store</p>
             </div>
-            <a href="shop.php" class="link-more">Xem tất cả →</a>
+            <a href="shop.php" class="link-more">See all →</a>
         </div>
 
         <div class="home-product-grid">
             <?php if (empty($newArrivals)): ?>
                 <div class="hp-empty">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <p>Chưa có sản phẩm nào. Vui lòng import dữ liệu vào DB.</p>
+                    <p>No products found. Please import data into DB.</p>
                 </div>
             <?php else: ?>
                 <?php foreach ($newArrivals as $p):
@@ -410,7 +410,7 @@ function formatVND($price) {
                         </div>
 
                         <!-- Wishlist -->
-                        <button type="button" class="hp-wish-btn" title="Thêm vào yêu thích"
+                        <button type="button" class="hp-wish-btn" title="Add to Wishlist"
                                 onclick="toggleWishlistHome(this, <?= $p['id'] ?>)">
                             <svg width="16" height="16" viewBox="0 0 24 24"
                                  fill="<?= $isWished ? '#FF3333' : 'none' ?>"
@@ -436,7 +436,7 @@ function formatVND($price) {
                             <?php if ($rating > 0): ?>
                                 <?= $starsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= number_format($rating, 1) ?>)</span>
                             <?php else: ?>
-                                <span style="color:#6C7275;font-size:11px;">Chưa có đánh giá</span>
+                                <span style="color:#6C7275;font-size:11px;">No reviews yet</span>
                             <?php endif; ?>
                         </div>
                         <a href="product_detail.php?id=<?= $p['id'] ?>" style="text-decoration:none;color:inherit;">

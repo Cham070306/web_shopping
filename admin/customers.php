@@ -85,7 +85,7 @@ include 'layouts/admin_header.php';
 <div class="adm-page-header">
     <div>
         <h1>Customers</h1>
-        <p>Quản lý người dùng và khách hàng</p>
+        <p>Manage users and customers</p>
     </div>
 </div>
 
@@ -96,7 +96,7 @@ include 'layouts/admin_header.php';
             <i class="fa-solid fa-users"></i>
         </div>
         <div>
-            <div class="stat-label">Tổng khách hàng</div>
+            <div class="stat-label">Total Customers</div>
             <div class="stat-value"><?= number_format($totalUsers) ?></div>
         </div>
     </div>
@@ -105,7 +105,7 @@ include 'layouts/admin_header.php';
             <i class="fa-solid fa-circle-check"></i>
         </div>
         <div>
-            <div class="stat-label">Đang hoạt động</div>
+            <div class="stat-label">Active</div>
             <div class="stat-value"><?= number_format($activeUsers) ?></div>
         </div>
     </div>
@@ -114,7 +114,7 @@ include 'layouts/admin_header.php';
             <i class="fa-solid fa-user-plus"></i>
         </div>
         <div>
-            <div class="stat-label">Đăng ký tháng này</div>
+            <div class="stat-label">New This Month</div>
             <div class="stat-value"><?= number_format($newThisMonth) ?></div>
         </div>
     </div>
@@ -135,24 +135,24 @@ include 'layouts/admin_header.php';
         <form method="GET" class="adm-search-form">
             <div class="adm-search-box">
                 <i class="fa-solid fa-search"></i>
-                <input type="text" name="search" placeholder="Tìm tên, email, SĐT..." value="<?= htmlspecialchars($search) ?>">
+                <input type="text" name="search" placeholder="Search by name, email, phone..." value="<?= htmlspecialchars($search) ?>">
             </div>
             <select name="role" class="adm-select-sm">
-                <option value="">Tất cả vai trò</option>
-                <option value="user"  <?= $role === 'user'  ? 'selected' : '' ?>>Khách hàng</option>
+                <option value="">All Roles</option>
+                <option value="user"  <?= $role === 'user'  ? 'selected' : '' ?>>Customer</option>
                 <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin</option>
             </select>
             <select name="status" class="adm-select-sm">
-                <option value="">Tất cả trạng thái</option>
-                <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Đang hoạt động</option>
-                <option value="0" <?= $status === '0' ? 'selected' : '' ?>>Đã khóa</option>
+                <option value="">All Statuses</option>
+                <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Active</option>
+                <option value="0" <?= $status === '0' ? 'selected' : '' ?>>Locked</option>
             </select>
-            <button type="submit" class="adm-btn adm-btn-primary">Lọc</button>
+            <button type="submit" class="adm-btn adm-btn-primary">Filter</button>
             <?php if ($search || $role || $status !== ''): ?>
-                <a href="customers.php" class="adm-btn adm-btn-outline">Xóa lọc</a>
+                <a href="customers.php" class="adm-btn adm-btn-outline">Clear Filter</a>
             <?php endif; ?>
         </form>
-        <span style="color:var(--gray-400); font-size:13px;"><?= number_format($total_rows) ?> người dùng</span>
+        <span style="color:var(--gray-400); font-size:13px;"><?= number_format($total_rows) ?> users</span>
     </div>
 </div>
 
@@ -162,14 +162,14 @@ include 'layouts/admin_header.php';
         <table class="adm-table">
             <thead>
                 <tr>
-                    <th>Khách hàng</th>
-                    <th>Vai trò</th>
-                    <th>Số đơn</th>
-                    <th>Tổng mua</th>
-                    <th>Thao tác cuối</th>
-                    <th>Ngày tạo</th>
-                    <th>Trạng thái</th>
-                    <th style="text-align:center;">Thao tác</th>
+                    <th>Customer</th>
+                    <th>Role</th>
+                    <th>Orders</th>
+                    <th>Total Spent</th>
+                    <th>Last Active</th>
+                    <th>Date Registered</th>
+                    <th>Status</th>
+                    <th style="text-align:center;">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -177,7 +177,7 @@ include 'layouts/admin_header.php';
                 <tr>
                     <td colspan="8" style="text-align:center; padding:48px; color:var(--gray-400);">
                         <i class="fa-solid fa-users" style="font-size:32px; margin-bottom:10px; display:block;"></i>
-                        Không tìm thấy người dùng
+                        No users found
                     </td>
                 </tr>
             <?php else: ?>
@@ -206,7 +206,7 @@ include 'layouts/admin_header.php';
                             <?= $c['role'] === 'admin' ? 'Admin' : 'User' ?>
                         </span>
                     </td>
-                    <td><?= (int)$c['order_count'] ?> đơn</td>
+                    <td><?= (int)$c['order_count'] ?> orders</td>
                     <td><strong><?= number_format((int)$c['total_spent'], 0, ',', '.') ?>₫</strong></td>
                     <td class="adm-cell-sub">
                         <?= $c['updated_at'] ? date('d/m/Y', strtotime($c['updated_at'])) : '—' ?>
@@ -214,15 +214,15 @@ include 'layouts/admin_header.php';
                     <td class="adm-cell-sub"><?= date('d/m/Y', strtotime($c['created_at'])) ?></td>
                     <td>
                         <span class="adm-badge <?= $c['is_active'] ? 'badge-green' : 'badge-red' ?>">
-                            <?= $c['is_active'] ? 'Hoạt động' : 'Bị khóa' ?>
+                            <?= $c['is_active'] ? 'Active' : 'Locked' ?>
                         </span>
                     </td>
                     <td style="text-align:center;">
                         <div class="adm-action-group">
-                            <button class="adm-action-btn" title="Xem chi tiết" onclick="openCustomerModal(<?= $c['id'] ?>)">
+                            <button class="adm-action-btn" title="View Details" onclick="openCustomerModal(<?= $c['id'] ?>)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button class="adm-action-btn" title="<?= $c['is_active'] ? 'Khóa tài khoản' : 'Mở khóa' ?>"
+                            <button class="adm-action-btn" title="<?= $c['is_active'] ? 'Lock Account' : 'Unlock Account' ?>"
                                     onclick="toggleUserStatus(<?= $c['id'] ?>, <?= $c['is_active'] ?>)">
                                 <i class="fa-solid <?= $c['is_active'] ? 'fa-lock' : 'fa-lock-open' ?>"></i>
                             </button>
@@ -238,7 +238,7 @@ include 'layouts/admin_header.php';
     <!-- Pagination -->
     <?php if ($total_pages > 1): ?>
     <div class="adm-pagination">
-        <span class="adm-pagination-info">Trang <?= $page_num ?> / <?= $total_pages ?></span>
+        <span class="adm-pagination-info">Page <?= $page_num ?> / <?= $total_pages ?></span>
         <div class="adm-pagination-btns">
             <?php if ($page_num > 1): ?>
                 <a href="?<?= http_build_query(array_merge($_GET, ['page' => $page_num - 1])) ?>" class="adm-page-btn">
@@ -263,14 +263,14 @@ include 'layouts/admin_header.php';
 <div class="adm-modal-overlay" id="customerModal">
     <div class="adm-modal adm-modal-lg">
         <div class="adm-modal-header">
-            <h3 id="customerModalTitle">Chi tiết khách hàng</h3>
+            <h3 id="customerModalTitle">Customer Details</h3>
             <button class="adm-modal-close" onclick="closeModal('customerModal')">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <div class="adm-modal-body" id="customerModalBody">
             <div class="adm-loading">
-                <i class="fa-solid fa-spinner fa-spin"></i> Đang tải...
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
             </div>
         </div>
     </div>
@@ -470,8 +470,8 @@ include 'layouts/admin_header.php';
 <script>
 // ── Customer detail modal ──
 async function openCustomerModal(id) {
-    document.getElementById('customerModalTitle').textContent = 'Đang tải...';
-    document.getElementById('customerModalBody').innerHTML = '<div class="adm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải...</div>';
+    document.getElementById('customerModalTitle').textContent = 'Loading...';
+    document.getElementById('customerModalBody').innerHTML = '<div class="adm-loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
     openModal('customerModal');
 
     try {
@@ -493,7 +493,7 @@ async function openCustomerModal(id) {
                 <td><strong>${Number(o.total).toLocaleString('vi-VN')}₫</strong></td>
                 <td><span class="adm-badge badge-gray">${o.status}</span></td>
               </tr>`).join('')
-            : '<tr><td colspan="4" style="text-align:center;color:var(--gray-400);padding:20px;">Chưa có đơn hàng</td></tr>';
+            : '<tr><td colspan="4" style="text-align:center;color:var(--gray-400);padding:20px;">No orders found</td></tr>';
 
         document.getElementById('customerModalBody').innerHTML = `
         <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
@@ -504,27 +504,27 @@ async function openCustomerModal(id) {
             </div>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
-            <div class="adm-info-block"><span>Điện thoại</span><strong>${u.phone || '—'}</strong></div>
-            <div class="adm-info-block"><span>Vai trò</span><strong>${u.role === 'admin' ? 'Admin' : 'User'}</strong></div>
-            <div class="adm-info-block"><span>Ngày đăng ký</span><strong>${new Date(u.created_at).toLocaleDateString('vi-VN')}</strong></div>
-            <div class="adm-info-block"><span>Trạng thái</span><strong>${u.is_active ? 'Hoạt động' : 'Bị khóa'}</strong></div>
-            <div class="adm-info-block"><span>Tổng đơn</span><strong>${data.order_count} đơn</strong></div>
-            <div class="adm-info-block"><span>Tổng mua</span><strong>${Number(data.total_spent).toLocaleString('vi-VN')}₫</strong></div>
+            <div class="adm-info-block"><span>Phone</span><strong>${u.phone || '—'}</strong></div>
+            <div class="adm-info-block"><span>Role</span><strong>${u.role === 'admin' ? 'Admin' : 'User'}</strong></div>
+            <div class="adm-info-block"><span>Registered Date</span><strong>${new Date(u.created_at).toLocaleDateString('en-US')}</strong></div>
+            <div class="adm-info-block"><span>Status</span><strong>${u.is_active ? 'Active' : 'Locked'}</strong></div>
+            <div class="adm-info-block"><span>Total Orders</span><strong>${data.order_count}</strong></div>
+            <div class="adm-info-block"><span>Total Spent</span><strong>${Number(data.total_spent).toLocaleString('vi-VN')}₫</strong></div>
         </div>
-        <h4 style="font-size:14px;font-weight:600;margin-bottom:10px;">Lịch sử đơn hàng</h4>
+        <h4 style="font-size:14px;font-weight:600;margin-bottom:10px;">Order History</h4>
         <table class="adm-table">
-            <thead><tr><th>Mã đơn</th><th>Ngày</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
+            <thead><tr><th>Order Code</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
             <tbody>${orderRows}</tbody>
         </table>`;
     } catch {
-        document.getElementById('customerModalBody').innerHTML = '<p style="text-align:center;color:var(--red);">Không tải được dữ liệu.</p>';
+        document.getElementById('customerModalBody').innerHTML = '<p style="text-align:center;color:var(--red);">Failed to load data.</p>';
     }
 }
 
 // ── Toggle user active status ──
 async function toggleUserStatus(id, isActive) {
-    const action = isActive ? 'Khóa' : 'Mở khóa';
-    if (!confirm(`Bạn có chắc muốn ${action} tài khoản này?`)) return;
+    const action = isActive ? 'Lock' : 'Unlock';
+    if (!confirm(`Are you sure you want to ${action.toLowerCase()} this account?`)) return;
 
     const fd = new FormData();
     fd.append('user_id', id);
@@ -534,9 +534,9 @@ async function toggleUserStatus(id, isActive) {
         const res  = await fetch('../controllers/AdminController.php?action=toggle_user', { method:'POST', body: fd });
         const data = await res.json();
         if (data.success) location.reload();
-        else alert('Thao tác thất bại: ' + (data.message || ''));
+        else alert('Action failed: ' + (data.message || ''));
     } catch {
-        alert('Lỗi kết nối!');
+        alert('Connection error!');
     }
 }
 

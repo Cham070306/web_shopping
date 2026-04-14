@@ -43,7 +43,7 @@ include '../layouts/admin_header.php';
         <thead>
             <tr>
                 <th style="width: 80px;">Image</th>
-                <th>Product Name</th>
+                <th style="max-width: 260px; width: 260px;">Product Name</th>
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
@@ -71,8 +71,10 @@ include '../layouts/admin_header.php';
                         ?>
                         <img src="<?= $img ?>" alt="thumb" style="width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gray-300);">
                     </td>
-                    <td>
-                        <div style="font-weight: 600; font-size: 14px;"><?= htmlspecialchars($p['name']) ?></div>
+                    <td style="max-width: 260px; width: 260px;">
+                        <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px;" title="<?= htmlspecialchars($p['name']) ?>">
+                            <?= htmlspecialchars($p['name']) ?>
+                        </div>
                         <div style="font-size: 12px; color: var(--gray-400); margin-top: 4px;">SKU: <?= htmlspecialchars($p['sku'] ?? 'N/A') ?></div>
                     </td>
                     <td style="color: var(--gray-400); font-size: 13px;"><?= htmlspecialchars($p['category_name'] ?? 'None') ?></td>

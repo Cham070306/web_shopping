@@ -164,6 +164,7 @@ function getLinkUrl($overrides = []) {
 }
 .shop-breadcrumb a { color: #6C7275; text-decoration: none; }
 .shop-breadcrumb a:hover { color: #141718; }
+.shop-breadcrumb span.active-crumb { font-weight: 600; color: #141718; }
 .shop-hero h1 {
     font-family: 'Poppins', sans-serif;
     font-size: 48px;
@@ -193,8 +194,11 @@ function getLinkUrl($overrides = []) {
     font-size: 20px;
     font-weight: 600;
     color: #141718;
+    height: 56px;
+    box-sizing: border-box;
+    margin-top: 0;
     margin-bottom: 32px;
-    padding-bottom: 16px;
+    padding: 0;
     border-bottom: 1px solid #E8ECEF;
 }
 .sb-section { margin-bottom: 36px; }
@@ -250,8 +254,11 @@ function getLinkUrl($overrides = []) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 28px;
-    padding-bottom: 16px;
+    height: 56px;
+    box-sizing: border-box;
+    margin-top: 0;
+    margin-bottom: 32px;
+    padding: 0;
     border-bottom: 1px solid #E8ECEF;
 }
 .toolbar-cat { font-size: 20px; font-weight: 600; color: #141718; }
@@ -311,7 +318,7 @@ function getLinkUrl($overrides = []) {
 }
 .product-grid.list-view .product-img-box {
     width: 260px;
-    height: 260px;
+    /* keeping absolute width for list view, aspect ratio keeps height */
     margin-bottom: 0;
 }
 .product-grid.list-view .card-info {
@@ -338,17 +345,15 @@ function getLinkUrl($overrides = []) {
     border-radius: 6px;
     overflow: hidden;
     width: 100%;
-    /* Fixed height so every card image is exactly the same size */
-    height: 260px;
+    aspect-ratio: 1 / 1; /* absolute square frame */
     flex-shrink: 0;
     margin-bottom: 14px;
 }
 .product-img-box img {
     width: 100%;
     height: 100%;
-    /* contain keeps full image visible without cropping */
-    object-fit: contain;
-    padding: 12px;
+    object-fit: cover;
+    padding: 0;
     transition: transform .4s ease;
     box-sizing: border-box;
 }
@@ -563,13 +568,40 @@ function getLinkUrl($overrides = []) {
     .shop-wrap { grid-template-columns: 190px 1fr; gap: 28px; }
     .product-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
 }
-@media (max-width: 700px) {
+@media (max-width: 768px) {
     .shop-wrap { grid-template-columns: 1fr; }
     .shop-sidebar { display: none; }
     .shop-hero h1 { font-size: 36px; }
     .shop-hero { height: 220px; }
     .product-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
+
+/* ── Newsletter ── */
+.newsletter {
+    position: relative;
+    overflow: hidden;
+    background: #F3F5F7;
+    text-align: center;
+    padding: 80px 24px;
+}
+.newsletter-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 440px;
+    margin: 0 auto;
+}
+.newsletter h2 { font-size: 36px; font-weight: 500; margin: 0 0 10px; font-family: 'Poppins', sans-serif; color: #141718; }
+.newsletter p { font-size: 15px; color: #6C7275; margin: 0 0 32px; }
+.newsletter-form {
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid #6C7275;
+    padding-bottom: 8px;
+    gap: 8px;
+}
+.newsletter-form input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: #6C7275; }
+.newsletter-form input::placeholder { color: #9BA3AF; }
+.newsletter-form button { background: none; border: none; font-size: 15px; font-weight: 600; cursor: pointer; color: #6C7275; }
 </style>
 
 <!-- ── Hero Banner ── -->
@@ -578,7 +610,7 @@ function getLinkUrl($overrides = []) {
         <nav class="shop-breadcrumb" aria-label="breadcrumb">
             <a href="index.php">Home</a>
             <span>›</span>
-            <span>Shop</span>
+            <span class="active-crumb">Shop</span>
         </nav>
         <h1>Shop Page</h1>
         <p>Let's design the place you always imagined.</p>
@@ -775,21 +807,7 @@ function getLinkUrl($overrides = []) {
     </main>
 </div>
 
-<!-- Newsletter -->
-<section class="newsletter">
-    <div class="newsletter-inner">
-        <h2>Join Our Newsletter</h2>
-        <p>Sign up for deals, new products and promotions</p>
-        <form class="newsletter-form" onsubmit="return false">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9BA3AF" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <input type="email" placeholder="Email address" aria-label="Email address">
-            <button type="submit">Signup</button>
-        </form>
-    </div>
-</section>
+<?php include '../includes/newsletter.php'; ?>
 
 <?php include '../includes/footer.php'; ?>
 

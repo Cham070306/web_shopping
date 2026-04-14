@@ -108,6 +108,15 @@ $current_page = 'shop.php';
 .pd-wrap *, .pd-wrap *::before, .pd-wrap *::after {
     box-sizing: border-box;
 }
+/* Hide Native Number Spinner Arrows */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
 
 .pd-wrap {
     max-width: 1120px; /* Exact match for beautiful container width */
@@ -153,21 +162,22 @@ $current_page = 'shop.php';
 .pd-main-img-box {
     position: relative;
     width: 100%;
-    /* Force 1:1 square but padding shrinks the internal image */
     aspect-ratio: 1 / 1;
     background: #F3F5F7;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px;
+    padding: 0;
     box-sizing: border-box;
+    overflow: hidden;
 }
 .pd-main-img-box img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Prevents cropping tall/wide furniture */
-    mix-blend-mode: multiply; /* Helps white background merge cleanly */
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    object-fit: cover;
     transition: 0.3s;
 }
 .pd-badges {
@@ -190,7 +200,7 @@ $current_page = 'shop.php';
     display: flex;
     gap: 16px;
     overflow-x: auto;
-    padding-bottom: 4px;
+    padding: 0 44px 4px 44px; /* added side padding for nav arrows */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
 }
@@ -214,8 +224,7 @@ $current_page = 'shop.php';
 .pd-thumb img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    mix-blend-mode: multiply;
+    object-fit: cover;
 }
 .pd-thumb.active { border-color: #141718; }
 .pd-thumb:hover { border-color: #6C7275; }
@@ -507,25 +516,26 @@ $current_page = 'shop.php';
 
 /* Newsletter */
 .newsletter {
+    position: relative;
+    overflow: hidden;
     background: #F3F5F7;
     text-align: center;
     padding: 80px 24px;
     margin-top: 80px;
 }
-.newsletter-inner { max-width: 440px; margin: 0 auto; }
-.newsletter h2 { font-size: 36px; font-weight: 500; margin: 0 0 10px; font-family: 'Poppins', sans-serif;}
-.newsletter p { font-size: 15px; color: #141718; margin: 0 0 32px; }
+.newsletter-inner { position: relative; z-index: 2; max-width: 440px; margin: 0 auto; }
+.newsletter h2 { font-size: 36px; font-weight: 500; margin: 0 0 10px; font-family: 'Poppins', sans-serif; color: #141718; }
+.newsletter p { font-size: 15px; color: #6C7275; margin: 0 0 32px; }
 .newsletter-form {
     display: flex;
     align-items: center;
-    border-bottom: 1.5px solid #141718;
+    border-bottom: 1.5px solid #6C7275;
     padding-bottom: 8px;
     gap: 8px;
 }
-.newsletter-form input {
-    flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: #141718;
-}
-.newsletter-form button { background: none; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+.newsletter-form input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: #6C7275; }
+.newsletter-form input::placeholder { color: #9BA3AF; }
+.newsletter-form button { background: none; border: none; font-size: 15px; font-weight: 600; cursor: pointer; color: #6C7275; }
 
 /* Responsive Mobile */
 @media (max-width: 900px) {
@@ -570,7 +580,7 @@ $current_page = 'shop.php';
                 </div>
                 <!-- Main Image -->
                 <?php $mainImg = getRealImage($all_images[0] ?? 'placeholder.jpg'); ?>
-                <img id="mainGalleryImage" src="<?= $mainImg ?>" alt="<?= htmlspecialchars($product['name']) ?>">
+                <img id="mainGalleryImage" src="<?= $mainImg ?>" alt="<?= htmlspecialchars($product['name']) ?>" onerror="this.src='../assets/images/sofa.jpg'">
             </div>
 
             <div class="pd-thumbs-wrap">
@@ -580,7 +590,7 @@ $current_page = 'shop.php';
                         $thumbSrc = getRealImage($imgName);
                     ?>
                     <div class="pd-thumb <?= $index === 0 ? 'active' : '' ?>" onclick="switchGalleryImage(this, '<?= $thumbSrc ?>')">
-                        <img src="<?= $thumbSrc ?>" alt="thumb">
+                        <img src="<?= $thumbSrc ?>" alt="thumb" onerror="this.src='../assets/images/sofa.jpg'; this.onerror=null;">
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -625,27 +635,29 @@ $current_page = 'shop.php';
                 <?php endif; ?>
             </div>
 
-            <!-- Fake Countdown Timer (Static visual as requested) -->
+            <!-- Dynamic Countdown Timer -->
+            <?php if ($hasSale): ?>
             <div class="pd-timer-box">
                 <span class="timer-label">Offer expires in:</span>
                 <div class="timer-blocks">
-                    <div class="t-block"><span class="t-num">02</span><span class="t-txt">Days</span></div>
-                    <div class="t-block"><span class="t-num">12</span><span class="t-txt">Hours</span></div>
-                    <div class="t-block"><span class="t-num">45</span><span class="t-txt">Minutes</span></div>
-                    <div class="t-block"><span class="t-num">05</span><span class="t-txt">Seconds</span></div>
+                    <div class="t-block"><span class="t-num" id="t-days">02</span><span class="t-txt">Days</span></div>
+                    <div class="t-block"><span class="t-num" id="t-hours">12</span><span class="t-txt">Hours</span></div>
+                    <div class="t-block"><span class="t-num" id="t-minutes">45</span><span class="t-txt">Minutes</span></div>
+                    <div class="t-block"><span class="t-num" id="t-seconds">05</span><span class="t-txt">Seconds</span></div>
                 </div>
             </div>
-
-            <!-- Specs -->
-            <?php if (!empty($product['size']) || !empty($product['measurements'])): ?>
-            <div class="pd-meta-row">
-                <strong>Measurements:</strong> <?= htmlspecialchars($product['size'] ?? ($product['measurements'] ?? '17 1/2*20 5/8 "')) ?>
-            </div>
-            <?php else: ?>
-            <div class="pd-meta-row">
-                <strong>Measurements:</strong> 17 1/2*20 5/8 "
-            </div>
             <?php endif; ?>
+
+            <?php 
+            $pSize = $product['size'] ?? '';
+            $pMeas = $product['measurements'] ?? '';
+            $sizeRaw = $pSize ?: ($pMeas ?: '17 1/2 × 20 5/8 "');
+            $sizeClean = str_replace('*', ' × ', $sizeRaw);
+            ?>
+            <div class="pd-meta-row" style="display: flex; align-items: center; gap: 12px; margin-bottom: 28px;">
+                <strong>Measurements:</strong> 
+                <span style="background: #F3F5F7; padding: 6px 14px; border-radius: 6px; font-weight: 600; color: #141718; font-size: 14px; letter-spacing: 0.5px;"><?= htmlspecialchars($sizeClean) ?></span>
+            </div>
 
             <!-- Authentic Options from DB Variants -->
             <?php if (!empty($variants)): ?>
@@ -674,7 +686,7 @@ $current_page = 'shop.php';
                     <!-- Qty Spinner -->
                     <div class="pd-qty">
                         <button type="button" class="qty-btn" onclick="updateQty(-1)">-</button>
-                        <input type="number" id="qtyInput" name="quantity" class="qty-input" value="1" min="1" max="<?= $product['stock'] > 0 ? $product['stock'] : 99 ?>" readonly>
+                        <input type="number" id="qtyInput" name="quantity" class="qty-input" value="1" min="1" max="<?= $product['stock'] > 0 ? $product['stock'] : 99 ?>">
                         <button type="button" class="qty-btn" onclick="updateQty(1)">+</button>
                     </div>
 
@@ -782,21 +794,7 @@ $current_page = 'shop.php';
 
 </div> <!-- /pd-wrap -->
 
-<!-- Newsletter -->
-<section class="newsletter">
-    <div class="newsletter-inner">
-        <h2>Join Our Newsletter</h2>
-        <p>Sign up for deals, new products and promotions</p>
-        <form class="newsletter-form" onsubmit="return false">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9BA3AF" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <input type="email" placeholder="Email address" required>
-            <button type="submit">Signup</button>
-        </form>
-    </div>
-</section>
+<?php include '../includes/newsletter.php'; ?>
 
 <?php include '../includes/footer.php'; ?>
 
@@ -862,6 +860,60 @@ function updateQty(delta) {
     
     input.value = nextVal;
 }
+
+// 4.1 Validate manual quantity input
+document.addEventListener('DOMContentLoaded', function() {
+    const qtyInput = document.getElementById('qtyInput');
+    if (!qtyInput) return;
+    
+    qtyInput.addEventListener('input', function() {
+        let max = parseInt(this.max) || 99;
+        let val = parseInt(this.value);
+        if (val > max) {
+            this.value = max; // Cap at max stock
+        } else if (val <= 0) {
+            this.value = 1; // Prevent 0 or negative
+        }
+    });
+
+    qtyInput.addEventListener('blur', function() {
+        if (!this.value || parseInt(this.value) < 1) {
+            this.value = 1; // Reset to 1 if left empty
+        }
+    });
+
+    // 4.2 Dynamic Countdown Timer
+    const elDays = document.getElementById('t-days');
+    const elHours = document.getElementById('t-hours');
+    const elMins = document.getElementById('t-minutes');
+    const elSecs = document.getElementById('t-seconds');
+    if (elDays && elHours && elMins && elSecs) {
+        let days = parseInt(elDays.innerText) || 0;
+        let hours = parseInt(elHours.innerText) || 0;
+        let mins = parseInt(elMins.innerText) || 0;
+        let secs = parseInt(elSecs.innerText) || 0;
+
+        let totalSeconds = (days * 86400) + (hours * 3600) + (mins * 60) + secs;
+
+        const timer = setInterval(() => {
+            if (totalSeconds <= 0) {
+                clearInterval(timer);
+                return;
+            }
+            totalSeconds--;
+            
+            let d = Math.floor(totalSeconds / 86400);
+            let h = Math.floor((totalSeconds % 86400) / 3600);
+            let m = Math.floor((totalSeconds % 3600) / 60);
+            let s = Math.floor(totalSeconds % 60);
+            
+            elDays.innerText = d < 10 ? '0' + d : d;
+            elHours.innerText = h < 10 ? '0' + h : h;
+            elMins.innerText = m < 10 ? '0' + m : m;
+            elSecs.innerText = s < 10 ? '0' + s : s;
+        }, 1000);
+    }
+});
 
 // 5. AJAX Wishlist Toggle
 async function toggleDetailWishlist(productId) {

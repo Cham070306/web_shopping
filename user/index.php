@@ -216,15 +216,15 @@ function formatVND($price) {
     position: relative;
     background: #F3F5F7;
     width: 100%;
-    height: 240px;
+    aspect-ratio: 1 / 1; /* uniform square on any screen */
     overflow: hidden;
     flex-shrink: 0;
 }
 .hp-img-box img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    padding: 14px;
+    object-fit: cover;
+    padding: 0;
     box-sizing: border-box;
     transition: transform .4s ease;
 }
@@ -551,58 +551,7 @@ function formatVND($price) {
     </div>
 </section>
 
-<section style="
-    position:relative;
-    background:#F3F5F7;
-    padding:80px 0;
-    overflow:hidden;
-">
-
-    <img src="../assets/images/image.png" style="
-       position:absolute;
-       top:0;
-       left:50%;
-       transform:translateX(-50%);   
-       height:100%;
-       width:auto;
-       min-width:100%; ">
-
-        <div style="max-width:500px;text-align:center;margin:auto;position:relative;z-index:2;">
-            
-            <h2 style="font-size:32px;font-weight:600;">
-                Join Our Newsletter
-            </h2>
-
-            <p style="color:#6C7275;margin:10px 0 30px;">
-                Sign up for deals, new products and promotions
-            </p>
-
-            <div style="
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                gap:10px;
-            ">
-            <div style="
-                display:flex;
-                align-items:center;
-                border-bottom:1px solid #6C7275;
-                padding:8px 0;
-                width:280px;
-                ">
-                    <i class="fa-regular fa-envelope" style="margin-right:10px;"></i>
-                    <input placeholder="Email address" style="border:none;outline:none;background:none;width:100%;">
-                </div>
-
-                <button style="border:none;background:none;font-weight:600;">
-                    Signup
-                </button>
-            </div>
-
-        </div>
-
-    </div>
-</section>
+<?php include '../includes/newsletter.php'; ?>
 <script>
 const track = document.getElementById("hero-track");
 const nextBtn = document.querySelector(".hero-btn.right");

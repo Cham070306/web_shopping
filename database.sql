@@ -474,18 +474,25 @@ CREATE TABLE `notification_subscribers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
--- SEED DATA
--- Test accounts required by spec:
--- Admin: admin@shop.com / Admin@123
--- User : user@shop.com  / User@123
+-- SEED DATA: 3 Admins, 5 Users
 -- =========================================================
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `phone`, `avatar`, `role`, `is_active`) VALUES
-(1, 'Admin', 'admin@shop.com', '$2y$12$uZal/hZLC2x6j.IJtRic3uBApW4ASimfP/AJ1gm2f8kxlAZ1vTME.', '0123456789', 'default.jpg', 'admin', 1),
-(2, 'User Test', 'user@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0987654321', 'default.jpg', 'user', 1);
+(1, '3legant Admin', 'admin@3legant.com', '$2y$10$4G0O8Qn3TusLImzl2SWuJO9PF2R72djXn8Qbj8g5VlZelIxryNSLa', '0900000000', 'default.jpg', 'admin', 1),
+(2, 'Super Admin', 'superadmin@3legant.com', '$2y$10$Cg2RJGl8etvyaxr8AtBXcOjkmvdcmt5ZhZeYEBzH/smvsNznnH5vW', '0900000001', 'default.jpg', 'admin', 1),
+(3, 'Store Manager', 'manager@3legant.com', '$2y$10$qX3O6DGCnccsL2uv39u/ZuZfzcnW308FKWBm11DTW4oQyjyg7lAXC', '0900000002', 'default.jpg', 'admin', 1),
+(4, 'User Test', 'user@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0987654321', 'default.jpg', 'user', 1),
+(5, 'Nguyen Thi Anh', 'anh.nguyen@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000001', 'default.jpg', 'user', 1),
+(6, 'Tran Van Binh', 'binh.tran@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000002', 'default.jpg', 'user', 1),
+(7, 'Le Hoang Nam', 'nam.le@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000003', 'default.jpg', 'user', 1),
+(8, 'Pham Thu Ha', 'ha.pham@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000004', 'default.jpg', 'user', 1);
 
 INSERT INTO `user_addresses` (`user_id`, `full_name`, `phone`, `address`, `city`, `province`, `country`, `zip_code`, `is_default`, `type`) VALUES
-(2, 'User Test', '0987654321', '123 Nguyen Trai', 'Ha Noi', 'Thanh Xuan', 'Vietnam', '100000', 1, 'shipping'),
-(2, 'User Test', '0987654321', '123 Nguyen Trai', 'Ha Noi', 'Thanh Xuan', 'Vietnam', '100000', 0, 'billing');
+(4, 'User Test', '0987654321', '123 Nguyen Trai', 'Ha Noi', 'Thanh Xuan', 'Vietnam', '100000', 1, 'shipping'),
+(4, 'User Test', '0987654321', '123 Nguyen Trai', 'Ha Noi', 'Thanh Xuan', 'Vietnam', '100000', 0, 'billing'),
+(5, 'Nguyen Thi Anh', '0912000001', '12 Le Loi', 'Ho Chi Minh City', 'District 1', 'Vietnam', '700000', 1, 'shipping'),
+(6, 'Tran Van Binh', '0912000002', '45 Tran Hung Dao', 'Da Nang', 'Hai Chau', 'Vietnam', '550000', 1, 'shipping'),
+(7, 'Le Hoang Nam', '0912000003', '88 Nguyen Van Cu', 'Can Tho', 'Ninh Kieu', 'Vietnam', '900000', 1, 'shipping'),
+(8, 'Pham Thu Ha', '0912000004', '22 Xuan Thuy', 'Ha Noi', 'Cau Giay', 'Vietnam', '100000', 1, 'shipping');
 
 
 
@@ -532,42 +539,10 @@ INSERT INTO `settings` (`key`, `value`) VALUES
 
 INSERT INTO `logs` (`user_id`, `action`) VALUES
 (1, 'Initialized database and sample data'),
-(2, 'Created first sample order ORD-00001');
+(4, 'Created first sample order ORD-00001');
 
 
--- =========================================================
--- EXTRA ADMIN DEMO SEED DATA
--- Added for richer dashboard / admin testing
--- =========================================================
-
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `phone`, `avatar`, `role`, `is_active`) VALUES
-(3, 'Nguyen Thi Anh', 'anh.nguyen@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000001', 'default.jpg', 'user', 1),
-(4, 'Tran Van Binh', 'binh.tran@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000002', 'default.jpg', 'user', 1),
-(5, 'Le Hoang Nam', 'nam.le@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000003', 'default.jpg', 'user', 1),
-(6, 'Pham Thu Ha', 'ha.pham@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000004', 'default.jpg', 'user', 1),
-(7, 'Vo Minh Khoa', 'khoa.vo@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000005', 'default.jpg', 'user', 1),
-(8, 'Bui Mai Lan', 'lan.bui@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000006', 'default.jpg', 'user', 1),
-(9, 'Do Quoc Viet', 'viet.do@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000007', 'default.jpg', 'user', 1),
-(10, 'Dang Ngoc Linh', 'linh.dang@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000008', 'default.jpg', 'user', 1),
-(11, 'Hoang Gia Bao', 'bao.hoang@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000009', 'default.jpg', 'user', 1),
-(12, 'Nguyen Kim Oanh', 'oanh.nguyen@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000010', 'default.jpg', 'user', 1),
-(13, 'Phan Duc Huy', 'huy.phan@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000011', 'default.jpg', 'user', 1),
-(14, 'Ly Thao My', 'my.ly@shop.com', '$2y$12$DYF1lAsG9qcgUePeLkjCE.82zb7JoPRCbTBz/yua6Jz1.Bolg5zdu', '0912000012', 'default.jpg', 'user', 1),
-(15, 'Admin Support', 'support-admin@shop.com', '$2y$12$uZal/hZLC2x6j.IJtRic3uBApW4ASimfP/AJ1gm2f8kxlAZ1vTME.', '0912000099', 'default.jpg', 'admin', 1);
-
-INSERT INTO `user_addresses` (`user_id`, `full_name`, `phone`, `address`, `city`, `province`, `country`, `zip_code`, `is_default`, `type`) VALUES
-(3, 'Nguyen Thi Anh', '0912000001', '12 Le Loi', 'Ho Chi Minh City', 'District 1', 'Vietnam', '700000', 1, 'shipping'),
-(4, 'Tran Van Binh', '0912000002', '45 Tran Hung Dao', 'Da Nang', 'Hai Chau', 'Vietnam', '550000', 1, 'shipping'),
-(5, 'Le Hoang Nam', '0912000003', '88 Nguyen Van Cu', 'Can Tho', 'Ninh Kieu', 'Vietnam', '900000', 1, 'shipping'),
-(6, 'Pham Thu Ha', '0912000004', '22 Xuan Thuy', 'Ha Noi', 'Cau Giay', 'Vietnam', '100000', 1, 'shipping'),
-(7, 'Vo Minh Khoa', '0912000005', '136 Vo Thi Sau', 'Ho Chi Minh City', 'District 3', 'Vietnam', '700000', 1, 'shipping'),
-(8, 'Bui Mai Lan', '0912000006', '17 Hai Ba Trung', 'Hai Phong', 'Hong Bang', 'Vietnam', '180000', 1, 'shipping'),
-(9, 'Do Quoc Viet', '0912000007', '65 Quang Trung', 'Ha Noi', 'Ha Dong', 'Vietnam', '100000', 1, 'shipping'),
-(10, 'Dang Ngoc Linh', '0912000008', '9 Nguyen Hue', 'Hue', 'Phu Hoi', 'Vietnam', '530000', 1, 'shipping'),
-(11, 'Hoang Gia Bao', '0912000009', '55 Cach Mang Thang 8', 'Ho Chi Minh City', 'District 10', 'Vietnam', '700000', 1, 'shipping'),
-(12, 'Nguyen Kim Oanh', '0912000010', '301 Le Duan', 'Da Nang', 'Thanh Khe', 'Vietnam', '550000', 1, 'shipping'),
-(13, 'Phan Duc Huy', '0912000011', '76 Pham Ngu Lao', 'Ha Noi', 'Dong Da', 'Vietnam', '100000', 1, 'shipping'),
-(14, 'Ly Thao My', '0912000012', '150 Bach Dang', 'Da Nang', 'Son Tra', 'Vietnam', '550000', 1, 'shipping');
+-- Removed extra user seed data
 
 
 
@@ -591,16 +566,12 @@ INSERT INTO `coupons` (`code`, `type`, `value`, `min_order`, `max_uses`, `used_c
 INSERT INTO `posts` (`category_id`, `author_id`, `title`, `slug`, `thumbnail`, `excerpt`, `content`, `views`, `is_published`, `published_at`, `created_at`, `updated_at`) VALUES
 (1, 1, 'Small living room ideas that still feel luxurious', 'small-living-room-ideas-that-still-feel-luxurious', 'post-4.jpg', 'Simple styling ideas for a small living room.', 'Expanded sample content for small living room styling and admin demo.', 74, 1, '2026-03-26 09:00:00', '2026-03-26 09:00:00', '2026-03-26 09:00:00'),
 (2, 1, 'How to choose the right dining set for your home', 'how-to-choose-the-right-dining-set-for-your-home', 'post-5.jpg', 'Practical tips to choose a dining table and chair set.', 'Expanded sample content for dining set guide and admin demo.', 61, 1, '2026-03-27 10:00:00', '2026-03-27 10:00:00', '2026-03-27 10:00:00'),
-(3, 15, '5 decor details that make your bedroom feel calm', '5-decor-details-that-make-your-bedroom-feel-calm', 'post-6.jpg', 'Bedroom styling tips with a calm and warm feeling.', 'Expanded sample content for bedroom styling article.', 49, 1, '2026-03-28 14:00:00', '2026-03-28 14:00:00', '2026-03-28 14:00:00'),
-(1, 15, 'Workspace refresh checklist for a more focused week', 'workspace-refresh-checklist-for-a-more-focused-week', 'post-7.jpg', 'Quick office refresh ideas for productivity.', 'Expanded sample content for workspace setup.', 37, 1, '2026-03-30 08:30:00', '2026-03-30 08:30:00', '2026-03-30 08:30:00');
+(3, 2, '5 decor details that make your bedroom feel calm', '5-decor-details-that-make-your-bedroom-feel-calm', 'post-6.jpg', 'Bedroom styling tips with a calm and warm feeling.', 'Expanded sample content for bedroom styling article.', 49, 1, '2026-03-28 14:00:00', '2026-03-28 14:00:00', '2026-03-28 14:00:00'),
+(1, 2, 'Workspace refresh checklist for a more focused week', 'workspace-refresh-checklist-for-a-more-focused-week', 'post-7.jpg', 'Quick office refresh ideas for productivity.', 'Expanded sample content for workspace setup.', 37, 1, '2026-03-30 08:30:00', '2026-03-30 08:30:00', '2026-03-30 08:30:00');
 
 INSERT INTO `contacts` (`name`, `email`, `phone`, `subject`, `message`, `is_read`, `created_at`) VALUES
 ('Tran My Linh', 'linh.contact@gmail.com', '0901112233', 'Order status', 'Can you help me check my order status for last week?', 1, '2026-03-18 10:10:00'),
-('Pham Van Duc', 'duc.ask@gmail.com', '0902223344', 'Return policy', 'I want to know your return policy for sale items.', 0, '2026-03-20 15:20:00'),
-('Le Thu Trang', 'trang.home@gmail.com', '0903334455', 'Product dimensions', 'Please send exact dimensions for the walnut desk.', 0, '2026-03-22 09:30:00'),
-('Bui Hoang Son', 'son.bui@gmail.com', '0904445566', 'Bulk order', 'Do you have discount for ordering 10 dining chairs?', 1, '2026-03-23 11:05:00'),
-('Ngo Minh Chau', 'chau.ngo@gmail.com', '0905556677', 'Shipping issue', 'My package arrived late. Please support.', 0, '2026-03-25 16:45:00'),
-('Dang Bao Ngoc', 'ngoc.dang@gmail.com', '0906667788', 'Warranty question', 'Does the office chair include a warranty period?', 0, '2026-03-28 13:10:00');
+('Pham Van Duc', 'duc.ask@gmail.com', '0902223344', 'Return policy', 'I want to know your return policy for sale items.', 0, '2026-03-20 15:20:00');
 
 INSERT INTO `banners` (`title`, `subtitle`, `image`, `link`, `sort_order`, `is_active`) VALUES
 ('New Season Dining Collection', 'Modern dining sets for everyday moments', '/assets/images/banner-dining.jpg', '/user/shop.php?category=dining-room', 3, 1),
@@ -608,12 +579,12 @@ INSERT INTO `banners` (`title`, `subtitle`, `image`, `link`, `sort_order`, `is_a
 
 INSERT INTO `logs` (`user_id`, `action`, `created_at`) VALUES
 (1, 'Seeded extended admin demo data', '2026-04-05 18:00:00'),
-(15, 'Reviewed inventory imports for March batch', '2026-04-05 18:05:00'),
+(2, 'Reviewed inventory imports for March batch', '2026-04-05 18:05:00'),
 (1, 'Confirmed multiple sample orders for admin testing', '2026-04-05 18:10:00');
 
 
 UPDATE `users` SET `last_login` = '2026-04-05 09:00:00' WHERE `id` = 1;
-UPDATE `users` SET `last_login` = '2026-04-04 20:30:00' WHERE `id` = 2;
+UPDATE `users` SET `last_login` = '2026-04-04 20:30:00' WHERE `id` = 4;
 
 
 
@@ -636,8 +607,8 @@ SET `meta_title` = `title`, `meta_description` = `excerpt`
 WHERE `meta_title` IS NULL;
 
 INSERT INTO `customer_notes` (`user_id`, `admin_id`, `note`) VALUES
-(2, 1, 'Frequent returning customer. Good sample account for order-history testing.'),
-(3, 1, 'Used for dashboard customer metrics and admin search demo.');
+(4, 1, 'Frequent returning customer. Good sample account for order-history testing.'),
+(5, 1, 'Used for dashboard customer metrics and admin search demo.');
 
 INSERT INTO `notification_subscribers` (`email`) VALUES
 ('newsletter1@example.com'),
@@ -651,14 +622,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- END OF FINAL CLEAN FILE
 -- =========================================================
 
--- =========================================================
--- OFFICIAL ADMIN ACCOUNT
--- Email : admin@3legant.com
--- Password: Admin@3legant
--- Only @3legant.com emails with role=admin can access /admin
--- =========================================================
-INSERT INTO `users` (`name`, `email`, `password`, `phone`, `avatar`, `role`, `is_active`) VALUES
-('3legant Admin', 'admin@3legant.com', '$2y$10$4G0O8Qn3TusLImzl2SWuJO9PF2R72djXn8Qbj8g5VlZelIxryNSLa', '0900000000', 'default.jpg', 'admin', 1);
+-- Remove the duplicate official admin account since it was moved up
 
 SET FOREIGN_KEY_CHECKS = 1;
 

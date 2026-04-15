@@ -50,9 +50,8 @@ function formatVND($price) {
     height: 18px;
 }
 .navbar {
-    position: fixed;
-    top: -10px;
-    ...
+    position: sticky;
+    top: 0;
 }
 .navbar.scrolled {
     background: rgba(255, 255, 255, 0.92);

@@ -483,49 +483,7 @@ function getLinkUrl($overrides = []) {
 }
 .btn-show-more:hover { background: #141718; color: #fff; }
 
-/* ── Newsletter ── */
-.newsletter {
-    background: #F3F5F7;
-    text-align: center;
-    padding: 80px 24px;
-}
-.newsletter-inner { max-width: 440px; margin: 0 auto; }
-.newsletter h2 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 36px;
-    font-weight: 500;
-    color: #141718;
-    margin: 0 0 10px;
-}
-.newsletter p { font-size: 15px; color: #141718; margin: 0 0 32px; }
-.newsletter-form {
-    display: flex;
-    align-items: center;
-    border-bottom: 1.5px solid #141718;
-    padding-bottom: 8px;
-    gap: 8px;
-}
-.newsletter-form svg { flex-shrink: 0; }
-.newsletter-form input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-family: inherit;
-    font-size: 15px;
-    color: #141718;
-}
-.newsletter-form input::placeholder { color: #9BA3AF; }
-.newsletter-form button {
-    background: none;
-    border: none;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    color: #141718;
-    cursor: pointer;
-    white-space: nowrap;
-}
+
 
 /* ── Pagination ── */
 .pagination-row {

@@ -57,7 +57,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 .topbar.hidden { display: none; }
 </style>
 <div class="topbar" id="topbar">
-    <img src="../assets/images/voucher.png" class="topbar-icon" onerror="this.style.display='none'">
+    <img src="<?= BASE_URL ?>assets/images/voucher.png" class="topbar-icon" onerror="this.style.display='none'">
     <span class="topbar-text">30% off storewide — Limited time!</span>
     <a href="shop.php" class="topbar-link">Shop Now →</a>
     <span class="topbar-close" onclick="document.getElementById('topbar').classList.add('hidden')">✕</span>
@@ -376,7 +376,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
         <input type="checkbox" id="menu-toggle">
 
         <label for="menu-toggle" class="menu-btn">
-            <img src="../assets/image/menu.png" alt="menu">
+            <img src="<?= BASE_URL ?>assets/image/menu.png" alt="menu">
         </label>
 
         <a href="index.php" class="logo">3legant.</a>
@@ -411,15 +411,15 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 
         <div class="icons">
             <a href="shop.php" class="icon-link desktop">
-                <img src="../assets/image/search 02.png" alt="search">
+                <img src="<?= BASE_URL ?>assets/image/search 02.png" alt="search">
             </a>
 
             <a href="my_account.php" class="icon-link desktop">
-                <img src="../assets/image/Vector1.png" alt="account">
+                <img src="<?= BASE_URL ?>assets/image/Vector1.png" alt="account">
             </a>
 
             <a href="cart.php" class="cart-wrapper">
-                <img src="../assets/image/shopping bag.png" alt="bag">
+                <img src="<?= BASE_URL ?>assets/image/shopping bag.png" alt="bag">
                 <span id="cart-count" class="cart-badge">
                     <?php
                         $total = 0;

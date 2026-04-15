@@ -1,5 +1,5 @@
 <section class="newsletter">
-    <img src="/web_shopping/assets/images/image.png" style="
+    <img src="../assets/images/image.png" style="
        position:absolute;
        top:0;
        left:50%;
@@ -41,7 +41,7 @@ document.getElementById('newsletterForm').addEventListener('submit', function(e)
     const formData = new FormData();
     formData.append('email', email);
 
-    fetch('/web_shopping/controllers/NewsletterController.php', {
+    fetch('../controllers/NewsletterController.php', {
         method: 'POST',
         body: formData
     })

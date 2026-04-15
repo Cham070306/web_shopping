@@ -3,18 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include "../includes/auth.php";
-include "../includes/navbar.php";
 ?>
-<!DOCTYPE html>
-<html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Address | 3legant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+<?php include '../includes/header.php'; ?>
+<?php include "../includes/navbar.php"; ?>
+<style>
         :root {
             --black: #141718;
             --gray-600: #343839;
@@ -23,186 +15,24 @@ include "../includes/navbar.php";
             --white: #FFFFFF;
         }
 
-        .navbar {
-            width: 100%;
-            height: 50px;
-            background: white;
-            display: flex;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
 
-        .navbar-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--black);
-            text-decoration: none;
-        }
-
-        .menu {
-            display: flex;
-            gap: 40px;
-        }
-
-        .menu-header {
-            display: none !important;
-        }
-
-        .menu a {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--gray-400);
-            text-decoration: none;
-            padding: 8px 0;
-            border-bottom: 2px solid transparent;
-            transition: 0.2s;
-        }
-
-        .menu a.active,
-        .menu a:hover {
-            color: var(--black);
-        }
-
-        .menu a.active {
-            color: var(--black);
-            border-bottom: 2px solid var(--black);
-        }
-
-        .icons {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .icons a {
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .icons img {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-            cursor: pointer;
-        }
-
-        .icon-link,
-        .cart-wrapper {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .cart-wrapper {
-            display: flex !important;
-            align-items: center;
-            gap: 5px;
-            position: relative;
-        }
-
-        .cart-badge {
-            background-color: var(--black);
-            color: white;
-            font-size: 12px;
-            font-weight: 700;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-        }
-
-        .cart-wrapper img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .desktop {
-            display: flex;
-        }
-
-        #menu-toggle,
-        .menu-btn {
-            display: none;
-        }
-
-        #menu-toggle:checked~.menu {
-            left: 0;
-        }
-
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: #1e2223;
-            ;
-            display: none;
-            z-index: 10000;
-        }
-
-        #menu-toggle:checked~.overlay {
-            display: block;
-        }
-
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            color: var(--black);
-            background: var(--white);
-            line-height: 1.5;
-            padding-top: 30px;
-        }
-
-        .container {
-            max-width: 1120px;
-            margin: 60px auto;
-            padding: 0 20px;
-            min-height: 70vh;
-        }
 
         .breadcrumb {
             display: none !important;
         }
 
         .page-header {
-            font-size: 54px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 60px;
-            letter-spacing: -1px;
+            font-size: 40px; 
+            font-weight: 600; 
+            text-align: center; 
+            margin-bottom: 60px; 
+            letter-spacing: -0.5px; 
         }
 
-        .account-layout {
-            display: flex;
-            gap: 64px;
+        .account-layout { 
+            display: flex; 
+            gap: 60px; 
+            padding-bottom: 80px;
         }
 
         .address-content {
@@ -348,6 +178,7 @@ include "../includes/navbar.php";
             border: none;
             padding: 12px;
             border-radius: 40px;
+            font-family: 'Inter', sans-serif;
             font-weight: 500;
             width: 100%;
             cursor: pointer;
@@ -701,11 +532,8 @@ include "../includes/navbar.php";
             }
         }
     </style>
-</head>
 
-<body>
-  
-    <div class="container">
+    <div class="container" style="margin-top: 60px; min-height: 70vh;">
         <div class="breadcrumb">
             <a href="javascript:history.back()" class="back-link">
                 <i class="fa-solid fa-chevron-left"></i> back
@@ -752,11 +580,11 @@ include "../includes/navbar.php";
                         </div>
                         <div class="address-info">
                             <strong
-                                id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Chưa nhập tên') ?></strong>
+                                id="billing-name"><?= htmlspecialchars($_SESSION['user']['billing_name'] ?? 'Not entered') ?></strong>
                             <span
-                                id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                                id="billing-phone"><?= htmlspecialchars($_SESSION['user']['billing_phone'] ?? 'Not entered') ?></span>
                             <p id="billing-address">
-                                <?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Vui lòng cập nhật địa chỉ') ?>
+                                <?= htmlspecialchars($_SESSION['user']['billing_address'] ?? 'Please update your address') ?>
                             </p>
                         </div>
                     </div>
@@ -769,11 +597,11 @@ include "../includes/navbar.php";
                         </div>
                         <div class="address-info">
                             <strong
-                                id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Chưa nhập tên') ?></strong>
+                                id="shipping-name"><?= htmlspecialchars($_SESSION['user']['shipping_name'] ?? 'Not entered') ?></strong>
                             <span
-                                id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Chưa nhập SĐT') ?></span>
+                                id="shipping-phone"><?= htmlspecialchars($_SESSION['user']['shipping_phone'] ?? 'Not entered') ?></span>
                             <p id="shipping-address">
-                                <?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Vui lòng cập nhật địa chỉ') ?>
+                                <?= htmlspecialchars($_SESSION['user']['shipping_address'] ?? 'Please update your address') ?>
                             </p>
                         </div>
                     </div>
@@ -790,54 +618,22 @@ include "../includes/navbar.php";
                 <input type="hidden" id="addressType">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="inputName" placeholder="Nhập họ và tên..." required>
+                    <input type="text" id="inputName" placeholder="Enter full name..." required>
                 </div>
                 <div class="form-group">
                     <label>Phone Number</label>
-                    <input type="text" id="inputPhone" placeholder="Nhập số điện thoại..." required>
+                    <input type="text" id="inputPhone" placeholder="Enter phone number..." required>
                 </div>
                 <div class="form-group">
                     <label>Address</label>
-                    <input type="text" id="inputAddress" placeholder="Nhập địa chỉ đầy đủ..." required>
+                    <input type="text" id="inputAddress" placeholder="Enter full address..." required>
                 </div>
                 <button type="submit" class="btn-save">Save Changes</button>
             </form>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="footercontainer">
-            <div class="footer-top">
-                <div class="footer-brand">
-                    <span class="logo-light">3legant.</span>
-                    <span class="line"></span>
-                    <span class="slogan">Gift & Decoration Store</span>
-                </div>
-                <nav class="footer-nav">
-                    <a href="index.php">Home</a>
-                    <a href="shop.php">Shop</a>
-                    <a href="Product.php">Product</a>
-                    <a href="blog.php">Blog</a>
-                    <a href="contact.php">Contact Us</a>
-                </nav>
-            </div>
-
-            <div class="footer-bottom">
-                <div class="footer-legal">
-                    <span>Copyright © 2026 3legant. All rights reserved</span>
-                    <div class="legal-links">
-                        <a href="Privacy Policy">Privacy Policy</a>
-                        <a href="Terms of Use">Terms of Use</a>
-                    </div>
-                </div>
-                <div class="footer-social">
-                    <a href="Instagram"><img src="../assets/image/instagram.png" alt="Instagram"></a>
-                    <a href="Facebook"><img src="../assets/image/Vector 2998.png" alt="Facebook"></a>
-                    <a href="Youtube"><img src="../assets/image/youtube.png" alt="Youtube"></a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <?php include '../includes/footer.php'; ?>
 
     <script>
         const modal = document.getElementById("addressModal");
@@ -850,9 +646,9 @@ include "../includes/navbar.php";
             const currentPhone = document.getElementById(prefix + "-phone").innerText.trim();
             const currentAddr = document.getElementById(prefix + "-address").innerText.trim();
 
-            document.getElementById("inputName").value = (currentName === "Chưa nhập tên") ? "" : currentName;
-            document.getElementById("inputPhone").value = (currentPhone === "Chưa nhập SĐT") ? "" : currentPhone;
-            document.getElementById("inputAddress").value = (currentAddr === "Vui lòng cập nhật địa chỉ") ? "" : currentAddr;
+            document.getElementById("inputName").value = (currentName === "Not entered") ? "" : currentName;
+            document.getElementById("inputPhone").value = (currentPhone === "Not entered") ? "" : currentPhone;
+            document.getElementById("inputAddress").value = (currentAddr === "Please update your address") ? "" : currentAddr;
 
             modal.style.display = "flex";
         }
@@ -880,11 +676,11 @@ include "../includes/navbar.php";
                 body: formData
             })
                 .then(response => {
-                    alert("Cập nhật thành công!");
+                    alert("Updated successfully!");
                     window.location.reload();
                 })
                 .catch(error => {
-                    alert("Lỗi kết nối!");
+                    alert("Connection error!");
                 });
         };
         window.onclick = function (event) {

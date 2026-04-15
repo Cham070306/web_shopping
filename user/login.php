@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập | 3legant</title>
+    <title>Sign In | 3legant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
@@ -41,15 +41,18 @@
             background-size: cover; 
             position: relative;
         }
-        .auth-side-bg::after {
-            content: "3legant"; 
-            position: absolute; 
-            top: 40px; 
+        .auth-side-logo {
+            position: absolute;
+            top: 40px;
             left: 50%;
-            transform: translateX(-50%); 
-            font-size: 24px; 
+            transform: translateX(-50%);
+            font-size: 24px;
             font-weight: 800;
+            color: #141718;
+            text-decoration: none;
+            white-space: nowrap;
         }
+        .auth-side-logo:hover { opacity: 0.75; }
 
         .auth-content { 
             flex: 1; 
@@ -161,12 +164,16 @@
         input::-ms-clear {
             display: none;
         }
-        input::-webkit-contacts-auto-fill-button,
-        input::-webkit-credentials-auto-fill-button {
-            visibility: hidden;
-            pointer-events: none;
-            position: absolute;
-            right: 0;
+
+        /* Override Chrome autofill blue background to match design */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+            box-shadow: 0 0 0 1000px #ffffff inset !important;
+            -webkit-text-fill-color: #141718 !important;
+            transition: background-color 5000s ease-in-out 0s;
+            border-bottom: 1px solid #E8ECEF !important;
         }
         
         .forgot-password { 
@@ -228,7 +235,9 @@
 <body>
 
 <div class="auth-wrapper">
-    <div class="auth-side-bg"></div>
+    <div class="auth-side-bg">
+        <a href="index.php" class="auth-side-logo">3legant.</a>
+    </div>
 
     <div class="auth-content">
         <div class="form-container">
@@ -242,16 +251,16 @@
                 <div class="msg success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
             <?php endif; ?>
 
-            <form method="POST" action="../controllers/AuthController.php?action=login">
+            <form method="POST" action="../controllers/AuthController.php?action=login" autocomplete="off">
                 <div class="form-group">
                     <label>Your Email Address</label>
-                    <input type="email" name="email" placeholder="Email address" required>
+                    <input type="email" name="email" placeholder="Email address" autocomplete="off" required>
                 </div>
                 
                 <div class="form-group">
                     <label>Password</label>
                     <div class="password-input-wrapper">
-                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <input type="password" id="password" name="password" placeholder="Password" autocomplete="new-password" required>
                         <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
                     </div>
                 </div>
@@ -269,6 +278,14 @@
     </div>
 </div>
 <script>
+    // Allow Chrome autofill but remove readonly on focus so user can type
+    document.querySelectorAll('input[name="email"], input[name="password"]').forEach(input => {
+        input.setAttribute('readonly', true);
+        input.addEventListener('focus', function () {
+            this.removeAttribute('readonly');
+        });
+    });
+
     const togglePassword = document.querySelector('#togglePassword');
     const passwordInput = document.querySelector('#password');
 

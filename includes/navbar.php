@@ -4,7 +4,65 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $current_page = basename($_SERVER['PHP_SELF']);
+
+// Pages that should NOT show the promotional topbar
+$_hide_topbar_pages = ['my_account.php', 'my_address.php', 'wishlist.php'];
+$_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 ?>
+
+<?php if ($_show_topbar): ?>
+<style>
+.topbar {
+    background: #141718;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+}
+.topbar-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.85;
+}
+.topbar-text {
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+.topbar-link {
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+.topbar-link:hover {
+    border-color: #fff;
+    text-decoration: none !important;
+}
+.topbar-close {
+    position: absolute;
+    right: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    user-select: none;
+}
+.topbar-close:hover { opacity: 1; }
+.topbar.hidden { display: none; }
+</style>
+<div class="topbar" id="topbar">
+    <img src="../assets/images/voucher.png" class="topbar-icon" onerror="this.style.display='none'">
+    <span class="topbar-text">30% off storewide — Limited time!</span>
+    <a href="shop.php" class="topbar-link">Shop Now →</a>
+    <span class="topbar-close" onclick="document.getElementById('topbar').classList.add('hidden')">✕</span>
+</div>
+<?php endif; ?>
 
 <style>
 :root {
@@ -78,6 +136,64 @@ $current_page = basename($_SERVER['PHP_SELF']);
     color: var(--black);
     font-weight: 600;
     border-bottom: 2px solid var(--black);
+}
+
+/* ── Mega Menu Dropdown ── */
+.nav-has-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 8px 0;
+}
+.nav-has-dropdown > a {
+    padding: 0;
+    border-bottom: none !important;
+}
+.dropdown-icon {
+    font-size: 10px;
+    transition: 0.3s;
+    color: var(--gray-400);
+}
+.nav-has-dropdown:hover .dropdown-icon {
+    transform: rotate(180deg);
+    color: var(--black);
+}
+.nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    background: #fff;
+    min-width: 240px; /* Slightly wider to fit Accessories & Decor on one line */
+    box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 12px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10000;
+}
+/* Show dropdown on hover */
+.nav-has-dropdown:hover .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.nav-dropdown a {
+    display: block !important;
+    padding: 10px 24px !important;
+    border-bottom: none !important;
+    color: var(--gray-400) !important;
+    font-weight: 500 !important;
+    white-space: nowrap; /* Prevent wrapping */
+    transition: all 0.2s;
+}
+.nav-dropdown a:hover {
+    color: var(--black) !important;
+    background: #F3F5F7;
+    padding-left: 28px !important; /* Nice hover indent effect */
 }
 
 .icons {
@@ -272,8 +388,24 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
 
             <a href="index.php" class="<?= ($current_page == 'index.php') ? 'active' : '' ?>">Home</a>
-            <a href="shop.php" class="<?= ($current_page == 'shop.php') ? 'active' : '' ?>">Shop</a>
-            <a href="product.php" class="<?= ($current_page == 'product.php') ? 'active' : '' ?>">Product</a>
+            
+            <a href="shop.php" class="<?= ($current_page == 'shop.php' && !isset($_GET['cat'])) ? 'active' : '' ?>">Shop</a>
+            
+            <!-- Dropdown for Product/Categories -->
+            <div class="nav-has-dropdown">
+                <a href="javascript:void(0)" class="<?= (isset($_GET['cat']) || $current_page == 'product_detail.php') ? 'active' : '' ?>">Product</a>
+                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                <div class="nav-dropdown">
+                    <a href="shop.php">All Products</a>
+                    <a href="shop.php?cat=living-room">Living Room</a>
+                    <a href="shop.php?cat=bedroom">Bedroom</a>
+                    <a href="shop.php?cat=kitchen">Kitchen</a>
+                    <a href="shop.php?cat=dining-room">Dining Room</a>
+                    <a href="shop.php?cat=outdoor">Outdoor</a>
+                    <a href="shop.php?cat=decor">Accessories & Decor</a>
+                </div>
+            </div>
+
             <a href="contact.php" class="<?= ($current_page == 'contact.php') ? 'active' : '' ?>">Contact Us</a>
         </div>
 
@@ -317,3 +449,40 @@ window.addEventListener('scroll', function () {
     }
 });
 </script>
+
+<?php
+$_nav_user = $_SESSION['user'] ?? [];
+if (
+    !empty($_nav_user) &&
+    ($_nav_user['role'] ?? '') === 'admin' &&
+    str_ends_with($_nav_user['email'] ?? '', '@3legant.com')
+): ?>
+<style>
+.admin-fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    background: #141718;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    transition: background 0.2s, transform 0.2s;
+}
+.admin-fab:hover {
+    background: #343839;
+    transform: translateY(-2px);
+}
+</style>
+<a href="../admin/dashboard.php" class="admin-fab">
+    <i class="fa-solid fa-gauge"></i> Admin Panel
+</a>
+<?php endif; ?>

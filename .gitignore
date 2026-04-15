@@ -7,10 +7,20 @@
 Thumbs.db
 .DS_Store
 
+# Stray files
+/=
+
+# Python cache & generated tools output
+__pycache__/
+*.pyc
+
 /assets/uploads/products/*
 /assets/uploads/posts/*
 /assets/uploads/users/*
 /assets/uploads/banners/*
+
+/assets/product-images/*
+!/assets/product-images/.gitkeep
 
 !/assets/uploads/products/.gitkeep
 !/assets/uploads/posts/.gitkeep

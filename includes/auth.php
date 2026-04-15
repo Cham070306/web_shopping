@@ -18,7 +18,7 @@ $user_id    = $_SESSION['user']['id'];
 $user_name  = $userData['name'] ?? $_SESSION['user']['name'];
 $user_email = $userData['email'] ?? $_SESSION['user']['email'];
 $user_phone = $userData['phone'] ?? '';
-$user_avatar = $userData['avatar'] ?? 'default-avatar.jpg';
+$user_avatar = $userData['avatar'] ?? 'default.jpg';
 
 $current_page = basename($_SERVER['PHP_SELF']);
 

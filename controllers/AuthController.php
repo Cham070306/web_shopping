@@ -30,28 +30,28 @@ switch ($action) {
             $_SESSION['old_data'] = ['name' => $name, 'email' => $email];
 
             if (empty($name) || empty($email) || empty($pass)) {
-                notify("../user/register.php", "error", "Vui lòng điền đầy đủ thông tin!");
+                notify("../user/register.php", "error", "Please fill in all fields!");
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                notify("../user/register.php", "error", "Email không đúng định dạng!");
+                notify("../user/register.php", "error", "Invalid email format!");
             }
             if (strlen($pass) < 6) {
-                notify("../user/register.php", "error", "Mật khẩu phải ít nhất 6 ký tự!");
+                notify("../user/register.php", "error", "Password must be at least 6 characters!");
             }
             if ($pass !== $conf) {
-                notify("../user/register.php", "error", "Mật khẩu xác nhận không khớp!");
+                notify("../user/register.php", "error", "Passwords do not match!");
             }
             if ($userModel->getByEmail($email)) {
-                notify("../user/register.php", "error", "Email này đã tồn tại!");
+                notify("../user/register.php", "error", "Email already exists!");
             }
 
             unset($_SESSION['old_data']);
             $hash = password_hash($pass, PASSWORD_BCRYPT);
 
             if ($userModel->create($name, $email, $hash)) {
-                notify("../user/login.php", "success", "Đăng ký thành công!");
+                notify("../user/login.php", "success", "Registration successful!");
             } else {
-                notify("../user/register.php", "error", "Lỗi hệ thống.");
+                notify("../user/register.php", "error", "System error.");
             }
         }
         break;
@@ -63,7 +63,7 @@ switch ($action) {
             $remember = isset($_POST['remember']);
 
             if (empty($email) || empty($pass)) {
-                notify("../user/login.php", "error", "Vui lòng nhập email và mật khẩu.");
+                notify("../user/login.php", "error", "Please enter email and password.");
             }
 
             $user = $userModel->getByEmail($email);
@@ -79,10 +79,15 @@ switch ($action) {
                     }
                 }
 
-                header("Location: ../user/index.php");
+                // Redirect based on role and email domain
+                if (($user['role'] ?? '') === 'admin' && str_ends_with($user['email'] ?? '', '@3legant.com')) {
+                    header("Location: ../admin/dashboard.php");
+                } else {
+                    header("Location: ../user/index.php");
+                }
                 exit();
             } else {
-                notify("../user/login.php", "error", "Email hoặc mật khẩu không chính xác.");
+                notify("../user/login.php", "error", "Incorrect email or password.");
             }
         }
         break;
@@ -106,10 +111,10 @@ switch ($action) {
                     header("Location: ../user/enter_code.php");
                     exit;
                 } else {
-                    notify("../user/forgot_password.php", "error", "Không gửi được email!");
+                    notify("../user/forgot_password.php", "error", "Failed to send email!");
                 }
             } else {
-                notify("../user/forgot_password.php", "error", "Email không tồn tại!");
+                notify("../user/forgot_password.php", "error", "Email does not exist!");
             }
         }
         break;
@@ -156,9 +161,9 @@ switch ($action) {
         $send = sendResetOTP($email, $otp);
 
         if ($send) {
-            notify("../user/enter_code.php", "success", "Đã gửi lại OTP!");
+            notify("../user/enter_code.php", "success", "OTP sent again!");
         } else {
-            notify("../user/enter_code.php", "error", "Không gửi lại được OTP!");
+            notify("../user/enter_code.php", "error", "Failed to resend OTP!");
         }
         break;
 
@@ -175,15 +180,15 @@ switch ($action) {
             $email = $_SESSION['reset_email'] ?? '';
 
             if (empty($password) || empty($confirm)) {
-                notify("../user/reset_password.php", "error", "Vui lòng nhập đầy đủ mật khẩu!");
+                notify("../user/reset_password.php", "error", "Please enter all password fields!");
             }
 
             if (strlen($password) < 6) {
-                notify("../user/reset_password.php", "error", "Mật khẩu phải có ít nhất 6 ký tự!");
+                notify("../user/reset_password.php", "error", "Password must be at least 6 characters!");
             }
 
             if ($password !== $confirm) {
-                notify("../user/reset_password.php", "error", "Mật khẩu không khớp!");
+                notify("../user/reset_password.php", "error", "Passwords do not match!");
             }
 
             $hashed = password_hash($password, PASSWORD_DEFAULT);
@@ -195,9 +200,9 @@ switch ($action) {
                 unset($_SESSION['otp_expire']);
                 unset($_SESSION['reset_verified']);
 
-                notify("../user/login.php", "success", "Đổi mật khẩu thành công!");
+                notify("../user/login.php", "success", "Password changed successfully!");
             } else {
-                notify("../user/reset_password.php", "error", "Không thể cập nhật mật khẩu!");
+                notify("../user/reset_password.php", "error", "Unable to update password!");
             }
         }
         break;
@@ -230,7 +235,11 @@ switch ($action) {
                     }
                 } else {
                     $hasError = true;
-                    notify("../user/my_account.php", "error", "Email không hợp lệ!");
+                    if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                        echo json_encode(['success' => false, 'message' => 'Invalid email!']);
+                        exit;
+                    }
+                    notify("../user/my_account.php", "error", "Invalid email!");
                 }
             }
 
@@ -241,7 +250,11 @@ switch ($action) {
 
                 if (!in_array($ext, $allowedExtensions)) {
                     $hasError = true;
-                    notify($redirectUrl, "error", "Đuôi file không hỗ trợ!");
+                    if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                        echo json_encode(['success' => false, 'message' => 'File extension not supported!']);
+                        exit;
+                    }
+                    notify($redirectUrl, "error", "File extension not supported!");
                 }
 
                 if (!$hasError) {
@@ -255,7 +268,11 @@ switch ($action) {
                         $_SESSION['user']['avatar'] = $fileName;
 
                         if (count($_POST) <= 1) {
-                            notify($redirectUrl, "success", "Cập nhật ảnh đại diện thành công.");
+                            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                                echo json_encode(['success' => true, 'message' => 'Avatar updated successfully.', 'avatar' => $fileName]);
+                                exit;
+                            }
+                            notify($redirectUrl, "success", "Avatar updated successfully.");
                         }
                     }
                 }
@@ -269,12 +286,20 @@ switch ($action) {
                     $userModel->updatePassword($userId, $newHash);
                 } else {
                     $hasError = true;
-                    notify("../user/my_account.php", "error", "Mật khẩu hiện tại không đúng.");
+                    if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                        echo json_encode(['success' => false, 'message' => 'Current password is incorrect.']);
+                        exit;
+                    }
+                    notify("../user/my_account.php", "error", "Current password is incorrect.");
                 }
             }
 
             if (!$hasError) {
-                notify($redirectUrl, "success", "Cập nhật thông tin thành công.");
+                if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                    echo json_encode(['success' => true, 'message' => 'Information updated successfully.']);
+                    exit;
+                }
+                notify($redirectUrl, "success", "Information updated successfully.");
             }
         }
         break;
@@ -297,7 +322,7 @@ switch ($action) {
                     exit();
                 }
 
-                notify("../user/my_address.php", "success", "Thành công");
+                notify("../user/my_address.php", "success", "Success");
             }
         }
         break;

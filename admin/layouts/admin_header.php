@@ -16,8 +16,9 @@ $_nav_items = [
     ['page' => 'dashboard',   'href' => 'dashboard.php',          'icon' => 'fa-chart-pie',      'label' => 'Dashboard',  'group' => 'Overview'],
     ['page' => 'categories',  'href' => 'categories/index.php',   'icon' => 'fa-layer-group',    'label' => 'Categories', 'group' => 'Catalog'],
     ['page' => 'products',    'href' => 'products/index.php',     'icon' => 'fa-box-open',       'label' => 'Products',   'group' => 'Catalog'],
-    ['page' => 'orders',      'href' => 'orders.php',             'icon' => 'fa-bag-shopping',   'label' => 'Orders',     'group' => 'Sales'],
-    ['page' => 'customers',   'href' => 'customers.php',          'icon' => 'fa-users',          'label' => 'Customers',  'group' => 'Sales'],
+    ['page' => 'orders',      'href' => 'orders/index.php',       'icon' => 'fa-bag-shopping',   'label' => 'Orders',     'group' => 'Sales'],
+    ['page' => 'inventory',   'href' => 'inventory/index.php',    'icon' => 'fa-warehouse',      'label' => 'Inventory',  'group' => 'Operations'],
+    ['page' => 'customers',   'href' => 'customers.php',          'icon' => 'fa-users',          'label' => 'Customers',  'group' => 'System'],
     ['page' => 'store',       'href' => '../user/index.php',      'icon' => 'fa-store',          'label' => 'View Store', 'group' => 'System'],
     ['page' => 'logout',      'href' => '../controllers/LogoutController.php', 'icon' => 'fa-arrow-right-from-bracket', 'label' => 'Logout', 'group' => 'System'],
 ];

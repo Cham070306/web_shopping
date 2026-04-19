@@ -335,7 +335,7 @@ body{
     <div class="menu-group">
         <span class="menu-title">Sales</span>
         <div class="sidebar-nav">
-            <a href="orders.php" class="sidebar-link <?php echo $currentPage == 'orders' ? 'active' : ''; ?>">
+            <a href="<?php echo $base_url ?? ''; ?>orders/index.php" class="sidebar-link <?php echo $currentPage == 'orders' ? 'active' : ''; ?>">
                 <i class="fa-solid fa-bag-shopping"></i>
                 <span>Orders</span>
             </a>
@@ -345,12 +345,12 @@ body{
     <div class="menu-group">
         <span class="menu-title">Operations</span>
         <div class="sidebar-nav">
-            <a href="inventory.php" class="sidebar-link <?php echo $currentPage == 'inventory' ? 'active' : ''; ?>">
+            <a href="<?php echo $base_url ?? ''; ?>inventory/index.php" class="sidebar-link <?php echo $currentPage == 'inventory' ? 'active' : ''; ?>">
                 <i class="fa-solid fa-warehouse"></i>
                 <span>Inventory</span>
             </a>
 
-            <a href="customers.php" class="sidebar-link <?php echo $currentPage == 'customers' ? 'active' : ''; ?>">
+            <a href="<?php echo $base_url ?? ''; ?>customers.php" class="sidebar-link <?php echo $currentPage == 'customers' ? 'active' : ''; ?>">
                 <i class="fa-solid fa-users"></i>
                 <span>Customers</span>
             </a>

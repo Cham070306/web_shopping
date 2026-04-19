@@ -10,6 +10,13 @@ Thumbs.db
 # Stray files
 /=
 
+# Backup and Temporary files
+*.bak
+*.old
+*.tmp
+*.swp
+*~
+
 # Python cache & generated tools output
 __pycache__/
 *.pyc

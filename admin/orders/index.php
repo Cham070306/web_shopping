@@ -35,11 +35,11 @@ $base_path   = '../';
 include '../layouts/admin_header.php';
 
 $statusLabels = [
-    'pending'   => ['Chờ xử lý', '#FFAB00', '#FFF7ED'],
-    'confirmed' => ['Xác nhận', '#2196F3', '#E3F2FD'],
-    'shipping'  => ['Đang giao', '#9C27B0', '#F3E5F5'],
-    'delivered' => ['Đã giao', '#38CB89', '#E8F9EE'],
-    'cancelled' => ['Đã hủy', '#FF5630', '#FFF0F0'],
+    'pending'   => ['Pending', '#FFAB00', '#FFF7ED'],
+    'confirmed' => ['Confirmed', '#2196F3', '#E3F2FD'],
+    'shipping'  => ['Shipping', '#9C27B0', '#F3E5F5'],
+    'delivered' => ['Delivered', '#38CB89', '#E8F9EE'],
+    'cancelled' => ['Cancelled', '#FF5630', '#FFF0F0'],
 ];
 
 if (!function_exists('formatVND')) {
@@ -94,33 +94,33 @@ if (!function_exists('formatVND')) {
 <!-- Stats -->
 <div class="stats-grid">
     <div class="stat-card">
-        <span class="stat-title">Tổng đơn hàng</span>
+        <span class="stat-title">Total Orders</span>
         <span class="stat-value"><?= number_format($stats['total_orders'] ?? 0) ?></span>
     </div>
     <div class="stat-card">
-        <span class="stat-title">Doanh thu tổng</span>
+        <span class="stat-title">Total Revenue</span>
         <span class="stat-value"><?= formatVND($stats['revenue'] ?? 0) ?></span>
     </div>
     <div class="stat-card">
-        <span class="stat-title">Đơn hàng mới (Chờ xử lý)</span>
+        <span class="stat-title">New Orders (Pending)</span>
         <span class="stat-value"><?= number_format($stats['pending_orders'] ?? 0) ?></span>
     </div>
     <div class="stat-card">
-        <span class="stat-title">Người dùng</span>
+        <span class="stat-title">Customers</span>
         <span class="stat-value"><?= number_format($stats['total_customers'] ?? 0) ?></span>
     </div>
 </div>
 
 <!-- Filter -->
 <form class="filter-bar" method="GET">
-    <input type="text" name="search" class="filter-input" placeholder="Tìm mã đơn, tên, email, sđt..." value="<?= htmlspecialchars($search) ?>">
+    <input type="text" name="search" class="filter-input" placeholder="Search by order code, name, email, phone..." value="<?= htmlspecialchars($search) ?>">
     <select name="status" class="filter-select">
-        <option value="">Tất cả trạng thái</option>
+        <option value="">All Statuses</option>
         <?php foreach ($statusLabels as $k => $v): ?>
             <option value="<?= $k ?>" <?= $status === $k ? 'selected' : '' ?>><?= $v[0] ?></option>
         <?php endforeach; ?>
     </select>
-    <button type="submit" class="btn-filter">Tìm kiếm</button>
+    <button type="submit" class="btn-filter">Search</button>
 </form>
 
 <!-- Table -->
@@ -128,19 +128,19 @@ if (!function_exists('formatVND')) {
     <table class="adm-table">
         <thead>
             <tr>
-                <th>Mã đơn</th>
-                <th>Khách hàng</th>
-                <th>SĐT</th>
-                <th>Tổng tiền</th>
-                <th>PTTT</th>
-                <th>Trạng thái</th>
-                <th>Ngày</th>
+                <th>Order Code</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             <?php if (empty($orders)): ?>
-                <tr><td colspan="8" style="text-align: center; padding: 40px; color: #6C7275;">Không tìm thấy đơn hàng nào.</td></tr>
+                <tr><td colspan="8" style="text-align: center; padding: 40px; color: #6C7275;">No orders found.</td></tr>
             <?php else: ?>
                 <?php foreach ($orders as $ord): ?>
                     <tr>
@@ -169,7 +169,7 @@ if (!function_exists('formatVND')) {
                         <td style="font-size: 13px; color: #6C7275;"><?= date('d/m/Y H:i', strtotime($ord['created_at'])) ?></td>
                         <td style="text-align: right;">
                             <a href="detail.php?id=<?= $ord['id'] ?>" class="btn btn-outline btn-sm">
-                                <i class="fa-solid fa-eye"></i> Chi tiết
+                                <i class="fa-solid fa-eye"></i> Details
                             </a>
                         </td>
                     </tr>

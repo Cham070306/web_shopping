@@ -102,7 +102,7 @@ function handleAdd()
     $quantity   = max(1, (int) ($input['quantity'] ?? 1));
 
     if (!$user_id) {
-        echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để thêm vào giỏ hàng.', 'require_login' => true]);
+        echo json_encode(['success' => false, 'message' => 'Please log in to add items to cart.', 'require_login' => true]);
         return;
     }
 
@@ -118,7 +118,7 @@ function handleAdd()
     $product = $stmt->get_result()->fetch_assoc();
 
     if (!$product || !$product['is_active']) {
-        echo json_encode(['success' => false, 'message' => 'Sản phẩm không tồn tại']);
+        echo json_encode(['success' => false, 'message' => 'Product not found']);
         return;
     }
 
@@ -135,7 +135,7 @@ function handleAdd()
     }
 
     if ($availableStock < $quantity) {
-        echo json_encode(['success' => false, 'message' => 'Sản phẩm không đủ số lượng trong kho']);
+        echo json_encode(['success' => false, 'message' => 'Insufficient stock for this product']);
         return;
     }
 
@@ -145,7 +145,7 @@ function handleAdd()
         $cartCount = $orderModel->getCartCount($user_id, $session_id);
         echo json_encode([
             'success'    => true,
-            'message'    => 'Đã thêm vào giỏ hàng',
+            'message'    => 'Added to cart',
             'cart_count' => $cartCount
         ]);
     } else {

@@ -135,7 +135,7 @@ function invThumb($thumb) {
 <?php if (count($lowStock) > 0): ?>
     <div class="inv-alert">
         <div class="inv-alert-header" onclick="document.getElementById('lsList').style.display = document.getElementById('lsList').style.display === 'block' ? 'none' : 'block'">
-            <div class="inv-alert-title"><i class="fa-solid fa-triangle-exclamation"></i> Chú ý: Có <?= count($lowStock) ?> sản phẩm sắp hoặc đã hết hàng</div>
+            <div class="inv-alert-title"><i class="fa-solid fa-triangle-exclamation"></i> Warning: <?= count($lowStock) ?> products are low or out of stock</div>
             <i class="fa-solid fa-chevron-down"></i>
         </div>
         <div class="low-stock-list" id="lsList">
@@ -163,7 +163,7 @@ function invThumb($thumb) {
             <option value="<?= $cat['id'] ?>" <?= $category_id === $cat['id'] ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
         <?php endforeach; ?>
     </select>
-    <button type="submit" class="btn-filter">Lọc dữ liệu</button>
+    <button type="submit" class="btn-filter">Filter</button>
 </form>
 
 <!-- Table -->
@@ -181,18 +181,18 @@ function invThumb($thumb) {
         </thead>
         <tbody>
             <?php if (empty($products)): ?>
-                <tr><td colspan="6" style="text-align:center; padding: 40px; color:#6C7275;">Không tìm thấy sản phẩm nào.</td></tr>
+                <tr><td colspan="6" style="text-align:center; padding: 40px; color:#6C7275;">No products found.</td></tr>
             <?php else: ?>
                 <?php foreach ($products as $p):
                     $stk = (int)$p['stock'];
                     $sold = (int)($p['sold_qty'] ?? 0);
                     $stockColor = $stk <= 5 ? 'red' : ($stk <= 10 ? 'orange' : 'green');
                     if ($stk <= 0) {
-                        $badge = ['Hết hàng', 'bg-red'];
+                        $badge = ['Out of Stock', 'bg-red'];
                     } elseif ($stk <= 10) {
                         $badge = ['Sắp hết', 'bg-orange'];
                     } else {
-                        $badge = ['Còn hàng', 'bg-green'];
+                        $badge = ['In Stock', 'bg-green'];
                     }
                 ?>
                 <tr>
@@ -276,16 +276,16 @@ async function saveStock(pid, btn) {
             const badge = document.getElementById('badge-' + pid);
             if (val <= 0) {
                 badge.className = 'badge-status bg-red';
-                badge.textContent = 'Hết hàng';
+                badge.textContent = 'Out of Stock';
             } else if (val <= 10) {
                 badge.className = 'badge-status bg-orange';
                 badge.textContent = 'Sắp hết';
             } else {
                 badge.className = 'badge-status bg-green';
-                badge.textContent = 'Còn hàng';
+                badge.textContent = 'In Stock';
             }
             
-            showToast('Cập nhật tồn kho thành công!');
+            showToast('Stock updated successfully!');
         } else {
             alert('Lỗi cập nhật');
         }

@@ -21,11 +21,11 @@ $recentOrders = $orderModel->getRecentOrders(5);
 $lowStockCount = count($orderModel->getLowStockProducts(10));
 
 $statusLabels = [
-    'pending'   => ['Chờ xử lý', '#FFAB00', '#FFF7ED'],
-    'confirmed' => ['Xác nhận', '#2196F3', '#E3F2FD'],
-    'shipping'  => ['Đang giao', '#9C27B0', '#F3E5F5'],
-    'delivered' => ['Đã giao', '#38CB89', '#E8F9EE'],
-    'cancelled' => ['Đã hủy', '#FF5630', '#FFF0F0'],
+    'pending'   => ['Pending', '#FFAB00', '#FFF7ED'],
+    'confirmed' => ['Confirmed', '#2196F3', '#E3F2FD'],
+    'shipping'  => ['Shipping', '#9C27B0', '#F3E5F5'],
+    'delivered' => ['Delivered', '#38CB89', '#E8F9EE'],
+    'cancelled' => ['Cancelled', '#FF5630', '#FFF0F0'],
 ];
 
 if (!function_exists('formatVND')) {
@@ -47,22 +47,22 @@ if (!function_exists('formatVND')) {
     <div class="adm-stat-card">
         <div class="stat-label">Total Revenue</div>
         <div class="stat-value"><?= formatVND($stats['revenue']) ?></div>
-        <div class="stat-note"><span class="badge badge-green" style="margin-right:4px;">Doanh thu hệ thống</span></div>
+        <div class="stat-note"><span class="badge badge-green" style="margin-right:4px;">System revenue</span></div>
     </div>
     <div class="adm-stat-card">
         <div class="stat-label">Total Orders</div>
         <div class="stat-value"><?= number_format($stats['total_orders']) ?></div>
-        <div class="stat-note"><span class="badge badge-green" style="margin-right:4px;"><?= number_format($stats['pending_orders']) ?> đơn chờ</span> Cần xử lý</div>
+        <div class="stat-note"><span class="badge badge-green" style="margin-right:4px;"><?= number_format($stats['pending_orders']) ?> pending</span> Needs processing</div>
     </div>
     <div class="adm-stat-card">
         <div class="stat-label">Active Customers</div>
         <div class="stat-value"><?= number_format($stats['total_customers']) ?></div>
-        <div class="stat-note"><span class="badge badge-green" style="margin-right:4px;">Khách hàng</span></div>
+        <div class="stat-note"><span class="badge badge-green" style="margin-right:4px;">Customers</span></div>
     </div>
     <div class="adm-stat-card">
         <div class="stat-label">Low Stock Items</div>
         <div class="stat-value" style="color: <?= $lowStockCount > 0 ? 'var(--red)' : '#38CB89' ?>;"><?= $lowStockCount ?></div>
-        <div class="stat-note" style="color: <?= $lowStockCount > 0 ? 'var(--red)' : '#6C7275' ?>;"><?= $lowStockCount > 0 ? 'Needs attention immediately' : 'Kho hàng ổn định' ?></div>
+        <div class="stat-note" style="color: <?= $lowStockCount > 0 ? 'var(--red)' : '#6C7275' ?>;"><?= $lowStockCount > 0 ? 'Needs attention immediately' : 'Inventory is stable' ?></div>
     </div>
 </div>
 

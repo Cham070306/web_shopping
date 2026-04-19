@@ -28,7 +28,7 @@ $pages   = max(1, ceil($total / $per_page));
 $stats = $orderModel->getAdminDashboardStats();
 
 $currentPage = 'orders';
-$pageTitle   = 'Quản lý đơn hàng';
+$pageTitle   = 'Order Management';
 $breadcrumb  = 'Sales / Orders';
 $base_path   = '../';
 
@@ -214,12 +214,12 @@ async function updateStatus(orderId, selectEl) {
             selectEl.style.backgroundColor = bg;
             selectEl.style.color = color;
         } else {
-            alert(data.message || 'Cập nhật thất bại');
+            alert(data.message || 'Update failed');
             window.location.reload();
         }
     } catch (e) {
         console.error(e);
-        alert('Lỗi kết nối!');
+        alert('Connection error!');
     }
 }
 </script>

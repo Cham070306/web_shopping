@@ -40,7 +40,7 @@ $pages    = max(1, ceil($total / $per_page));
 $lowStock = $orderModel->getLowStockProducts(10); // Lấy danh sách sp sắp hết hàng (<=10)
 
 $currentPage = 'inventory';
-$pageTitle   = 'Quản lý tồn kho';
+$pageTitle   = 'Inventory Management';
 $breadcrumb  = 'Operations / Inventory';
 $base_path   = '../';
 
@@ -145,7 +145,7 @@ function invThumb($thumb) {
                         <img src="<?= invThumb($ls['thumbnail']) ?>" alt="">
                         <div class="ls-info">
                             <div class="ls-name" title="<?= htmlspecialchars($ls['name']) ?>"><?= htmlspecialchars($ls['name']) ?></div>
-                            <div class="ls-stock">Tồn: <?= $ls['stock'] ?></div>
+                            <div class="ls-stock">Stock: <?= $ls['stock'] ?></div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -156,9 +156,9 @@ function invThumb($thumb) {
 
 <!-- Filter -->
 <form class="filter-bar" method="GET">
-    <input type="text" name="search" class="filter-input" placeholder="Tìm tên sản phẩm, SKU..." value="<?= htmlspecialchars($search) ?>">
+    <input type="text" name="search" class="filter-input" placeholder="Search product name, SKU..." value="<?= htmlspecialchars($search) ?>">
     <select name="category" class="filter-select">
-        <option value="0">Tất cả danh mục</option>
+        <option value="0">All Categories</option>
         <?php foreach ($allCategories as $cat): ?>
             <option value="<?= $cat['id'] ?>" <?= $category_id === $cat['id'] ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
         <?php endforeach; ?>
@@ -171,12 +171,12 @@ function invThumb($thumb) {
     <table class="inv-table">
         <thead>
             <tr>
-                <th>Sản phẩm</th>
-                <th>Danh mục</th>
-                <th>Đã bán</th>
-                <th>Tồn kho</th>
-                <th>Trạng thái</th>
-                <th>Cập nhật Tồn kho</th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Sold</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Update Stock</th>
             </tr>
         </thead>
         <tbody>
@@ -190,7 +190,7 @@ function invThumb($thumb) {
                     if ($stk <= 0) {
                         $badge = ['Out of Stock', 'bg-red'];
                     } elseif ($stk <= 10) {
-                        $badge = ['Sắp hết', 'bg-orange'];
+                        $badge = ['Low Stock', 'bg-orange'];
                     } else {
                         $badge = ['In Stock', 'bg-green'];
                     }
@@ -212,7 +212,7 @@ function invThumb($thumb) {
                     <td>
                         <div class="update-wrap">
                             <input type="number" class="update-input" id="input-<?= $p['id'] ?>" value="<?= $stk ?>" min="0">
-                            <button class="btn-save-inline" onclick="saveStock(<?= $p['id'] ?>, this)">Lưu</button>
+                            <button class="btn-save-inline" onclick="saveStock(<?= $p['id'] ?>, this)">Save</button>
                         </div>
                     </td>
                 </tr>
@@ -279,7 +279,7 @@ async function saveStock(pid, btn) {
                 badge.textContent = 'Out of Stock';
             } else if (val <= 10) {
                 badge.className = 'badge-status bg-orange';
-                badge.textContent = 'Sắp hết';
+                badge.textContent = 'Low Stock';
             } else {
                 badge.className = 'badge-status bg-green';
                 badge.textContent = 'In Stock';
@@ -287,13 +287,13 @@ async function saveStock(pid, btn) {
             
             showToast('Stock updated successfully!');
         } else {
-            alert('Lỗi cập nhật');
+            alert('Update error');
         }
     } catch (e) {
-        alert('Lỗi mạng kết nối');
+        alert('Network connection error');
     } finally {
         btn.classList.remove('loading');
-        btn.textContent = 'Lưu';
+        btn.textContent = 'Save';
         btn.disabled = false;
     }
 }

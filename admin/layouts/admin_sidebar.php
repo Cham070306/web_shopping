@@ -387,7 +387,7 @@ body{
             <div class="admin-top">
                 <div class="admin-avatar">AD</div>
                 <div class="admin-info">
-                    <h4>Admin Nguyễn</h4>
+                    <h4><?= htmlspecialchars($_SESSION['user']['name'] ?? 'Administrator') ?></h4>
                     <p>admin@3elegant.com</p>
                 </div>
             </div>

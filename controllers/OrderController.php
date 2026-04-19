@@ -98,7 +98,7 @@ function processCheckout()
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        flashRedirect('../user/checkout.php', 'error', 'Email không hợp lệ');
+        flashRedirect('../user/checkout.php', 'error', 'Invalid email address');
     }
 
     // ── 2. Lấy cart items ──
@@ -280,7 +280,7 @@ function userCancelOrder()
 
     if (!$user_id || !$order_id) {
         header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+        echo json_encode(['success' => false, 'message' => 'Invalid data']);
         return;
     }
 
@@ -307,7 +307,7 @@ function adminUpdateStatus()
     // Kiểm tra quyền admin
     $user = $_SESSION['user'] ?? [];
     if (empty($user) || ($user['role'] ?? '') !== 'admin') {
-        echo json_encode(['success' => false, 'message' => 'Không có quyền truy cập']);
+        echo json_encode(['success' => false, 'message' => 'Access denied']);
         return;
     }
 
@@ -316,7 +316,7 @@ function adminUpdateStatus()
 
     $allowedStatuses = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'];
     if (!$order_id || !in_array($status, $allowedStatuses)) {
-        echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+        echo json_encode(['success' => false, 'message' => 'Invalid data']);
         return;
     }
 
@@ -341,7 +341,7 @@ function adminUpdatePayment()
 
     $user = $_SESSION['user'] ?? [];
     if (empty($user) || ($user['role'] ?? '') !== 'admin') {
-        echo json_encode(['success' => false, 'message' => 'Không có quyền truy cập']);
+        echo json_encode(['success' => false, 'message' => 'Access denied']);
         return;
     }
 
@@ -350,7 +350,7 @@ function adminUpdatePayment()
 
     $allowedPayment = ['pending', 'paid', 'failed', 'refunded'];
     if (!$order_id || !in_array($payment_status, $allowedPayment)) {
-        echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+        echo json_encode(['success' => false, 'message' => 'Invalid data']);
         return;
     }
 
@@ -375,14 +375,14 @@ function adminGetDetail()
 
     $user = $_SESSION['user'] ?? [];
     if (empty($user) || ($user['role'] ?? '') !== 'admin') {
-        echo json_encode(['success' => false, 'message' => 'Không có quyền truy cập']);
+        echo json_encode(['success' => false, 'message' => 'Access denied']);
         return;
     }
 
     $order_id = (int) ($_GET['order_id'] ?? $_POST['order_id'] ?? 0);
 
     if (!$order_id) {
-        echo json_encode(['success' => false, 'message' => 'Thiếu order_id']);
+        echo json_encode(['success' => false, 'message' => 'Missing order_id']);
         return;
     }
 

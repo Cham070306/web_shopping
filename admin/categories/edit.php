@@ -50,7 +50,7 @@ include '../layouts/admin_header.php';
             <label>Slug</label>
             <input type="text" name="slug" class="adm-input"
                    value="<?= htmlspecialchars($category['slug']) ?>">
-            <p class="adm-form-hint">Dùng cho URL, chỉ bao gồm chữ thường, số và dấu gạch ngang.</p>
+            <p class="adm-form-hint">Used for URL, only includes lowercase letters, numbers and hyphens.</p>
         </div>
 
         <div class="adm-form-group">

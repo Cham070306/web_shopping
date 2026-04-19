@@ -7,7 +7,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
 }
 ?>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -165,7 +165,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center font-bold">AD</div>
           <div class="min-w-0">
-            <p class="font-semibold truncate">Admin Nguyễn</p>
+            <p class="font-semibold truncate">Administrator</p>
             <p class="text-xs text-slate-400 truncate">admin@3elegant.com</p>
           </div>
         </div>
@@ -228,7 +228,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
             <div class="glass rounded-[28px] border border-white/70 p-5 card-hover">
               <div class="flex items-start justify-between">
                 <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center"><i class="fas fa-triangle-exclamation text-xl"></i></div>
-                <span class="status-pill bg-rose-50 text-rose-700"><span class="dot bg-rose-500"></span>Cảnh báo</span>
+                <span class="status-pill bg-rose-50 text-rose-700"><span class="dot bg-rose-500"></span>Warning</span>
               </div>
               <p class="text-sm text-slate-500 mt-5">Low stock items</p>
               <h3 id="lowStockCount" class="text-3xl font-extrabold mt-1">0</h3>
@@ -436,13 +436,13 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
           <div class="glass rounded-[28px] border border-white/70 p-5 lg:p-6">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
               <div>
-                <h3 class="text-xl font-bold">Danh sách đơn hàng</h3>
+                <h3 class="text-xl font-bold">Order List</h3>
                 <p class="text-sm text-slate-500">Quick status updates with a popup.</p>
               </div>
               <div class="flex flex-wrap gap-2">
                 <input id="orderSearch" type="text" placeholder="Order code / Customer name" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none min-w-[220px]" oninput="renderOrders()" />
                 <select id="orderStatusFilter" class="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none" onchange="renderOrders()">
-                  <option value="all">All trạng thái</option>
+                  <option value="all">All Statuses</option>
                   <option value="pending">Pending</option>
                   <option value="processing">Processing</option>
                   <option value="shipped">Shipped</option>
@@ -584,7 +584,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
     <div class="w-full max-w-2xl rounded-[28px] bg-white p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h3 id="modalTitle" class="text-2xl font-extrabold">Add sản phẩm</h3>
+          <h3 id="modalTitle" class="text-2xl font-extrabold">Add Product</h3>
           <p class="text-sm text-slate-500">Fill in the product information to create or edit an item.</p>
         </div>
         <button onclick="closeProductModal()" class="w-10 h-10 rounded-full bg-slate-100"><i class="fas fa-xmark"></i></button>
@@ -599,7 +599,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         <div><label class="text-sm font-semibold">Status</label>
           <select id="prodStatus" class="w-full rounded-2xl border border-slate-200 px-4 py-3 mt-2 bg-white">
             <option value="active">Active</option>
-            <option value="inactive">Ngừng bán</option>
+            <option value="inactive">Inactive</option>
           </select>
         </div>
       </div>
@@ -614,8 +614,8 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
     <div class="w-full max-w-xl rounded-[28px] bg-white p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h3 class="text-2xl font-extrabold">Add mã giảm giá</h3>
-          <p class="text-sm text-slate-500">Nhập thông tin khuyến mãi để hiển thị ở khu quản trị.</p>
+          <h3 class="text-2xl font-extrabold">Add Coupon</h3>
+          <p class="text-sm text-slate-500">Enter promotion details for the admin panel.</p>
         </div>
         <button onclick="closeCouponModal()" class="w-10 h-10 rounded-full bg-slate-100"><i class="fas fa-xmark"></i></button>
       </div>
@@ -742,7 +742,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         delivered: ['Delivered', 'bg-emerald-50 text-emerald-700', 'bg-emerald-500'],
         cancelled: ['Cancelled', 'bg-rose-50 text-rose-700', 'bg-rose-500'],
         active: ['Active', 'bg-emerald-50 text-emerald-700', 'bg-emerald-500'],
-        inactive: ['Ngừng bán', 'bg-slate-100 text-slate-600', 'bg-slate-400']
+        inactive: ['Inactive', 'bg-slate-100 text-slate-600', 'bg-slate-400']
       };
       return map[status] || [status, 'bg-slate-100 text-slate-700', 'bg-slate-400'];
     }
@@ -800,9 +800,9 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const lowStock = products.filter(p => p.stock <= 5).length;
       const expiredCoupons = coupons.filter(c => isCouponExpired(c.expiry)).length;
       document.getElementById('quickTasks').innerHTML = [
-        { title: 'Đơn hàng chờ xử lý', value: pending, color: 'amber', action: "setActiveSection('orders')" },
+        { title: 'Pending Orders', value: pending, color: 'amber', action: "setActiveSection('orders')" },
         { title: 'Low stock items', value: lowStock, color: 'rose', action: "setActiveSection('inventory')" },
-        { title: 'Coupon đã hết hạn', value: expiredCoupons, color: 'slate', action: "setActiveSection('marketing')" }
+        { title: 'Expired Coupons', value: expiredCoupons, color: 'slate', action: "setActiveSection('marketing')" }
       ].map(item => `
         <button onclick="${item.action}" class="w-full flex items-center justify-between rounded-2xl border border-slate-200 p-3 bg-white/70 hover:bg-white text-left">
           <div>
@@ -833,9 +833,9 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
           <div class="flex items-center justify-between gap-3">
             <div>
               <p class="font-semibold">${p.name}</p>
-              <p class="text-sm text-rose-700">Stock hiện tại: ${p.stock}</p>
+              <p class="text-sm text-rose-700">Current stock: ${p.stock}</p>
             </div>
-            <button onclick="openImportModal(); document.getElementById('importProductId').value='${p.id}'" class="text-sm font-semibold text-rose-700">Nhập thêm</button>
+            <button onclick="openImportModal(); document.getElementById('importProductId').value='${p.id}'" class="text-sm font-semibold text-rose-700">Restock</button>
           </div>
         </div>
       `).join('') : `<div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-700 font-medium">Inventory looks healthy. No products are below the alert threshold.</div>`;
@@ -1066,7 +1066,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
             <button onclick="deleteProduct(${p.id})" class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100"><i class="far fa-trash-can"></i></button>
           </td>
         </tr>
-      `).join('') : `<tr><td colspan="8" class="px-4 py-12 text-center text-slate-400">Không có sản phẩm phù hợp.</td></tr>`;
+      `).join('') : `<tr><td colspan="8" class="px-4 py-12 text-center text-slate-400">No matching products found.</td></tr>`;
 
       document.getElementById('productPageInfo').innerText = `Page ${currentProductPage} / ${totalPages}`;
     }
@@ -1195,7 +1195,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
           <td class="px-4 py-4 font-bold">${o.id}</td>
           <td class="px-4 py-4">
             <p class="font-semibold">${o.customer}</p>
-            <p class="text-xs text-slate-400">${o.items.reduce((sum, i) => sum + i.qty, 0)} sản phẩm</p>
+            <p class="text-xs text-slate-400">${o.items.reduce((sum, i) => sum + i.qty, 0)} items</p>
           </td>
           <td class="px-4 py-4 text-slate-500">${o.items.map(i => `${i.name} x${i.qty}`).join(', ')}</td>
           <td class="px-4 py-4 font-bold">${money(o.total)}</td>
@@ -1205,7 +1205,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
             <button onclick="updateOrderStatus('${o.id}')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-sm font-semibold">Update</button>
           </td>
         </tr>
-      `).join('') : `<tr><td colspan="7" class="px-4 py-12 text-center text-slate-400">Không tìm thấy đơn hàng.</td></tr>`;
+      `).join('') : `<tr><td colspan="7" class="px-4 py-12 text-center text-slate-400">No orders found.</td></tr>`;
 
       document.getElementById('pendingCount').innerText = orders.filter(o => o.status === 'pending').length;
       document.getElementById('processingCount').innerText = orders.filter(o => o.status === 'processing').length;
@@ -1233,7 +1233,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
             <div class="rounded-2xl bg-slate-50 p-3"><p class="text-xs text-slate-400">Joined</p><p class="font-bold mt-1">${formatDate(c.joined)}</p></div>
           </div>
         </div>
-      `).join('') : `<div class="text-slate-400">Không có khách hàng phù hợp.</div>`;
+      `).join('') : `<div class="text-slate-400">No matching customers found.</div>`;
     }
 
     function isCouponExpired(expiry) {
@@ -1260,11 +1260,11 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
             </div>
             <div class="mt-4 flex gap-2">
               <button onclick="toggleCoupon('${c.code}')" ${expired ? 'disabled' : ''} class="flex-1 px-4 py-2.5 rounded-2xl ${expired ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white'} text-sm font-semibold">${c.active ? 'Disable' : 'Enable'}</button>
-              <button onclick="deleteCoupon('${c.code}')" class="px-4 py-2.5 rounded-2xl bg-rose-50 text-rose-600 text-sm font-semibold">Xóa</button>
+              <button onclick="deleteCoupon('${c.code}')" class="px-4 py-2.5 rounded-2xl bg-rose-50 text-rose-600 text-sm font-semibold">Delete</button>
             </div>
           </div>
         `;
-      }).join('') : `<div class="text-slate-400">Chưa có coupon nào.</div>`;
+      }).join('') : `<div class="text-slate-400">No coupons yet.</div>`;
     }
 
     function renderInventory() {
@@ -1273,7 +1273,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const totalLogs = inventoryLogs.length;
       document.getElementById('inventorySummary').innerHTML = `
         <div class="rounded-[24px] bg-white/70 border border-slate-200 p-4"><p class="text-sm text-slate-500">Total stock</p><p class="text-2xl font-extrabold mt-2">${totalStock}</p></div>
-        <div class="rounded-[24px] bg-white/70 border border-slate-200 p-4"><p class="text-sm text-slate-500">Product cần nhập</p><p class="text-2xl font-extrabold mt-2">${lowStock}</p></div>
+        <div class="rounded-[24px] bg-white/70 border border-slate-200 p-4"><p class="text-sm text-slate-500">Products to restock</p><p class="text-2xl font-extrabold mt-2">${lowStock}</p></div>
         <div class="rounded-[24px] bg-white/70 border border-slate-200 p-4"><p class="text-sm text-slate-500">Stock entries</p><p class="text-2xl font-extrabold mt-2">${totalLogs}</p></div>
       `;
 
@@ -1286,7 +1286,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
           </div>
           <div class="text-emerald-700 text-xl font-extrabold">+${log.quantity}</div>
         </div>
-      `).join('') : `<div class="rounded-2xl border border-slate-200 bg-white/70 p-4 text-slate-400">Chưa có lịch sử nhập kho.</div>`;
+      `).join('') : `<div class="rounded-2xl border border-slate-200 bg-white/70 p-4 text-slate-400">No import history yet.</div>`;
     }
 
     function openProductModal(id = null) {
@@ -1296,7 +1296,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       if (id) {
         const p = products.find(item => item.id === id);
         if (!p) return;
-        document.getElementById('modalTitle').innerText = 'Chỉnh sửa sản phẩm';
+        document.getElementById('modalTitle').innerText = 'Edit Product';
         document.getElementById('editProductId').value = p.id;
         document.getElementById('prodName').value = p.name;
         populateCategoryOptions(p.categoryId || '');
@@ -1305,7 +1305,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         document.getElementById('prodSold').value = p.sold || 0;
         document.getElementById('prodStatus').value = p.status;
       } else {
-        document.getElementById('modalTitle').innerText = 'Add sản phẩm';
+        document.getElementById('modalTitle').innerText = 'Add Product';
         document.getElementById('editProductId').value = '';
         document.getElementById('prodName').value = '';
         populateCategoryOptions();
@@ -1343,11 +1343,11 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         if (index !== -1) {
           products[index] = { ...products[index], name, categoryId, category, price, stock, sold, status };
         }
-        Swal.fire('Đã cập nhật', 'Product đã được chỉnh sửa thành công.', 'success');
+        Swal.fire('Updated', 'Product has been edited successfully.', 'success');
       } else {
         const newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
         products.push({ id: newId, name, categoryId, category, price, stock, sold, status });
-        Swal.fire('Đã thêm', 'Product mới đã được tạo.', 'success');
+        Swal.fire('Added', 'New product has been created.', 'success');
       }
 
       persistData();
@@ -1359,11 +1359,11 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
 
     function deleteProduct(id) {
       Swal.fire({
-        title: 'Xóa sản phẩm?',
-        text: 'Actions này sẽ xóa khỏi dữ liệu demo hiện tại.',
+        title: 'Delete Product?',
+        text: 'This action will remove it from current demo data.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Xóa',
+        confirmButtonText: 'Delete',
         cancelButtonText: 'Cancel',
         confirmButtonColor: '#e11d48'
       }).then(res => {
@@ -1371,7 +1371,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         products = products.filter(p => p.id !== id);
         persistData();
         rerenderAll();
-        Swal.fire('Đã xóa', 'Product đã được xóa.', 'success');
+        Swal.fire('Deleted', 'Product has been removed.', 'success');
       });
     }
 
@@ -1402,14 +1402,14 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'SanPham');
       XLSX.writeFile(wb, 'admin-products-sample.xlsx');
-      Swal.fire('Xuất thành công', 'Danh sách sản phẩm đã được tải xuống.', 'success');
+      Swal.fire('Export Successful', 'Product list has been downloaded.', 'success');
     }
 
     function updateOrderStatus(orderId) {
       const order = orders.find(o => o.id === orderId);
       if (!order) return;
       Swal.fire({
-        title: 'Update trạng thái đơn hàng',
+        title: 'Update Order Status',
         input: 'select',
         inputOptions: {
           pending: 'Pending',
@@ -1420,14 +1420,14 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         },
         inputValue: order.status,
         showCancelButton: true,
-        confirmButtonText: 'Lưu',
+        confirmButtonText: 'Save',
         cancelButtonText: 'Cancel'
       }).then(res => {
         if (!res.value) return;
         order.status = res.value;
         persistData();
         rerenderAll();
-        Swal.fire('Đã cập nhật', `Đơn ${order.id} đã đổi trạng thái.`, 'success');
+        Swal.fire('Updated', `Order ${order.id} status has been changed.`, 'success');
       });
     }
 
@@ -1449,18 +1449,18 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const discount = Number(document.getElementById('couponDiscount').value);
       const expiry = document.getElementById('couponExpiry').value;
       if (!code || Number.isNaN(discount) || discount <= 0 || discount > 100 || !expiry) {
-        Swal.fire('Thiếu dữ liệu', 'Nhập đầy đủ mã, phần trăm giảm và ngày hết hạn.', 'error');
+        Swal.fire('Missing Data', 'Please enter code, discount percentage, and expiry date.', 'error');
         return;
       }
       if (coupons.some(c => c.code === code)) {
-        Swal.fire('Trùng mã', 'Coupons này đã tồn tại.', 'warning');
+        Swal.fire('Duplicate Code', 'This coupon already exists.', 'warning');
         return;
       }
       coupons.push({ code, discount, expiry, active: true });
       persistData();
       renderCoupons();
       closeCouponModal();
-      Swal.fire('Thành công', 'Đã thêm coupon mới.', 'success');
+      Swal.fire('Success', 'New coupon has been added.', 'success');
     }
 
     function toggleCoupon(code) {
@@ -1475,7 +1475,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       coupons = coupons.filter(c => c.code !== code);
       persistData();
       renderCoupons();
-      Swal.fire('Đã xóa', 'Coupon đã được xóa.', 'success');
+      Swal.fire('Deleted', 'Coupon has been removed.', 'success');
     }
 
     function openImportModal() {
@@ -1497,15 +1497,15 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const note = document.getElementById('importNote').value.trim();
       const product = products.find(p => p.id === productId);
       if (!product || Number.isNaN(quantity) || quantity <= 0) {
-        Swal.fire('Không hợp lệ', 'Kiểm tra lại Product ID và số lượng nhập.', 'error');
+        Swal.fire('Invalid', 'Please check the Product ID and import quantity.', 'error');
         return;
       }
       product.stock += quantity;
-      inventoryLogs.push({ productId, quantity, note: note || 'Stock import thủ công', date: new Date().toLocaleString('vi-VN') });
+      inventoryLogs.push({ productId, quantity, note: note || 'Manual stock import', date: new Date().toLocaleString('en-US') });
       persistData();
       closeImportModal();
       rerenderAll();
-      Swal.fire('Thành công', `Đã nhập thêm ${quantity} sản phẩm cho ${product.name}.`, 'success');
+      Swal.fire('Success', `Imported ${quantity} units for ${product.name}.`, 'success');
     }
 
     function exportCustomers() {
@@ -1513,7 +1513,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'KhachHang');
       XLSX.writeFile(wb, 'admin-customers-sample.xlsx');
-      Swal.fire('Xuất thành công', 'Danh sách khách hàng đã được tải xuống.', 'success');
+      Swal.fire('Export Successful', 'Customer list has been downloaded.', 'success');
     }
 
     function exportReport() {
@@ -1522,7 +1522,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'BaoCao');
       XLSX.writeFile(wb, 'admin-report-sample.xlsx');
-      Swal.fire('Đã xuất', 'Báo cáo đơn hàng đã được tải xuống.', 'success');
+      Swal.fire('Exported', 'Order report has been downloaded.', 'success');
     }
 
     function saveSettings() {
@@ -1531,14 +1531,14 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       localStorage.setItem('shopPhone', document.getElementById('shopPhone').value.trim());
       localStorage.setItem('shopAddress', document.getElementById('shopAddress').value.trim());
       localStorage.setItem('shippingFee', document.getElementById('shippingFee').value.trim());
-      Swal.fire('Đã lưu', 'Thông tin cửa hàng đã được lưu vào localStorage.', 'success');
+      Swal.fire('Saved', 'Store information has been saved to localStorage.', 'success');
     }
 
     function loadSettings() {
       document.getElementById('shopName').value = localStorage.getItem('shopName') || '3elegant Store';
       document.getElementById('shopEmail').value = localStorage.getItem('shopEmail') || 'contact@3elegant.com';
       document.getElementById('shopPhone').value = localStorage.getItem('shopPhone') || '1900 1234';
-      document.getElementById('shopAddress').value = localStorage.getItem('shopAddress') || '123 Đường ABC, Quận 1, TP.HCM';
+      document.getElementById('shopAddress').value = localStorage.getItem('shopAddress') || '123 Sample St, District 1, HCMC';
       document.getElementById('shippingFee').value = localStorage.getItem('shippingFee') || '15';
     }
 
@@ -1548,12 +1548,12 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         html: `
           <div style="text-align:left; line-height:1.8">
             <p><b>Email:</b> ${document.getElementById('shopEmail').value || '--'}</p>
-            <p><b>Điện thoại:</b> ${document.getElementById('shopPhone').value || '--'}</p>
+            <p><b>Phone:</b> ${document.getElementById('shopPhone').value || '--'}</p>
             <p><b>Address:</b> ${document.getElementById('shopAddress').value || '--'}</p>
-            <p><b>Phí ship:</b> ${document.getElementById('shippingFee').value || '0'} USD</p>
+            <p><b>Shipping Fee:</b> ${document.getElementById('shippingFee').value || '0'} USD</p>
           </div>
         `,
-        confirmButtonText: 'Đóng'
+        confirmButtonText: 'Close'
       });
     }
 
@@ -1612,7 +1612,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
       orders.filter(o => o.status !== 'cancelled').forEach(order => {
         order.items.forEach(item => {
           const product = products.find(p => p.name === item.name);
-          const category = product?.category || 'Khác';
+          const category = product?.category || 'Other';
           categoryMap[category] = (categoryMap[category] || 0) + item.price * item.qty;
         });
       });
@@ -1670,7 +1670,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         'product-detail': ['Product detail', 'A dedicated admin view for one product, linked orders, and stock notes.'],
         orders: ['Orders', 'Track, filter, and update order status.'],
         inventory: ['Inventory', 'Review stock imports, logs, and low-stock alerts.'],
-        customers: ['Customers', 'Hiển thị thông tin, phân loại và tổng chi tiêu.'],
+        customers: ['Customers', 'Display customer info, classification, and total spending.'],
         marketing: ['Coupons', 'Manage discount codes for the marketing module.'],
         reports: ['Reports', 'Revenue charts and order status summaries.'],
         settings: ['Settings', 'Store information saved quickly to localStorage for demo purposes.']
@@ -1694,7 +1694,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
     function handleGlobalSearch() {
       const query = document.getElementById('globalSearch').value.trim().toLowerCase();
       if (!query) {
-        Swal.fire('Chưa nhập từ khóa', 'Please enter a product name, customer, or order code.', 'info');
+        Swal.fire('No keyword entered', 'Please enter a product name, customer, or order code.', 'info');
         return;
       }
 
@@ -1721,14 +1721,14 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         return;
       }
 
-      Swal.fire('Không tìm thấy', 'No data matched this keyword.', 'warning');
+      Swal.fire('Not Found', 'No data matched this keyword.', 'warning');
     }
 
     function exportCurrentSection() {
       if (currentSection === 'products') return exportProducts();
       if (currentSection === 'customers') return exportCustomers();
       if (currentSection === 'reports' || currentSection === 'orders') return exportReport();
-      Swal.fire('Gợi ý', 'Bạn đang ở khu không cần export riêng. Hãy chuyển sang Products, Customers hoặc Reports.', 'info');
+      Swal.fire('Hint', 'This section does not support export. Please switch to Products, Customers, or Reports.', 'info');
     }
 
     function openMobileSidebar() {
@@ -1743,8 +1743,8 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
 
     function resetDemoData() {
       Swal.fire({
-        title: 'Reset dữ liệu demo?',
-        text: 'Sẽ đưa toàn bộ products, orders, customers, coupons và inventory về trạng thái mẫu ban đầu.',
+        title: 'Reset demo data?',
+        text: 'This will restore all products, orders, customers, coupons, and inventory to their default state.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Reset',
@@ -1759,7 +1759,7 @@ if (empty($_user) || ($_user['role'] ?? '') !== 'admin' || !str_ends_with($_user
         inventoryLogs = structuredClone(demoSeed.inventoryLogs);
         persistData();
         rerenderAll();
-        Swal.fire('Đã reset', 'Dữ liệu demo đã quay về bản mẫu.', 'success');
+        Swal.fire('Reset Complete', 'Demo data has been restored to defaults.', 'success');
       });
     }
 

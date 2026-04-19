@@ -107,7 +107,7 @@ function handleAdd()
     }
 
     if (!$product_id) {
-        echo json_encode(['success' => false, 'message' => 'Thiếu product_id']);
+        echo json_encode(['success' => false, 'message' => 'Missing product_id']);
         return;
     }
 
@@ -149,7 +149,7 @@ function handleAdd()
             'cart_count' => $cartCount
         ]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra, vui lòng thử lại']);
+        echo json_encode(['success' => false, 'message' => 'An error occurred, please try again']);
     }
 }
 
@@ -166,7 +166,7 @@ function handleUpdate()
     $quantity = (int) ($input['quantity'] ?? 0);
 
     if (!$cart_id || $quantity < 1) {
-        echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+        echo json_encode(['success' => false, 'message' => 'Invalid data']);
         return;
     }
 
@@ -182,7 +182,7 @@ function handleUpdate()
     $cartItem = $stmt->get_result()->fetch_assoc();
 
     if (!$cartItem) {
-        echo json_encode(['success' => false, 'message' => 'Item không tồn tại']);
+        echo json_encode(['success' => false, 'message' => 'Item not found']);
         return;
     }
 
@@ -201,7 +201,7 @@ function handleUpdate()
     if ($quantity > $maxStock) {
         echo json_encode([
             'success'   => false,
-            'message'   => "Chỉ còn $maxStock sản phẩm trong kho",
+            'message'   => "Only $maxStock items available in stock",
             'max_stock' => $maxStock
         ]);
         return;
@@ -245,7 +245,7 @@ function handleRemove()
     $cart_id = (int) ($input['cart_id'] ?? 0);
 
     if (!$cart_id) {
-        echo json_encode(['success' => false, 'message' => 'Dữ liệu không hợp lệ']);
+        echo json_encode(['success' => false, 'message' => 'Invalid data']);
         return;
     }
 
@@ -293,14 +293,14 @@ function handleApplyCoupon()
     $subtotal = (float) ($input['subtotal'] ?? 0);
 
     if (empty($code)) {
-        echo json_encode(['success' => false, 'message' => 'Vui lòng nhập mã giảm giá']);
+        echo json_encode(['success' => false, 'message' => 'Please enter a coupon code']);
         return;
     }
 
     $coupon = $orderModel->validateCoupon($code, $subtotal);
 
     if (!$coupon) {
-        echo json_encode(['success' => false, 'message' => 'Mã không hợp lệ, đã hết hạn hoặc không đủ điều kiện']);
+        echo json_encode(['success' => false, 'message' => 'Invalid coupon, expired, or does not meet requirements']);
         return;
     }
 

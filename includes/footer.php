@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (err) {
                 console.error(err);
-                showGlobalToast('Lỗi kết nối Server.', 'error');
+                showGlobalToast('Server connection error.', 'error');
             }
         });
     });

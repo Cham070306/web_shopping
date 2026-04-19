@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $_user = $_SESSION['user'] ?? [];
 if (empty($_user) || ($_user['role'] ?? '') !== 'admin') {
     header("Location: ../../user/login.php");

@@ -52,24 +52,24 @@ function orderThumb($thumb) {
 }
 
 $statusConfig = [
-    'pending'   => ['Chờ xác nhận', '#FFAB00', '#FFF7ED'],
-    'confirmed' => ['Đã xác nhận', '#2196F3', '#E3F2FD'],
-    'shipping'  => ['Đang giao',   '#9C27B0', '#F3E5F5'],
-    'delivered' => ['Đã giao',     '#38CB89', '#E8F9EE'],
-    'cancelled' => ['Đã hủy',      '#FF5630', '#FFF0F0'],
+    'pending'   => ['Pending', '#FFAB00', '#FFF7ED'],
+    'confirmed' => ['Confirmed', '#2196F3', '#E3F2FD'],
+    'shipping'  => ['Shipping',   '#9C27B0', '#F3E5F5'],
+    'delivered' => ['Delivered',     '#38CB89', '#E8F9EE'],
+    'cancelled' => ['Cancelled',      '#FF5630', '#FFF0F0'],
 ];
 
 $paymentLabels = [
     'cod'           => 'COD',
-    'bank_transfer' => 'Chuyển khoản',
+    'bank_transfer' => 'Bank Transfer',
     'momo'          => 'MoMo'
 ];
 
 $paymentStatusLabels = [
-    'pending'  => ['Chưa thanh toán', '#FFAB00', '#FFF7ED'],
-    'paid'     => ['Đã thanh toán',   '#38CB89', '#E8F9EE'],
-    'failed'   => ['Thất bại',        '#FF5630', '#FFF0F0'],
-    'refunded' => ['Đã hoàn tiền',    '#2196F3', '#E3F2FD'],
+    'pending'  => ['Unpaid', '#FFAB00', '#FFF7ED'],
+    'paid'     => ['Paid',   '#38CB89', '#E8F9EE'],
+    'failed'   => ['Failed',        '#FF5630', '#FFF0F0'],
+    'refunded' => ['Refunded',    '#2196F3', '#E3F2FD'],
 ];
 
 // Timeline steps
@@ -222,7 +222,7 @@ $timelineSteps = ['pending', 'confirmed', 'shipping', 'delivered'];
             <?php if ($detailOrder): ?>
             <!-- ═══════════ DETAIL VIEW ═══════════ -->
             <a href="my_orders.php" class="back-link">
-                <i class="fa-solid fa-chevron-left"></i> Đơn hàng của tôi
+                <i class="fa-solid fa-chevron-left"></i> My Orders
             </a>
 
             <h2 class="section-title"><?= htmlspecialchars($detailOrder['order_code']) ?></h2>
@@ -235,7 +235,7 @@ $timelineSteps = ['pending', 'confirmed', 'shipping', 'delivered'];
                         <?php
                         $currentIdx = array_search($detailOrder['status'], $timelineSteps);
                         if ($currentIdx === false) $currentIdx = -1;
-                        $stepLabels = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Đã giao'];
+                        $stepLabels = ['Pending', 'Confirmed', 'Shipping', 'Delivered'];
                         foreach ($timelineSteps as $i => $step):
                             $cls = '';
                             if ($i < $currentIdx) $cls = 'done';
@@ -253,23 +253,23 @@ $timelineSteps = ['pending', 'confirmed', 'shipping', 'delivered'];
             </div>
             <?php else: ?>
             <div class="detail-card" style="text-align:center;">
-                <span class="status-badge" style="background:#FFF0F0; color:#FF5630; font-size:14px; padding:8px 20px;">Đơn hàng đã bị hủy</span>
+                <span class="status-badge" style="background:#FFF0F0; color:#FF5630; font-size:14px; padding:8px 20px;">This order has been cancelled</span>
             </div>
             <?php endif; ?>
 
             <!-- Order Info -->
             <div class="detail-card">
-                <h3 class="detail-card-title">Thông tin đơn hàng</h3>
+                <h3 class="detail-card-title">Order Information</h3>
                 <div class="detail-grid">
-                    <div><div class="detail-label">Mã đơn</div><div class="detail-value" style="font-family:monospace;"><?= htmlspecialchars($detailOrder['order_code']) ?></div></div>
-                    <div><div class="detail-label">Ngày đặt</div><div class="detail-value"><?= date('d/m/Y H:i', strtotime($detailOrder['created_at'])) ?></div></div>
+                    <div><div class="detail-label">Order Code</div><div class="detail-value" style="font-family:monospace;"><?= htmlspecialchars($detailOrder['order_code']) ?></div></div>
+                    <div><div class="detail-label">Order Date</div><div class="detail-value"><?= date('d/m/Y H:i', strtotime($detailOrder['created_at'])) ?></div></div>
                     <div>
-                        <div class="detail-label">Trạng thái</div>
+                        <div class="detail-label">Status</div>
                         <?php $sc = $statusConfig[$detailOrder['status']] ?? ['N/A','#6C7275','#F3F5F7']; ?>
                         <span class="status-badge" style="background:<?= $sc[2] ?>; color:<?= $sc[1] ?>;"><?= $sc[0] ?></span>
                     </div>
                     <div>
-                        <div class="detail-label">Thanh toán</div>
+                        <div class="detail-label">Payment</div>
                         <?php $ps = $paymentStatusLabels[$detailOrder['payment_status']] ?? ['N/A','#6C7275','#F3F5F7']; ?>
                         <span class="status-badge" style="background:<?= $ps[2] ?>; color:<?= $ps[1] ?>;"><?= $ps[0] ?></span>
                     </div>
@@ -278,23 +278,23 @@ $timelineSteps = ['pending', 'confirmed', 'shipping', 'delivered'];
 
             <!-- Shipping info -->
             <div class="detail-card">
-                <h3 class="detail-card-title">Thông tin giao hàng</h3>
+                <h3 class="detail-card-title">Shipping Information</h3>
                 <div class="detail-grid">
-                    <div><div class="detail-label">Người nhận</div><div class="detail-value"><?= htmlspecialchars($detailOrder['full_name']) ?></div></div>
-                    <div><div class="detail-label">Số điện thoại</div><div class="detail-value"><?= htmlspecialchars($detailOrder['phone']) ?></div></div>
-                    <div style="grid-column:1/-1;"><div class="detail-label">Địa chỉ</div><div class="detail-value"><?= htmlspecialchars($detailOrder['address']) ?><?= $detailOrder['city'] ? ', ' . htmlspecialchars($detailOrder['city']) : '' ?></div></div>
+                    <div><div class="detail-label">Recipient</div><div class="detail-value"><?= htmlspecialchars($detailOrder['full_name']) ?></div></div>
+                    <div><div class="detail-label">Phone</div><div class="detail-value"><?= htmlspecialchars($detailOrder['phone']) ?></div></div>
+                    <div style="grid-column:1/-1;"><div class="detail-label">Address</div><div class="detail-value"><?= htmlspecialchars($detailOrder['address']) ?><?= $detailOrder['city'] ? ', ' . htmlspecialchars($detailOrder['city']) : '' ?></div></div>
                     <?php if ($detailOrder['note']): ?>
-                        <div style="grid-column:1/-1;"><div class="detail-label">Ghi chú</div><div class="detail-value"><?= htmlspecialchars($detailOrder['note']) ?></div></div>
+                        <div style="grid-column:1/-1;"><div class="detail-label">Note</div><div class="detail-value"><?= htmlspecialchars($detailOrder['note']) ?></div></div>
                     <?php endif; ?>
                 </div>
             </div>
 
             <!-- Items -->
             <div class="detail-card">
-                <h3 class="detail-card-title">Sản phẩm (<?= count($detailItems) ?>)</h3>
+                <h3 class="detail-card-title">Products (<?= count($detailItems) ?>)</h3>
                 <table class="items-table">
                     <thead>
-                        <tr><th>Sản phẩm</th><th>Giá</th><th>SL</th><th style="text-align:right;">Thành tiền</th></tr>
+                        <tr><th>Product</th><th>Price</th><th>Qty</th><th style="text-align:right;">Amount</th></tr>
                     </thead>
                     <tbody>
                         <?php foreach ($detailItems as $it): ?>
@@ -336,41 +336,41 @@ $timelineSteps = ['pending', 'confirmed', 'shipping', 'delivered'];
                         <span class="value"><?= formatVND($detailOrder['total']) ?></span>
                     </div>
                     <div class="detail-total-row">
-                        <span class="label">Phương thức</span>
+                        <span class="label">Payment Method</span>
                         <span class="value"><?= $paymentLabels[$detailOrder['payment_method']] ?? $detailOrder['payment_method'] ?></span>
                     </div>
                 </div>
             </div>
 
             <?php if ($detailOrder['status'] === 'pending'): ?>
-                <form method="POST" onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">
+                <form method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?')">
                     <input type="hidden" name="action" value="cancel">
                     <input type="hidden" name="order_id" value="<?= $detailOrder['id'] ?>">
                     <button type="submit" class="btn-cancel-order">
-                        <i class="fa-solid fa-xmark"></i> Hủy đơn hàng
+                        <i class="fa-solid fa-xmark"></i> Cancel Order
                     </button>
                 </form>
             <?php endif; ?>
 
             <?php else: ?>
             <!-- ═══════════ LIST VIEW ═══════════ -->
-            <h2 class="section-title">Đơn hàng của tôi</h2>
+            <h2 class="section-title">My Orders</h2>
 
             <!-- Status Tabs -->
             <div class="status-tabs">
-                <a href="my_orders.php" class="status-tab <?= !$status_filter ? 'active' : '' ?>">Tất cả</a>
-                <a href="my_orders.php?status=pending" class="status-tab <?= $status_filter === 'pending' ? 'active' : '' ?>">Chờ xác nhận</a>
-                <a href="my_orders.php?status=confirmed" class="status-tab <?= $status_filter === 'confirmed' ? 'active' : '' ?>">Đã xác nhận</a>
-                <a href="my_orders.php?status=shipping" class="status-tab <?= $status_filter === 'shipping' ? 'active' : '' ?>">Đang giao</a>
-                <a href="my_orders.php?status=delivered" class="status-tab <?= $status_filter === 'delivered' ? 'active' : '' ?>">Đã giao</a>
-                <a href="my_orders.php?status=cancelled" class="status-tab <?= $status_filter === 'cancelled' ? 'active' : '' ?>">Đã hủy</a>
+                <a href="my_orders.php" class="status-tab <?= !$status_filter ? 'active' : '' ?>">All</a>
+                <a href="my_orders.php?status=pending" class="status-tab <?= $status_filter === 'pending' ? 'active' : '' ?>">Pending</a>
+                <a href="my_orders.php?status=confirmed" class="status-tab <?= $status_filter === 'confirmed' ? 'active' : '' ?>">Confirmed</a>
+                <a href="my_orders.php?status=shipping" class="status-tab <?= $status_filter === 'shipping' ? 'active' : '' ?>">Shipping</a>
+                <a href="my_orders.php?status=delivered" class="status-tab <?= $status_filter === 'delivered' ? 'active' : '' ?>">Delivered</a>
+                <a href="my_orders.php?status=cancelled" class="status-tab <?= $status_filter === 'cancelled' ? 'active' : '' ?>">Cancelled</a>
             </div>
 
             <?php if (empty($orders)): ?>
                 <div class="orders-empty">
                     <div class="orders-empty-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-                    <h3>Chưa có đơn hàng nào</h3>
-                    <p>Hãy bắt đầu mua sắm ngay!</p>
+                    <h3>No orders yet</h3>
+                    <p>Start shopping now!</p>
                     <a href="shop.php" class="btn-shop-link">Shop Now</a>
                 </div>
             <?php else: ?>
@@ -406,18 +406,18 @@ $timelineSteps = ['pending', 'confirmed', 'shipping', 'delivered'];
                             <img src="<?= orderThumb($t['thumbnail']) ?>" alt="" class="order-thumb" onerror="this.src='../assets/images/sofa.jpg'">
                         <?php endforeach; ?>
                         <?php if ($itemCount > 3): ?>
-                            <span class="order-more">+<?= $itemCount - 3 ?> sản phẩm</span>
+                            <span class="order-more">+<?= $itemCount - 3 ?> more</span>
                         <?php endif; ?>
                     </div>
                     <div class="order-card-bottom">
                         <div class="order-total"><?= formatVND($ord['total']) ?></div>
                         <div class="order-actions">
-                            <a href="my_orders.php?detail=<?= urlencode($ord['order_code']) ?>" class="btn-view">Xem chi tiết</a>
+                            <a href="my_orders.php?detail=<?= urlencode($ord['order_code']) ?>" class="btn-view">View Details</a>
                             <?php if ($ord['status'] === 'pending'): ?>
-                                <form method="POST" style="display:inline;" onsubmit="return confirm('Hủy đơn hàng này?')">
+                                <form method="POST" style="display:inline;" onsubmit="return confirm('Cancel this order?')">
                                     <input type="hidden" name="action" value="cancel">
                                     <input type="hidden" name="order_id" value="<?= $ord['id'] ?>">
-                                    <button type="submit" class="btn-cancel-sm">Hủy</button>
+                                    <button type="submit" class="btn-cancel-sm">Cancel</button>
                                 </form>
                             <?php endif; ?>
                         </div>

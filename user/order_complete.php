@@ -37,16 +37,16 @@ function completeThumb($thumb) {
 }
 
 $paymentLabels = [
-    'cod'           => 'Thanh toán khi nhận hàng (COD)',
-    'bank_transfer' => 'Chuyển khoản ngân hàng',
-    'momo'          => 'MoMo'
+    'cod'           => 'Cash on Delivery (COD)',
+    'bank_transfer' => 'Bank Transfer',
+    'momo'          => 'MoMo Wallet'
 ];
 $statusLabels = [
-    'pending'   => ['Chờ xác nhận', '#FFAB00', '#FFF7ED'],
-    'confirmed' => ['Đã xác nhận', '#2196F3', '#E3F2FD'],
-    'shipping'  => ['Đang giao', '#9C27B0', '#F3E5F5'],
-    'delivered' => ['Đã giao', '#38CB89', '#E8F9EE'],
-    'cancelled' => ['Đã hủy', '#FF5630', '#FFF0F0'],
+    'pending'   => ['Pending', '#FFAB00', '#FFF7ED'],
+    'confirmed' => ['Confirmed', '#2196F3', '#E3F2FD'],
+    'shipping'  => ['Shipping', '#9C27B0', '#F3E5F5'],
+    'delivered' => ['Delivered', '#38CB89', '#E8F9EE'],
+    'cancelled' => ['Cancelled', '#FF5630', '#FFF0F0'],
 ];
 $orderStatus = $statusLabels[$order['status']] ?? ['N/A', '#6C7275', '#F3F5F7'];
 ?>
@@ -143,15 +143,15 @@ $orderStatus = $statusLabels[$order['status']] ?? ['N/A', '#6C7275', '#F3F5F7'];
         </svg>
     </div>
 
-    <h1 class="complete-heading">Đặt hàng thành công!</h1>
-    <p class="complete-sub">Cảm ơn bạn đã mua hàng. Chúng tôi sẽ liên hệ sớm nhất.</p>
+    <h1 class="complete-heading">Order Successful!</h1>
+    <p class="complete-sub">Thank you for your purchase. We will contact you shortly.</p>
 
     <!-- Order Info -->
     <div class="order-card">
-        <h3 class="order-card-title">Thông tin đơn hàng</h3>
+        <h3 class="order-card-title">Order Information</h3>
         <div class="order-info-grid">
             <div class="order-info-item">
-                <div class="order-info-label">Mã đơn hàng</div>
+                <div class="order-info-label">Order Code</div>
                 <div class="order-info-value">
                     <span class="order-code-value">
                         <?= htmlspecialchars($order['order_code']) ?>
@@ -162,15 +162,15 @@ $orderStatus = $statusLabels[$order['status']] ?? ['N/A', '#6C7275', '#F3F5F7'];
                 </div>
             </div>
             <div class="order-info-item">
-                <div class="order-info-label">Ngày đặt</div>
+                <div class="order-info-label">Order Date</div>
                 <div class="order-info-value"><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></div>
             </div>
             <div class="order-info-item">
-                <div class="order-info-label">Phương thức thanh toán</div>
+                <div class="order-info-label">Payment Method</div>
                 <div class="order-info-value"><?= $paymentLabels[$order['payment_method']] ?? $order['payment_method'] ?></div>
             </div>
             <div class="order-info-item">
-                <div class="order-info-label">Trạng thái</div>
+                <div class="order-info-label">Status</div>
                 <div class="order-info-value">
                     <span class="status-badge" style="background: <?= $orderStatus[2] ?>; color: <?= $orderStatus[1] ?>;">
                         <?= $orderStatus[0] ?>
@@ -180,9 +180,35 @@ $orderStatus = $statusLabels[$order['status']] ?? ['N/A', '#6C7275', '#F3F5F7'];
         </div>
     </div>
 
+    <!-- Hướng dẫn Thanh Toán QR Code (Nếu dùng Bank/MoMo) -->
+    <?php if (in_array($order['payment_method'], ['bank_transfer', 'momo'])): ?>
+    <div class="order-card" style="text-align: center;">
+        <h3 class="order-card-title" style="margin-bottom: 8px;">Payment QR Code</h3>
+        <p style="font-size:14px; color:#6C7275; margin-bottom: 24px;">Please use your banking app or MoMo Wallet to scan this QR.</p>
+        
+        <div style="padding: 16px; background:#fff; border:2px dashed #E8ECEF; border-radius:12px; display:inline-block; margin-bottom: 20px;">
+            <!-- Dummy QR Demo link generated from order code -->
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PAYMENT_DEMO_<?= htmlspecialchars($order['order_code']) ?>_AMOUNT_<?= $order['total'] ?>" alt="Payment QR" style="width:200px; height:200px; display:block;">
+        </div>
+
+        <div style="font-size: 14px; margin-bottom: 8px;">
+            <span style="color:#6C7275;">Transfer Message:</span> 
+            <strong style="color:#141718; font-family: monospace; background:#F3F5F7; padding: 2px 6px; border-radius: 4px;"><?= htmlspecialchars($order['order_code']) ?></strong>
+        </div>
+        <div style="font-size: 14px; margin-bottom: 20px;">
+            <span style="color:#6C7275;">Amount:</span> 
+            <strong style="color:#38CB89; font-size: 18px;"><?= formatVND($order['total']) ?></strong>
+        </div>
+
+        <div style="background:#FFF7ED; padding:12px 16px; border-radius:8px; font-size:13px; color:#EA580C; max-width: 400px; margin: 0 auto; text-align: left; line-height: 1.5;">
+            <strong>Integration Demo:</strong> This simulated QR is for demonstration only. In a real environment, dynamic APIs from VietQR or Momo Sandbox would be integrated.
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Items -->
     <div class="order-card">
-        <h3 class="order-card-title">Sản phẩm đã đặt</h3>
+        <h3 class="order-card-title">Ordered Products</h3>
         <?php foreach ($items as $it): ?>
             <div class="item-row">
                 <img src="<?= completeThumb($it['thumbnail']) ?>" alt="" class="item-img" onerror="this.src='../assets/images/sofa.jpg'">
@@ -221,8 +247,8 @@ $orderStatus = $statusLabels[$order['status']] ?? ['N/A', '#6C7275', '#F3F5F7'];
 
     <!-- Actions -->
     <div class="complete-actions">
-        <a href="my_orders.php" class="btn-secondary">Xem đơn hàng</a>
-        <a href="shop.php" class="btn-primary">Tiếp tục mua sắm</a>
+        <a href="my_orders.php" class="btn-secondary">View Orders</a>
+        <a href="shop.php" class="btn-primary">Continue Shopping</a>
     </div>
 </div>
 

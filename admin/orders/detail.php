@@ -25,25 +25,25 @@ if (!$order) {
 $items = $detailModel->getItemsByOrderId($id);
 
 $currentPage = 'orders';
-$pageTitle   = 'Chi tiết đơn hàng';
+$pageTitle   = 'Order Details';
 $breadcrumb  = 'Sales / Orders / #' . $order['order_code'];
 $base_path   = '../';
 
 include '../layouts/admin_header.php';
 
 $statusLabels = [
-    'pending'   => ['Chờ xử lý', '#FFAB00', '#FFF7ED'],
-    'confirmed' => ['Xác nhận', '#2196F3', '#E3F2FD'],
-    'shipping'  => ['Đang giao', '#9C27B0', '#F3E5F5'],
-    'delivered' => ['Đã giao', '#38CB89', '#E8F9EE'],
-    'cancelled' => ['Đã hủy', '#FF5630', '#FFF0F0'],
+    'pending'   => ['Pending', '#FFAB00', '#FFF7ED'],
+    'confirmed' => ['Confirmed', '#2196F3', '#E3F2FD'],
+    'shipping'  => ['Shipping', '#9C27B0', '#F3E5F5'],
+    'delivered' => ['Delivered', '#38CB89', '#E8F9EE'],
+    'cancelled' => ['Cancelled', '#FF5630', '#FFF0F0'],
 ];
 
 $paymentStatusLabels = [
-    'pending'  => ['Chưa thanh toán', '#FFAB00', '#FFF7ED'],
-    'paid'     => ['Đã thanh toán',   '#38CB89', '#E8F9EE'],
-    'failed'   => ['Thất bại',        '#FF5630', '#FFF0F0'],
-    'refunded' => ['Đã hoàn tiền',    '#2196F3', '#E3F2FD'],
+    'pending'  => ['Unpaid', '#FFAB00', '#FFF7ED'],
+    'paid'     => ['Paid',   '#38CB89', '#E8F9EE'],
+    'failed'   => ['Failed',        '#FF5630', '#FFF0F0'],
+    'refunded' => ['Refunded',    '#2196F3', '#E3F2FD'],
 ];
 
 if (!function_exists('formatVND')) {
@@ -117,10 +117,10 @@ function orderThumb($thumb) {
 
 <div class="adm-page-header">
     <div>
-        <h1>Chi tiết đơn hàng</h1>
+        <h1>Order Details</h1>
         <p><?= htmlspecialchars($breadcrumb) ?></p>
     </div>
-    <a href="index.php" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+    <a href="index.php" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back</a>
 </div>
 
 <div class="detail-layout">
@@ -128,10 +128,10 @@ function orderThumb($thumb) {
     <div class="detail-left">
         <!-- Products -->
         <div class="dt-card">
-            <h3 class="dt-title">Chi tiết sản phẩm</h3>
+            <h3 class="dt-title">Product Details</h3>
             <table class="dt-table">
                 <thead>
-                    <tr><th>Sản phẩm</th><th>Đơn giá</th><th>SL</th><th style="text-align:right;">Thành tiền</th></tr>
+                    <tr><th>Product</th><th>Unit Price</th><th>Qty</th><th style="text-align:right;">Amount</th></tr>
                 </thead>
                 <tbody>
                     <?php foreach ($items as $it): ?>
@@ -168,18 +168,18 @@ function orderThumb($thumb) {
     <div class="detail-right">
         <!-- Info -->
         <div class="dt-card">
-            <h3 class="dt-title">Thông tin giao dịch</h3>
+            <h3 class="dt-title">Transaction Info</h3>
             <div class="info-grid">
                 <div class="info-item">
-                    <span class="info-label">Mã đơn hàng</span>
+                    <span class="info-label">Order Code</span>
                     <span class="info-val" style="font-family:monospace; background:#F3F5F7; padding:4px 8px; border-radius:4px; width:fit-content;"><?= htmlspecialchars($order['order_code']) ?></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Ngày đặt</span>
+                    <span class="info-label">Order Date</span>
                     <span class="info-val"><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Cổng thanh toán</span>
+                    <span class="info-label">Payment Gateway</span>
                     <span class="info-val" style="text-transform:uppercase;"><?= htmlspecialchars($order['payment_method']) ?></span>
                 </div>
             </div>
@@ -187,23 +187,23 @@ function orderThumb($thumb) {
 
         <!-- Khách hàng -->
         <div class="dt-card">
-            <h3 class="dt-title">Thông tin khách hàng</h3>
+            <h3 class="dt-title">Customer Information</h3>
             <div class="info-grid">
                 <div class="info-item">
-                    <span class="info-label">Họ tên & Email</span>
+                    <span class="info-label">Full Name & Email</span>
                     <span class="info-val"><?= htmlspecialchars($order['full_name']) ?> <br> <span style="color:#6C7275; font-size:13px;"><?= htmlspecialchars($order['email'] ?? 'No email') ?></span></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Số điện thoại</span>
+                    <span class="info-label">Phone</span>
                     <span class="info-val"><?= htmlspecialchars($order['phone']) ?></span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Nơi giao</span>
+                    <span class="info-label">Shipping Address</span>
                     <span class="info-val"><?= htmlspecialchars($order['address']) ?><?= $order['city'] ? ', '.htmlspecialchars($order['city']) : '' ?></span>
                 </div>
                 <?php if ($order['note']): ?>
                 <div class="info-item" style="background:#FFF8E1; padding:12px; border-radius:8px; border:1px solid #FFE082;">
-                    <span class="info-label" style="color:#F57F17;">Ghi chú của khách</span>
+                    <span class="info-label" style="color:#F57F17;">Customer Note</span>
                     <span class="info-val" style="color:#F57F17; font-style:italic;"><?= htmlspecialchars($order['note']) ?></span>
                 </div>
                 <?php endif; ?>
@@ -212,7 +212,7 @@ function orderThumb($thumb) {
 
         <!-- Trạng thái đơn -->
         <div class="dt-card">
-            <h3 class="dt-title">Trạng thái đơn hàng</h3>
+            <h3 class="dt-title">Order Status</h3>
             <div style="margin-bottom: 20px;">
                 <?php $curr = $statusLabels[$order['status']] ?? ['Unknown','#000','#eee']; ?>
                 <span class="info-badge" id="badge-status" style="background:<?= $curr[2] ?>; color:<?= $curr[1] ?>;"><?= $curr[0] ?></span>
@@ -222,12 +222,12 @@ function orderThumb($thumb) {
                     <option value="<?= $k ?>" <?= $k === $order['status'] ? 'selected' : '' ?>><?= $v[0] ?></option>
                 <?php endforeach; ?>
             </select>
-            <button class="btn-update" onclick="updateOrderStatus()">Cập nhật</button>
+            <button class="btn-update" onclick="updateOrderStatus()">Update</button>
         </div>
 
         <!-- Trạng thái TT -->
         <div class="dt-card">
-            <h3 class="dt-title">Trạng thái thanh toán</h3>
+            <h3 class="dt-title">Payment Status</h3>
             <div style="margin-bottom: 20px;">
                 <?php $currP = $paymentStatusLabels[$order['payment_status']] ?? ['Unknown','#000','#eee']; ?>
                 <span class="info-badge" id="badge-payment" style="background:<?= $currP[2] ?>; color:<?= $currP[1] ?>;"><?= $currP[0] ?></span>
@@ -237,7 +237,7 @@ function orderThumb($thumb) {
                     <option value="<?= $k ?>" <?= $k === $order['payment_status'] ? 'selected' : '' ?>><?= $v[0] ?></option>
                 <?php endforeach; ?>
             </select>
-            <button class="btn-update" onclick="updatePaymentStatus()">Cập nhật</button>
+            <button class="btn-update" onclick="updatePaymentStatus()">Update</button>
         </div>
 
     </div>
@@ -273,9 +273,9 @@ async function updateOrderStatus() {
             b.style.backgroundColor = statusConfig[val][2];
             b.style.color = statusConfig[val][1];
             b.textContent = statusConfig[val][0];
-            showToast('Cập nhật trạng thái đơn thành công');
+            showToast('Order status updated successfully');
         } else { alert(data.message); }
-    } catch (e) { alert('Lỗi mạng'); }
+    } catch (e) { alert('Network error'); }
 }
 
 async function updatePaymentStatus() {
@@ -292,8 +292,8 @@ async function updatePaymentStatus() {
             b.style.backgroundColor = payConfig[val][2];
             b.style.color = payConfig[val][1];
             b.textContent = payConfig[val][0];
-            showToast('Cập nhật thanh toán thành công');
+            showToast('Payment status updated successfully');
         } else { alert(data.message); }
-    } catch (e) { alert('Lỗi mạng'); }
+    } catch (e) { alert('Network error'); }
 }
 </script>

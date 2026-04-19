@@ -10,7 +10,7 @@ $cartItems  = $orderModel->getCartItems($user_id, $session_id);
 
 // Redirect nếu giỏ hàng trống
 if (empty($cartItems)) {
-    $_SESSION['error'] = 'Giỏ hàng trống, vui lòng thêm sản phẩm trước.';
+    $_SESSION['error'] = 'Your cart is empty. Please add products first.';
     header("Location: cart.php");
     exit;
 }
@@ -241,7 +241,7 @@ function checkoutThumb($thumb) {
                     </div>
                     <div class="form-group full">
                         <label>Order Note (optional)</label>
-                        <textarea name="note" rows="2" placeholder="Ghi chú giao hàng..."></textarea>
+                        <textarea name="note" rows="2" placeholder="Delivery notes..."></textarea>
                     </div>
                 </div>
 
@@ -251,19 +251,19 @@ function checkoutThumb($thumb) {
                         <input type="radio" name="payment_method" value="cod" checked>
                         <span class="payment-radio"></span>
                         <span class="payment-icon">💵</span>
-                        <span class="payment-label">Thanh toán khi nhận hàng (COD)</span>
+                        <span class="payment-label">Cash on Delivery (COD)</span>
                     </label>
                     <label class="payment-option" onclick="selectPayment(this)">
                         <input type="radio" name="payment_method" value="bank_transfer">
                         <span class="payment-radio"></span>
                         <span class="payment-icon">🏦</span>
-                        <span class="payment-label">Chuyển khoản ngân hàng</span>
+                        <span class="payment-label">Bank Transfer</span>
                     </label>
                     <label class="payment-option" onclick="selectPayment(this)">
                         <input type="radio" name="payment_method" value="momo">
                         <span class="payment-radio"></span>
                         <span class="payment-icon">📱</span>
-                        <span class="payment-label">MoMo</span>
+                        <span class="payment-label">MoMo Wallet</span>
                     </label>
                 </div>
             </div>

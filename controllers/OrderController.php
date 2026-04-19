@@ -94,7 +94,7 @@ function processCheckout()
     }
 
     if (!$full_name || !$email || !$phone || !$address) {
-        flashRedirect('../user/checkout.php', 'error', 'Vui lòng điền đầy đủ thông tin giao hàng');
+        flashRedirect('../user/checkout.php', 'error', 'Please fill in all required shipping information');
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -105,7 +105,7 @@ function processCheckout()
     $cartItems = $orderModel->getCartItems($user_id, $session_id);
 
     if (empty($cartItems)) {
-        flashRedirect('../user/cart.php', 'error', 'Giỏ hàng trống, không thể đặt hàng');
+        flashRedirect('../user/cart.php', 'error', 'Your cart is empty');
     }
 
     // ── 3. Tính subtotal ──
@@ -172,7 +172,7 @@ function processCheckout()
             flashRedirect(
                 '../user/cart.php',
                 'error',
-                'Sản phẩm "' . htmlspecialchars($item['name']) . '" không đủ số lượng trong kho. Vui lòng cập nhật giỏ hàng.'
+                'Product "' . htmlspecialchars($item['name']) . '" is out of stock. Please update your cart.'
             );
         }
     }
@@ -207,7 +207,7 @@ function processCheckout()
         $order_id = $orderModel->createOrder($orderData);
 
         if (!$order_id) {
-            throw new Exception('Không thể tạo đơn hàng');
+            throw new Exception('Unable to create order');
         }
 
         // ── 10. INSERT order_items + giảm stock ──
@@ -243,7 +243,7 @@ function processCheckout()
 
             // Giảm stock
             if (!$detailModel->decreaseStock($item['product_id'], $qty)) {
-                throw new Exception('Sản phẩm "' . $item['name'] . '" không đủ hàng');
+                throw new Exception('Product "' . $item['name'] . '" is out of stock');
             }
         }
 
@@ -263,7 +263,7 @@ function processCheckout()
 
     } catch (Exception $e) {
         $conn->rollback();
-        flashRedirect('../user/checkout.php', 'error', 'Đặt hàng thất bại: ' . $e->getMessage());
+        flashRedirect('../user/checkout.php', 'error', 'Order failed: ' . $e->getMessage());
     }
 }
 
@@ -288,9 +288,9 @@ function userCancelOrder()
 
     header('Content-Type: application/json');
     if ($result) {
-        echo json_encode(['success' => true, 'message' => 'Đã huỷ đơn hàng']);
+        echo json_encode(['success' => true, 'message' => 'Order cancelled successfully']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Không thể huỷ đơn hàng. Chỉ đơn "Chờ xác nhận" mới huỷ được.']);
+        echo json_encode(['success' => false, 'message' => 'Cannot cancel this order. Only pending orders can be cancelled.']);
     }
 }
 
@@ -323,9 +323,9 @@ function adminUpdateStatus()
     $result = $orderModel->updateOrderStatus($order_id, $status);
 
     if ($result) {
-        echo json_encode(['success' => true, 'message' => 'Đã cập nhật trạng thái đơn hàng']);
+        echo json_encode(['success' => true, 'message' => 'Order status updated']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Cập nhật thất bại']);
+        echo json_encode(['success' => false, 'message' => 'Update failed']);
     }
 }
 
@@ -357,9 +357,9 @@ function adminUpdatePayment()
     $result = $orderModel->updatePaymentStatus($order_id, $payment_status);
 
     if ($result) {
-        echo json_encode(['success' => true, 'message' => 'Đã cập nhật trạng thái thanh toán']);
+        echo json_encode(['success' => true, 'message' => 'Payment status updated']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Cập nhật thất bại']);
+        echo json_encode(['success' => false, 'message' => 'Update failed']);
     }
 }
 
@@ -388,7 +388,7 @@ function adminGetDetail()
 
     $order = $orderModel->getOrderById($order_id);
     if (!$order) {
-        echo json_encode(['success' => false, 'message' => 'Không tìm thấy đơn hàng']);
+        echo json_encode(['success' => false, 'message' => 'Order not found']);
         return;
     }
 

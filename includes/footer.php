@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await res.json();
                 
                 if (data.require_login) {
-                    showGlobalToast(data.message || 'Vui lòng đăng nhập để thêm vào giỏ.', 'error');
+                    showGlobalToast(data.message || 'Please log in to add items.', 'error');
                     setTimeout(() => window.location.href = 'login.php', 1500);
                     return;
                 }
@@ -86,9 +86,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     const badges = document.querySelectorAll('#cart-count');
                     badges.forEach(b => b.textContent = data.cart_count);
-                    showGlobalToast(data.message || 'Thêm vào giỏ hàng thành công!', 'success');
+                    showGlobalToast(data.message || 'Added to cart successfully!', 'success');
                 } else {
-                    showGlobalToast(data.message || 'Không thể thêm vào giỏ.', 'error');
+                    showGlobalToast(data.message || 'Could not add to cart.', 'error');
                 }
             } catch (err) {
                 console.error(err);

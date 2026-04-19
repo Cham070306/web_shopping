@@ -179,8 +179,8 @@ function cartThumb($thumb) {
     <?php if (empty($cartItems)): ?>
         <div class="cart-empty">
             <div class="cart-empty-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-            <h2>Giỏ hàng trống</h2>
-            <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+            <h2>Your Cart is Empty</h2>
+            <p>You haven't added any products to your cart yet.</p>
             <a href="shop.php" class="btn-shop">Shop Now</a>
         </div>
     <?php else: ?>
@@ -237,7 +237,7 @@ function cartThumb($thumb) {
                                 <?= formatVND($item['line_total']) ?>
                             </td>
                             <td class="td-actions">
-                                <button class="btn-remove-item" onclick="removeItem(<?= $item['id'] ?>, this)" title="Xóa">
+                                <button class="btn-remove-item" onclick="removeItem(<?= $item['id'] ?>, this)" title="Remove">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                         <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                                     </svg>
@@ -250,7 +250,7 @@ function cartThumb($thumb) {
 
                 <!-- Coupon -->
                 <div class="coupon-row">
-                    <input type="text" id="coupon-input" class="coupon-input" placeholder="Nhập mã giảm giá">
+                    <input type="text" id="coupon-input" class="coupon-input" placeholder="Enter coupon code">
                     <button class="btn-coupon" onclick="applyCoupon()">Apply</button>
                 </div>
                 <div id="coupon-msg" class="coupon-msg"></div>
@@ -370,8 +370,8 @@ async function removeItem(cartId, btn) {
                     document.getElementById('cart-container').innerHTML = `
                         <div class="cart-empty" style="width:100%">
                             <div class="cart-empty-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-                            <h2>Giỏ hàng trống</h2>
-                            <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+                            <h2>Your Cart is Empty</h2>
+                            <p>You haven't added any products to your cart yet.</p>
                             <a href="shop.php" class="btn-shop">Shop Now</a>
                         </div>`;
                 }
@@ -388,7 +388,7 @@ async function removeItem(cartId, btn) {
 async function applyCoupon() {
     const code = document.getElementById('coupon-input').value.trim();
     const msgEl = document.getElementById('coupon-msg');
-    if (!code) { msgEl.className = 'coupon-msg error'; msgEl.textContent = 'Vui lòng nhập mã giảm giá'; return; }
+    if (!code) { msgEl.className = 'coupon-msg error'; msgEl.textContent = 'Please enter a coupon code'; return; }
 
     // Lấy subtotal hiện tại
     let subtotal = 0;
@@ -411,7 +411,7 @@ async function applyCoupon() {
             document.getElementById('summary-discount').textContent = data.discount_text;
             document.getElementById('discount-row').classList.add('active');
             msgEl.className = 'coupon-msg success';
-            msgEl.textContent = 'Áp dụng mã "' + data.coupon_code + '" thành công!';
+            msgEl.textContent = 'Coupon "' + data.coupon_code + '" applied successfully!';
             recalcSummary();
         } else {
             currentDiscount = 0;

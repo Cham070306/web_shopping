@@ -191,6 +191,7 @@ input[type=number] {
 }
 .badge-new { background: #fff; color: #141718; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; border: 1px solid #E8ECEF;}
 .badge-sale { background: #38CB89; color: #fff; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px;}
+.badge-oos { background: #FF5630; color: #fff; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; letter-spacing: 0.03em; }
 
 .pd-thumbs-wrap {
     position: relative;
@@ -414,6 +415,9 @@ input[type=number] {
     transition: 0.2s;
 }
 .pd-add-btn:hover { background: #343839; }
+.pd-add-btn.disabled {
+    background: #CBCFD2; color: #fff; cursor: not-allowed; pointer-events: none; opacity: 0.65;
+}
 
 .pd-meta-links {
     display: flex;
@@ -575,7 +579,11 @@ input[type=number] {
             <div class="pd-main-img-box">
                 <!-- Badges -->
                 <div class="pd-badges">
-                    <?php if ($product['is_featured']): ?><span class="badge-new">NEW</span><?php endif; ?>
+                    <?php if ((int)$product['stock'] <= 0): ?>
+                        <span class="badge-oos">OUT OF STOCK</span>
+                    <?php elseif ($product['is_featured']): ?>
+                        <span class="badge-new">NEW</span>
+                    <?php endif; ?>
                     <?php if ($discount > 0): ?><span class="badge-sale">-<?= $discount ?>%</span><?php endif; ?>
                 </div>
                 <!-- Main Image -->
@@ -685,9 +693,9 @@ input[type=number] {
                 <div class="pd-actions">
                     <!-- Qty Spinner -->
                     <div class="pd-qty">
-                        <button type="button" class="qty-btn" onclick="updateQty(-1)">-</button>
-                        <input type="number" id="qtyInput" name="quantity" class="qty-input" value="1" min="1" max="<?= $product['stock'] > 0 ? $product['stock'] : 99 ?>">
-                        <button type="button" class="qty-btn" onclick="updateQty(1)">+</button>
+                        <button type="button" class="qty-btn" onclick="updateQty(-1)" <?= (int)$product['stock'] <= 0 ? 'disabled' : '' ?>>-</button>
+                        <input type="number" id="qtyInput" name="quantity" class="qty-input" value="1" min="1" max="<?= $product['stock'] > 0 ? $product['stock'] : 0 ?>" <?= (int)$product['stock'] <= 0 ? 'disabled' : '' ?>>
+                        <button type="button" class="qty-btn" onclick="updateQty(1)" <?= (int)$product['stock'] <= 0 ? 'disabled' : '' ?>>+</button>
                     </div>
 
                     <!-- Wishlist Toggle Button -->
@@ -699,7 +707,11 @@ input[type=number] {
                     </button>
 
                     <!-- Add to Cart -->
-                    <button type="submit" class="pd-add-btn">Add to Cart</button>
+                    <?php if ((int)$product['stock'] <= 0): ?>
+                        <button type="button" class="pd-add-btn disabled" disabled>Out of Stock</button>
+                    <?php else: ?>
+                        <button type="submit" class="pd-add-btn">Add to Cart</button>
+                    <?php endif; ?>
                 </div>
             </form>
 

@@ -1,45 +1,103 @@
 # Documentation: Feature Cart - Checkout - Orders 🛍️
 
-**Người thực hiện:** [Tên bạn]
-**Module phụ trách:** Toàn bộ luồng E-commerce cốt lõi (Cart -> Checkout -> Sales Admin)
+
+**Module phụ trách:** Hệ thống Đơn hàng (Cart -> Checkout -> Sales Admin)
 **Chi nhánh / Feature:** `feature/cart-checkout-orders`
 
-Mục tiêu của module này là mang đến trải nghiệm shopping hoàn hảo và bảo mật với JSON API kết hợp Vanilla Javascript (AJAX), tách bạch rõ ràng giữa *Data Access Layer* (Models), *Business Logic* (Controllers) và *Dynamic Views* tương tự kiến trúc của Shopify.
+Mục tiêu của module này là thiết kế và triển khai quy trình E-commerce hoàn chỉnh, bảo mật cao và tối ưu UX. Kiến trúc sử dụng **PHP 8.x + MySQLi (OOP Model-Controller)** kết hợp **Vanilla JS (Fetch API)** để xử lý các luồng động không cần tải lại trang (Single Page Application UX).
 
 ---
 
-## Danh sách tệp tin (Scope)
-Mọi chức năng dưới đây mình đã review, fix bugs conflict cũ và hoàn thành 100%. Mọi file đều vượt qua `php -lint` check (0 lỗi cú pháp).
+## 1. Kiến trúc Hệ Thống (Architecture Workflow)
 
-### 1. Database & Seeder
-- **`config/database.php`**: Được cài cắm mạch *Auto-Seeder*. Bất kì ai clone repo về, lúc chạy web lần đầu nếu Kho trống trơn, hệ thống sẽ trigger tự rải Data và Import tự động 6 sản phẩm cực nét (Sofa, Lamp, Bàn Gỗ...) từ kho ảnh chất lượng Unsplash.
-- **`models/Order.php`**: Xử lý 22 Hàm truy xuất. Code bằng `mysqli_prepare` để block toàn vẹn lỗi Hack SQL Injection. Chống thất thoát hàng (Check đủ stock mới cho add). Tính năng *Transaction Rollback* ở Checkout bảo vệ nếu lỗi DB thì không bị huỷ đơn nửa chừng.
-- **`models/OrderDetail.php`**: Các hàm tính toán kho rời rạc.
+Luồng xử lý từ lúc Khách hàng nhấn "Thêm vào giỏ" đến Admin Quản lý được mô tả qua sơ đồ sau:
 
-### 2. Restful Array Controllers
-- **`controllers/CartController.php`**: Thiết kế chạy JSON 100%. Xử lý Add/Remove/Update và Apply Coupon.
-- **`controllers/OrderController.php`**: Handler chuyển hướng. Kiểm duyệt Form Address và kết nối đến Model Order.
+```mermaid
+sequenceDiagram
+    participant User as Khách Hàng
+    participant Front as Frontend (JS)
+    participant Ctrl as Controllers
+    participant Mod as Models (DB)
+    participant Admin as Admin Portal
 
-### 3. Customer Portal (Trải nghiệm Khách mua hàng)
-- **`includes/navbar.php` (Shared)**: Cập nhật tích hợp Logic Avatar & Dropdown Hover *Mini-cart popup*.
-- **`includes/footer.php` (Shared)**: Hook Javascript chèn *Toast Notification Global*, giúp chặn Form Submit mặc định của Dev Team cũ và chuyển thành form AJAX mượt. Tránh bị văng vỡ view rác JSON.
-- **`user/cart.php`**: Quản lí giỏ. Live DOM update để không phải tải lại trang khi + / - sản phẩm, hoặc Apply mã giảm giá.
-- **`user/checkout.php`**: Quy trình thanh toán có Auto-fill thông tin (nếu User đang Login) nhằm tối đa Purchase Conversion Rate. 
-- **`user/order_complete.php`**: Khoá Session ID (không F5) để chống Spam Submit.
-- **`user/my_orders.php`**: Tích hợp giao diện Filter Tab lọc theo Status (Chờ xác nhận, Đang giao...) + Timeline theo dõi chặng đơn chuyên nghiệp.
+    User->>Front: Click "Add to Cart"
+    Front->>Ctrl: POST /CartController.php?action=add (JSON)
+    Ctrl->>Mod: Gọi hàm checkStock() & addToSession
+    Mod-->>Ctrl: Return True
+    Ctrl-->>Front: {success: true, cart_count: X}
+    Front-->>User: Hiển thị Toast (Thêm thành công!)
 
-### 4. Admin Portal (Trải nghiệm nội bộ Quản trị)
-- **`admin/orders/index.php`**: Trang tổng quan, có bộ Box Thống Kê doanh thu và Grid table. **Tính năng độc quyền:** thả Dropdown thay đổi Trạng Thái Đơn ngay và luôn tại bảng dữ liệu bằng AJAX, nhạy 1ms không load tab.
-- **`admin/orders/detail.php`**: Setup Layout 2 mặt (Trái xem hàng hóa gửi / Phải xem thông tin Status Giao & Tiền).
-- **`admin/inventory/index.php`**: (Kho hàng) Hiện cảnh báo màu nổi nếu Hàng Trong Kho <= 10. Update nhanh Input tồn kho bằng AJAX thả Toast màu Xanh dưới mép website.
+    User->>Front: Bấm Checkout (Gửi form địa chỉ)
+    Front->>Ctrl: POST /OrderController.php?action=checkout
+    Ctrl->>Mod: Bắt đầu TRANSACTION (Begin)
+    Mod->>Mod: Trừ trừ Stock ở DB
+    Mod->>Mod: Ghi vào order_items & orders
+    Mod-->>Ctrl: COMMIT Thành công
+    Ctrl-->>User: Chuyển hướng sang Trang Order Complete
+
+    Admin->>Ctrl: Đổi trạng thái trạng thái (Shipping) bằng AJAX
+    Ctrl->>Mod: Update order status = 'shipping'
+```
 
 ---
 
-## Dành cho Team / Code Reviewer ✋
+## 2. Danh sách Tệp tin & Chức năng (Scope)
 
-- **Frontend Dev (`shop.php`, `product_detail.php`, `index.php`...)**: 
-  - Toàn bộ form submit có `action="CartController.php"` giờ đã được script dưới `footer.php` của mình auto Catch! 
-  - Cứ gọi standard HTML Input bình thường, mình đã lo phần convert JSON Request ẩn bên dưới và quăng Toast cho User. Không cần viết thêm JS dư thừa.
-- **Database Mod**: Table `orders` mình set `user_id` có thể NULL nên hỗ trợ sẵn tính năng Checkout dành cho Guest. Update model là dùng được ngay tính năng "Buy Now without Login" nhé (mặc dù hiện tại mình khoá luồng để bắt User Đăng kí).
+### Lớp Dữ liệu (Models Layer)
+- **`models/Order.php`**: Xử lý 22 Hàm truy xuất hệ thống (từ Quản trị Giỏ Cục bộ đến Thống kê Doanh Thu Admin). Cốt lõi sử dụng `mysqli_prepare` để đóng đinh lỗi **SQL Injection**. Tích hợp `Transaction Rollback` chống thất thoát (Race Condition).
+- **`models/OrderDetail.php`**: Chuyên biệt các hàm tính toán trừ kho và thao tác từng mã SKU rời rạc, tách bạch với đơn hàng mẹ.
 
-**Trạng thái Code:** `READY TO MERGE`.
+### Lớp Điều hướng (Controllers Layer)
+Thiết kế Restful định dạng JSON 100%.
+- **`controllers/CartController.php`**: Endpoint gánh toàn bộ AJAX từ Add/Remove/Update số lượng đến Apply Coupon giảm giá.
+- **`controllers/OrderController.php`**: Handler định tuyến cho Submit Checkout và là cầu nối xử lý các Request cập nhật trạng thái đơn tức thời từ Dashboard Admin.
+
+### Giao diện Khách hàng (Customer Front-end)
+- **`includes/navbar.php` & `includes/footer.php`**: Hook Javascript "tàng hình" được cắm vào để thiết lập **Mini-cart popup** trượt xuống khi Hover và hiển thị **Toast UI Global** đẹp mắt dưới góc trang. Chặn đứng các Form Submit lỗi thời.
+- **`user/cart.php`**: Render Giỏ hàng chuẩn 3legant, tự động cập nhật Giá & Tổng tính toán trực tiếp qua fetch DOM thao tác giá trị.
+- **`user/checkout.php`**: Trải nghiệm Thanh toán 1-Click có Auto-fill (điền sẵn form) nếu Khách có Session Login.
+- **`user/order_complete.php` & `user/my_orders.php`**: Bảo vệ trang cuối khỏi Spam Refresh. List đơn hàng trang bị Lọc Tab theo Status xịn sò.
+
+### Giao diện Quản trị viên (Admin Back-end)
+- **`admin/orders/index.php`**: Bảng dữ liệu trang bị Widget thống kê tổng quan (Doanh thu, Đơn chờ xử lý) được bóc tách từ Dashboard. **Tính năng:** Đổi trạng thái thả Dropdown AJAX 1ms ngay trong lưới dữ liệu.
+- **`admin/orders/detail.php`**: Layout xem Chi tiết chia đôi (Sản phẩm xuất/ Trạng thái & Tiền tệ).
+- **`admin/inventory/index.php`**: Tracker theo dõi tồn kho. Áp dụng Rule cảnh báo đỏ gắt nếu Inventory ≤ 10 con. Tương tác nhập kho In-line.
+
+---
+
+## 3. Đặc tả API Nội bộ (API Specifications)
+
+Hệ thống cung cấp Endpoint Backend độc lập. JS ở bất kì trang nào cũng có thể gọi.
+
+### Thêm sản phẩm vào giỏ
+- **URL:** `controllers/CartController.php?action=add`
+- **Method:** `POST`
+- **Body payload (JSON):**
+  ```json
+  {
+    "product_id": 15,
+    "quantity": 1,
+    "color": "Black",
+    "size": "L"
+  }
+  ```
+- **Response:** `{"success": true, "message": "Đã thêm...", "cart_count": 3}`
+
+### Admin Đổi trạng thái giao hàng
+- **URL:** `controllers/OrderController.php?action=admin_update_status`
+- **Method:** `POST` (FormData)
+- **Tham số:** `order_id` (int), `status` (chuỗi enum: *pending, confirmed, shipping, delivered, cancelled*)
+- **Response:** `{"success": true}`
+
+---
+
+## 4. Kiểm soát Bảo mật (Security Validations)
+
+1. **Auto-seeder Tàng hình:** File `config/database.php` được chèn mạch theo dõi. Nếu hệ thống DB được setup mới tinh, nó tự gọi `seed.php` lấy 6 sản phẩm Demo chất lượng cao từ Cloud Unsplash bơm vào, tránh lỗi giao diện cho Dev khác clone về test.
+2. **Ngăn chặn SQL Injection:** Tuyệt đối không nhúng `$variable` thẳng vào Query. Tất cả đều đi qua `$conn->prepare()` & `bind_param()`.
+3. **Rollback Giao dịch Gốc:** Trong trường hợp Checkout (Cần ghi 1 bảng `orders`, 3 bảng `order_items`, và Update Kho `products`). Lệnh `$conn->begin_transaction();` được thả ở đầu. Nếu quá trình trừ hàng trong khi chạy xảy ra Lỗi (ví dụ Khách khác đã mua mất con hàng cuối cùng), luồng Code sẽ bắt Exception và xả `$conn->rollback()` cứu toàn bộ Data không sinh hoá đơn rác.
+4. **Xử lý XSS:** Đầu ra hiển thị thông tin Input như `Full Name`, `Order code` đều bọc qua hàm diệt khuẩn `htmlspecialchars()`.
+
+---
+
+**Trạng thái Code:** `READY TO MERGE`. Mọi đoạn Script đều pass Tool Lint và không có config thừa. Toàn bộ logic Backend JSON hoàn chỉnh. Mời team vào băm! 🚀

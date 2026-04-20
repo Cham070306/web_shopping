@@ -399,6 +399,19 @@ function getLinkUrl($overrides = []) {
     letter-spacing: .5px;
     display: inline-block;
 }
+.badge-oos {
+    background: #FF5630;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+    display: inline-block;
+}
+.btn-cart.disabled {
+    background: #CBCFD2; cursor: not-allowed; pointer-events: none; opacity: 0.7;
+}
 
 /* wishlist heart */
 .card-wish-btn {
@@ -696,7 +709,11 @@ function getLinkUrl($overrides = []) {
 
                         <!-- Badges -->
                         <div class="card-badges">
-                            <?php if ($p['is_featured']): ?><span class="badge-new">NEW</span><?php endif; ?>
+                            <?php if ((int)($p['stock'] ?? 0) <= 0): ?>
+                                <span class="badge-oos">OUT OF STOCK</span>
+                            <?php elseif ($p['is_featured']): ?>
+                                <span class="badge-new">NEW</span>
+                            <?php endif; ?>
                             <?php if ($hasSale): ?><span class="badge-sale">-<?= $discount ?>%</span><?php endif; ?>
                         </div>
 
@@ -710,12 +727,16 @@ function getLinkUrl($overrides = []) {
 
                         <!-- Add to cart overlay -->
                         <div class="card-cart-overlay">
+                            <?php if ((int)($p['stock'] ?? 0) <= 0): ?>
+                                <button class="btn-cart disabled" type="button" disabled>Out of Stock</button>
+                            <?php else: ?>
                             <form action="../controllers/CartController.php" method="POST">
                                 <input type="hidden" name="action" value="add">
                                 <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="quantity" value="1">
                                 <button class="btn-cart" type="submit">Add to cart</button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </div>
 

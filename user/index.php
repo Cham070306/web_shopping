@@ -257,6 +257,15 @@ function formatVND($price) {
     border-radius: 4px;
     letter-spacing: .5px;
 }
+.hp-badge-oos {
+    background: #FF5630;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: .5px;
+}
 
 /* Wishlist btn */
 .hp-wish-btn {
@@ -306,6 +315,7 @@ function formatVND($price) {
     transition: background .18s;
 }
 .hp-btn-cart:hover { background: #343839; }
+.hp-btn-cart.disabled { background: #CBCFD2; cursor: not-allowed; pointer-events: none; opacity: 0.7; }
 
 /* Info */
 .hp-info {
@@ -400,7 +410,9 @@ function formatVND($price) {
 
                         <!-- Badges -->
                         <div class="hp-badges">
-                            <?php if (!empty($p['is_featured'])): ?>
+                            <?php if ((int)($p['stock'] ?? 0) <= 0): ?>
+                                <span class="hp-badge-oos">OUT OF STOCK</span>
+                            <?php elseif (!empty($p['is_featured'])): ?>
                                 <span class="hp-badge-new">NEW</span>
                             <?php endif; ?>
                             <?php if ($hasSale): ?>
@@ -420,12 +432,16 @@ function formatVND($price) {
 
                         <!-- Add to cart overlay -->
                         <div class="hp-cart-overlay">
+                            <?php if ((int)($p['stock'] ?? 0) <= 0): ?>
+                                <button class="hp-btn-cart disabled" type="button" disabled>Out of Stock</button>
+                            <?php else: ?>
                             <form action="../controllers/CartController.php" method="POST">
                                 <input type="hidden" name="action" value="add">
                                 <input type="hidden" name="product_id" value="<?= $p['id'] ?>">
                                 <input type="hidden" name="quantity" value="1">
                                 <button class="hp-btn-cart" type="submit">Add to cart</button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </div>
 

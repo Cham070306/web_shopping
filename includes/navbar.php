@@ -505,10 +505,10 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
                             <?php endforeach; ?>
                         </div>
                         <?php if (count($navCartItems) > 4): ?>
-                            <div style="text-align:center; padding: 8px; font-size: 12px; color: #6C7275;">+<?= count($navCartItems) - 4 ?> sản phẩm khác</div>
+                            <div style="text-align:center; padding: 8px; font-size: 12px; color: #6C7275;">+<?= count($navCartItems) - 4 ?> more items</div>
                         <?php endif; ?>
                         <div class="mc-actions">
-                            <a href="cart.php" class="mc-btn-cart">Xem giỏ hàng</a>
+                            <a href="cart.php" class="mc-btn-cart">View Cart</a>
                         </div>
                     <?php endif; ?>
                 </div>

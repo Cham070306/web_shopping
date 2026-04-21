@@ -20,6 +20,8 @@ if (!$product) {
     exit;
 }
 
+$gallery_images = $productModel->getImages($id);
+
 $categoryModel = new Category($conn);
 $categories = $categoryModel->getAll();
 
@@ -149,6 +151,41 @@ include '../layouts/admin_header.php';
                 </div>
             </div>
 
+            <div class="adm-card" style="padding: 24px;">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Gallery Images</h3>
+                
+                <?php if(!empty($gallery_images)): ?>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                    <?php foreach($gallery_images as $gImg): 
+                        $gUrl = htmlspecialchars($gImg['image_url']);
+                        if (strpos($gUrl, 'http') !== 0 && $gUrl) {
+                            $gUrl = '../../assets/product-images/' . $gUrl;
+                        }
+                    ?>
+                        <div style="position: relative; width: 80px; height: 80px; border-radius: 6px; overflow: hidden; border: 1px solid var(--gray-300);">
+                            <img src="<?= $gUrl ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <button type="button" 
+                                    onclick="document.getElementById('form-delete-img-<?= $gImg['id'] ?>').submit()"
+                                    style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa-solid fa-times"></i>
+                            </button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+
+                <div class="form-group">
+                    <div id="gallery-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                        <!-- Gallery previews will be appended here -->
+                    </div>
+                    <div style="border: 2px dashed var(--gray-300); border-radius: 8px; padding: 24px; text-align: center; background: var(--gray-100);">
+                        <i class="fa-solid fa-images" style="font-size: 24px; color: var(--gray-400); margin-bottom: 12px;"></i>
+                        <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 12px;">Click to select multiple gallery images to add</div>
+                        <input type="file" name="images[]" id="gallery-input" accept="image/*" multiple class="form-control" style="background: white; font-size: 13px;">
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-dark" style="width: 100%; padding: 14px;"><i class="fa-solid fa-floppy-disk"></i> Update Product</button>
         </div>
 
@@ -156,6 +193,7 @@ include '../layouts/admin_header.php';
 </form>
 
 <script>
+    // Thumbnail Preview
     document.getElementById('thumbnail-input').addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
             var reader = new FileReader();
@@ -168,6 +206,86 @@ include '../layouts/admin_header.php';
             reader.readAsDataURL(this.files[0]);
         }
     });
+
+    // Gallery Preview & Remove
+    const galleryInput = document.getElementById('gallery-input');
+    const galleryPreview = document.getElementById('gallery-preview');
+    let dataTransfer = null;
+    
+    if (galleryInput) {
+        dataTransfer = new DataTransfer();
+        galleryInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            
+            files.forEach((file) => {
+                dataTransfer.items.add(file);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.style.position = 'relative';
+                    div.style.width = '80px';
+                    div.style.height = '80px';
+                    div.style.borderRadius = '6px';
+                    div.style.overflow = 'hidden';
+                    div.style.border = '1px solid var(--gray-300)';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.innerHTML = '<i class="fa-solid fa-times"></i>';
+                    removeBtn.style.position = 'absolute';
+                    removeBtn.style.top = '2px';
+                    removeBtn.style.right = '2px';
+                    removeBtn.style.background = 'rgba(0,0,0,0.6)';
+                    removeBtn.style.color = 'white';
+                    removeBtn.style.border = 'none';
+                    removeBtn.style.borderRadius = '50%';
+                    removeBtn.style.width = '20px';
+                    removeBtn.style.height = '20px';
+                    removeBtn.style.fontSize = '12px';
+                    removeBtn.style.cursor = 'pointer';
+                    removeBtn.style.display = 'flex';
+                    removeBtn.style.alignItems = 'center';
+                    removeBtn.style.justifyContent = 'center';
+
+                    removeBtn.onclick = function() {
+                        const fileName = file.name;
+                        for(let i=0; i<dataTransfer.items.length; i++) {
+                            if(dataTransfer.items[i].getAsFile().name === fileName) {
+                                dataTransfer.items.remove(i);
+                                break;
+                            }
+                        }
+                        galleryInput.files = dataTransfer.files;
+                        div.remove();
+                    };
+                    
+                    div.appendChild(img);
+                    div.appendChild(removeBtn);
+                    galleryPreview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            galleryInput.files = dataTransfer.files;
+        });
+    }
 </script>
+
+<?php if(!empty($gallery_images)): ?>
+    <?php foreach($gallery_images as $gImg): ?>
+        <form id="form-delete-img-<?= $gImg['id'] ?>" action="../../controllers/ProductController.php" method="POST" style="display:none;">
+            <input type="hidden" name="action" value="delete_product_image">
+            <input type="hidden" name="image_id" value="<?= $gImg['id'] ?>">
+            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+        </form>
+    <?php endforeach; ?>
+<?php endif; ?>
 
 <?php include '../layouts/admin_footer.php'; ?>

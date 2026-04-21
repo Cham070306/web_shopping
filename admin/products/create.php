@@ -107,17 +107,32 @@ include '../layouts/admin_header.php';
             </div>
 
             <div class="adm-card" style="padding: 24px;">
-                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Thumbnail Image</h3>
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Thumbnail Image *</h3>
                 
                 <div class="form-group">
                     <div id="image-preview" style="display: none; margin-bottom: 16px;">
                         <img id="preview-img" src="" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid var(--gray-300);">
-                        <p style="text-align:center; font-size: 12px; color: var(--gray-400); margin-top: 8px;">Image preview</p>
+                        <p style="text-align:center; font-size: 12px; color: var(--gray-400); margin-top: 8px;">Thumbnail preview</p>
                     </div>
                     <div style="border: 2px dashed var(--gray-300); border-radius: 8px; padding: 24px; text-align: center; background: var(--gray-100);">
                         <i class="fa-regular fa-image" style="font-size: 24px; color: var(--gray-400); margin-bottom: 12px;"></i>
-                        <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 12px;">Click to select an image to upload</div>
-                        <input type="file" name="thumbnail" id="thumbnail-input" accept="image/*" class="form-control" style="background: white; font-size: 13px;">
+                        <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 12px;">Click to select thumbnail</div>
+                        <input type="file" name="thumbnail" id="thumbnail-input" accept="image/*" class="form-control" style="background: white; font-size: 13px;" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adm-card" style="padding: 24px;">
+                <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 20px;">Gallery Images</h3>
+                
+                <div class="form-group">
+                    <div id="gallery-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                        <!-- Gallery previews will be appended here -->
+                    </div>
+                    <div style="border: 2px dashed var(--gray-300); border-radius: 8px; padding: 24px; text-align: center; background: var(--gray-100);">
+                        <i class="fa-solid fa-images" style="font-size: 24px; color: var(--gray-400); margin-bottom: 12px;"></i>
+                        <div style="font-size: 12px; color: var(--gray-400); margin-bottom: 12px;">Click to select multiple gallery images</div>
+                        <input type="file" name="images[]" id="gallery-input" accept="image/*" multiple class="form-control" style="background: white; font-size: 13px;">
                     </div>
                 </div>
             </div>
@@ -129,6 +144,7 @@ include '../layouts/admin_header.php';
 </form>
 
 <script>
+    // Thumbnail Preview
     document.getElementById('thumbnail-input').addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
             var reader = new FileReader();
@@ -140,6 +156,74 @@ include '../layouts/admin_header.php';
         } else {
             document.getElementById('image-preview').style.display = 'none';
         }
+    });
+
+    // Gallery Preview & Remove
+    const galleryInput = document.getElementById('gallery-input');
+    const galleryPreview = document.getElementById('gallery-preview');
+    let dataTransfer = new DataTransfer();
+
+    galleryInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        
+        files.forEach((file) => {
+            dataTransfer.items.add(file);
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.style.position = 'relative';
+                div.style.width = '80px';
+                div.style.height = '80px';
+                div.style.borderRadius = '6px';
+                div.style.overflow = 'hidden';
+                div.style.border = '1px solid var(--gray-300)';
+                
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '<i class="fa-solid fa-times"></i>';
+                removeBtn.style.position = 'absolute';
+                removeBtn.style.top = '2px';
+                removeBtn.style.right = '2px';
+                removeBtn.style.background = 'rgba(0,0,0,0.6)';
+                removeBtn.style.color = 'white';
+                removeBtn.style.border = 'none';
+                removeBtn.style.borderRadius = '50%';
+                removeBtn.style.width = '20px';
+                removeBtn.style.height = '20px';
+                removeBtn.style.fontSize = '12px';
+                removeBtn.style.cursor = 'pointer';
+                removeBtn.style.display = 'flex';
+                removeBtn.style.alignItems = 'center';
+                removeBtn.style.justifyContent = 'center';
+
+                removeBtn.onclick = function() {
+                    const fileName = file.name;
+                    for(let i=0; i<dataTransfer.items.length; i++) {
+                        if(dataTransfer.items[i].getAsFile().name === fileName) {
+                            dataTransfer.items.remove(i);
+                            break;
+                        }
+                    }
+                    galleryInput.files = dataTransfer.files;
+                    div.remove();
+                };
+                
+                div.appendChild(img);
+                div.appendChild(removeBtn);
+                galleryPreview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Update input files
+        galleryInput.files = dataTransfer.files;
     });
 </script>
 

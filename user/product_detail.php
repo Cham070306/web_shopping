@@ -95,6 +95,49 @@ $hasSale = $product['sale_price'] && $product['price'] > $product['sale_price'];
 $discount = $hasSale ? round((($product['price'] - $product['sale_price']) / $product['price']) * 100) : 0;
 $displayPrice = $hasSale ? $product['sale_price'] : $product['price'];
 
+// Fetch Related Products (same category first, fallback to others, max 4 total)
+$relStmt = $conn->prepare("
+    SELECT p.*, (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = p.id AND is_approved = 1) as avg_rating 
+    FROM products p 
+    WHERE p.category_id = ? AND p.id != ? AND p.is_active = 1 
+    ORDER BY p.id DESC LIMIT 4
+");
+$relStmt->bind_param("ii", $product['category_id'], $id);
+$relStmt->execute();
+$related_products = $relStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$needed = 4 - count($related_products);
+if ($needed > 0) {
+    // Collect IDs already fetched to exclude them
+    $exclude_ids = array_column($related_products, 'id');
+    $exclude_ids[] = (int)$id; 
+    $notIn = implode(',', $exclude_ids);
+    
+    $fallbackStmt = $conn->prepare("
+        SELECT p.*, (SELECT COALESCE(AVG(rating), 0) FROM reviews WHERE product_id = p.id AND is_approved = 1) as avg_rating 
+        FROM products p 
+        WHERE p.id NOT IN ($notIn) AND p.is_active = 1 
+        ORDER BY p.id DESC LIMIT ?
+    ");
+    $fallbackStmt->bind_param("i", $needed);
+    $fallbackStmt->execute();
+    $fallback_products = $fallbackStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    
+    $related_products = array_merge($related_products, $fallback_products);
+}
+
+$wishedIds = [];
+if ($user_id) {
+    if ($isWished) $wishedIds[] = $id;
+    $ws_stmt = $conn->prepare("SELECT product_id FROM wishlist WHERE user_id = ? AND product_id != ?");
+    $ws_stmt->bind_param("ii", $user_id, $id);
+    $ws_stmt->execute();
+    $ws_res = $ws_stmt->get_result();
+    while ($row = $ws_res->fetch_assoc()) {
+        $wishedIds[] = $row['product_id'];
+    }
+}
+
 $current_page = 'shop.php';
 ?>
 <?php include '../includes/header.php'; ?>
@@ -659,13 +702,15 @@ input[type=number] {
             <?php 
             $pSize = $product['size'] ?? '';
             $pMeas = $product['measurements'] ?? '';
-            $sizeRaw = $pSize ?: ($pMeas ?: '17 1/2 × 20 5/8 "');
-            $sizeClean = str_replace('*', ' × ', $sizeRaw);
+            $sizeRaw = $pSize ?: $pMeas;
+            if ($sizeRaw):
+                $sizeClean = str_replace('*', ' × ', $sizeRaw);
             ?>
             <div class="pd-meta-row" style="display: flex; align-items: center; gap: 12px; margin-bottom: 28px;">
                 <strong>Measurements:</strong> 
                 <span style="background: #F3F5F7; padding: 6px 14px; border-radius: 6px; font-weight: 600; color: #141718; font-size: 14px; letter-spacing: 0.5px;"><?= htmlspecialchars($sizeClean) ?></span>
             </div>
+            <?php endif; ?>
 
             <!-- Authentic Options from DB Variants -->
             <?php if (!empty($variants)): ?>
@@ -726,7 +771,6 @@ input[type=number] {
     <div class="pd-tabs-section">
         <div class="tabs-nav">
             <div class="tab-link active" onclick="openTab('tab-additional')">Additional Info</div>
-            <div class="tab-link" onclick="openTab('tab-questions')">Questions</div>
             <div class="tab-link" onclick="openTab('tab-reviews')">Reviews</div>
         </div>
 
@@ -734,22 +778,18 @@ input[type=number] {
             <!-- TAB: Additional Info -->
             <div id="tab-additional" class="tab-pane active">
                 <div style="font-size: 16px; color: #6C7275; line-height: 1.8;">
+                    <?php if (!empty($product['description'])): ?>
                     <h3 style="color:#141718; font-weight:600; margin-top:0;">Details</h3>
-                    <p><?= nl2br(htmlspecialchars(!empty($product['description']) ? $product['description'] : 'You can use the removable tray for serving. The design makes it easy to put the tray back after use since you place it directly on the table frame without having to fit it into any holes.')) ?></p>
+                    <p><?= nl2br(htmlspecialchars($product['description'])) ?></p>
                     <br>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($product['material'])): ?>
                     <h3 style="color:#141718; font-weight:600; margin-top:0;">Material & Care</h3>
                     <ul>
-                        <li>Material: <?= htmlspecialchars(!empty($product['material']) ? $product['material'] : 'Powder-coated steel') ?></li>
-                        <li>Wipe clean with a damp cloth</li>
-                        <li>Check regularly that all assembly fastenings are properly tightened</li>
+                        <li>Material: <?= htmlspecialchars($product['material']) ?></li>
                     </ul>
-                </div>
-            </div>
-
-            <!-- TAB: Questions -->
-            <div id="tab-questions" class="tab-pane">
-                <div style="text-align:center; padding: 40px; color:#6C7275;">
-                    <p>No questions yet. Be the first to ask a question!</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -803,6 +843,89 @@ input[type=number] {
             </div>
         </div>
     </div> <!-- /tabs -->
+
+    <!-- Related Products -->
+    <?php if (!empty($related_products)): ?>
+    <div class="related-products" style="margin-top: 80px; padding-top: 40px; border-top: 1px solid #E8ECEF;">
+        <h2 style="font-size: 28px; font-weight: 500; margin-bottom: 32px; color: #141718; font-family: 'Poppins', sans-serif;">You might also like</h2>
+        <div class="related-product-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+            <?php foreach ($related_products as $rp): 
+                $rpThumb = trim($rp['thumbnail'] ?? '');
+                if (strpos($rpThumb, 'http') === 0) {
+                    $rpImg = htmlspecialchars($rpThumb);
+                } elseif ($rpThumb) {
+                    $rpImg = '../assets/product-images/' . htmlspecialchars($rpThumb);
+                } else {
+                    $rpImg = '../assets/images/sofa.jpg';
+                }
+                $hasSaleRp = $rp['sale_price'] && $rp['price'] > $rp['sale_price'];
+                $rpDiscount = $hasSaleRp ? round((($rp['price'] - $rp['sale_price']) / $rp['price']) * 100) : 0;
+                $rpDisplayPrice = $hasSaleRp ? $rp['sale_price'] : $rp['price'];
+                $rpRating = !empty($rp['avg_rating']) ? (float)$rp['avg_rating'] : 0;
+                $rpStarsHtml = str_repeat('★', min(5, (int)round($rpRating))) . str_repeat('☆', 5 - min(5, (int)round($rpRating)));
+                $rpIsWished = in_array($rp['id'], $wishedIds);
+            ?>
+            <div class="product-card" style="display: flex; flex-direction: column; cursor: pointer; height: 100%;">
+                <div class="product-img-box" style="position: relative; background: #F3F5F7; border-radius: 6px; overflow: hidden; width: 100%; aspect-ratio: 1/1; margin-bottom: 14px;">
+                    <a href="product_detail.php?id=<?= $rp['id'] ?>" style="display:block; width:100%; height:100%;">
+                        <img style="width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease;" src="<?= $rpImg ?>" alt="<?= htmlspecialchars($rp['name']) ?>" onerror="this.src='../assets/images/sofa.jpg'" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    </a>
+                    <div class="card-badges" style="position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 6px; z-index: 2;">
+                        <?php if ((int)($rp['stock'] ?? 0) <= 0): ?>
+                            <span class="badge-oos" style="background: #FF5630; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px;">OUT OF STOCK</span>
+                        <?php elseif ($rp['is_featured']): ?>
+                            <span class="badge-new" style="background: #fff; color: #141718; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 3px 10px;">NEW</span>
+                        <?php endif; ?>
+                        <?php if ($hasSaleRp): ?><span class="badge-sale" style="background: #38CB89; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px;">-<?= $rpDiscount ?>%</span><?php endif; ?>
+                    </div>
+                    <button type="button" class="card-wish-btn" title="Toggle wishlist" onclick="toggleDetailWishlist(<?= $rp['id'] ?>)" style="position: absolute; top: 14px; right: 14px; z-index: 2; background: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.10); cursor: pointer; transition: background 0.18s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="<?= $rpIsWished ? '#FF3333' : 'none' ?>" stroke="<?= $rpIsWished ? '#FF3333' : '#141718' ?>" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </button>
+                    <!-- Add to cart overlay -->
+                    <div class="card-cart-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 14px; opacity: 0; transform: translateY(12px); transition: all .28s ease; z-index: 2;">
+                        <?php if ((int)($rp['stock'] ?? 0) <= 0): ?>
+                            <button style="width: 100%; background: #CBCFD2; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; padding: 8px; cursor: not-allowed;" type="button" disabled>Out of Stock</button>
+                        <?php else: ?>
+                        <form action="../controllers/CartController.php" method="POST">
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="product_id" value="<?= $rp['id'] ?>">
+                            <input type="hidden" name="quantity" value="1">
+                            <button style="width: 100%; background: #141718; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; padding: 8px; cursor: pointer; transition: background 0.18s;" type="submit" onmouseover="this.style.background='#343839'" onmouseout="this.style.background='#141718'">Add to cart</button>
+                        </form>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="card-info" style="display: flex; flex-direction: column; flex: 1;">
+                    <div class="card-stars" style="color: #141718; font-size: 11px; margin-bottom: 6px; letter-spacing: 1px;">
+                        <?php if ($rpRating > 0): ?>
+                            <?= $rpStarsHtml ?> <span style="color:#6C7275;font-size:11px;">(<?= number_format($rpRating, 1) ?>)</span>
+                        <?php else: ?>
+                            <span style="color:#6C7275;font-size:11px;">No reviews yet</span>
+                        <?php endif; ?>
+                    </div>
+                    <a href="product_detail.php?id=<?= $rp['id'] ?>" style="text-decoration:none; color:inherit; flex: 1;">
+                        <div class="card-name" style="font-size: 15px; font-weight: 600; color: #141718; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.45;" title="<?= htmlspecialchars($rp['name']) ?>"><?= htmlspecialchars($rp['name']) ?></div>
+                    </a>
+                    <div class="card-price" style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #141718; margin-top: auto; padding-top: 4px;">
+                        <span><?= formatVND($rpDisplayPrice) ?>₫</span>
+                        <?php if ($hasSaleRp): ?>
+                            <span class="card-price-old" style="color: #6C7275; text-decoration: line-through; font-weight: 400; font-size: 13px;"><?= formatVND($rp['price']) ?>₫</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    
+    <style>
+    .product-img-box:hover .card-cart-overlay { opacity: 1 !important; transform: translateY(0) !important; }
+    @media (max-width: 900px) { .related-product-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+    @media (max-width: 600px) { .related-product-grid { grid-template-columns: 1fr !important; } }
+    </style>
+    <?php endif; ?>
 
 </div> <!-- /pd-wrap -->
 

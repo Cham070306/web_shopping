@@ -1,8 +1,11 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once "../config/database.php";
+require_once "../models/Review.php";
 
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($id <= 0) {
     header("Location: shop.php");
     exit;
@@ -31,7 +34,9 @@ $imgStmt->execute();
 $images = $imgStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $all_images = [];
-if ($product['thumbnail']) { $all_images[] = $product['thumbnail']; }
+if ($product['thumbnail']) {
+    $all_images[] = $product['thumbnail'];
+}
 foreach ($images as $img) {
     if (!in_array($img['image_url'], $all_images)) {
         $all_images[] = $img['image_url'];
@@ -65,19 +70,25 @@ $totalReviews = count($reviews);
 $avgRating = 0;
 if ($totalReviews > 0) {
     $sum = 0;
-    foreach ($reviews as $rev) { $sum += (int)$rev['rating']; }
+    foreach ($reviews as $rev) {
+        $sum += (int) $rev['rating'];
+    }
     $avgRating = round($sum / $totalReviews, 1);
 }
 
 // Format Helper
-function formatVND($price) {
-    if (!$price) return '0';
-    return number_format((int)$price, 0, ',', '.');
+function formatVND($price)
+{
+    if (!$price)
+        return '0';
+    return number_format((int) $price, 0, ',', '.');
 }
 
 // Image Resolver
-function getRealImage($imgStr) {
-    if (strpos($imgStr, 'http') === 0) return htmlspecialchars($imgStr);
+function getRealImage($imgStr)
+{
+    if (strpos($imgStr, 'http') === 0)
+        return htmlspecialchars($imgStr);
     return '../assets/product-images/' . htmlspecialchars($imgStr);
 }
 
@@ -101,485 +112,1132 @@ $current_page = 'shop.php';
 <?php include '../includes/navbar.php'; ?>
 
 <style>
-/* ────────────────────────────────────────────────────────
+    /* ────────────────────────────────────────────────────────
    PRODUCT DETAIL PAGE STYLES - 3LEGANT DESIGN
 ──────────────────────────────────────────────────────── */
 
-.pd-wrap *, .pd-wrap *::before, .pd-wrap *::after {
-    box-sizing: border-box;
-}
-/* Hide Native Number Spinner Arrows */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
-    margin: 0; 
-}
-input[type=number] {
-    -moz-appearance: textfield;
-}
+    .pd-wrap *,
+    .pd-wrap *::before,
+    .pd-wrap *::after {
+        box-sizing: border-box;
+    }
 
-.pd-wrap {
-    max-width: 1120px; /* Exact match for beautiful container width */
-    margin: 40px auto 80px;
-    padding: 0 24px;
-    font-family: 'Inter', sans-serif;
-    color: #141718;
-}
+    /* Hide Native Number Spinner Arrows */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 
-/* ── Breadcrumb ── */
-.pd-breadcrumb {
-    font-size: 14px;
-    color: #6C7275;
-    margin-bottom: 32px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.pd-breadcrumb a {
-    color: #6C7275;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-.pd-breadcrumb a:hover { color: #141718; }
-.pd-breadcrumb .current { color: #141718; font-weight: 500; }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
 
-/* ── Top Section Grid ── */
-.pd-top {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 60px;
-    margin-bottom: 60px;
-    align-items: start;
-}
+    .pd-wrap {
+        max-width: 1120px;
+        /* Exact match for beautiful container width */
+        margin: 40px auto 80px;
+        padding: 0 24px;
+        font-family: 'Inter', sans-serif;
+        color: #141718;
+    }
 
-/* Gallery */
-.pd-gallery {
-    min-width: 0; /* Prevents grid column blowout */
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-.pd-main-img-box {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background: #F3F5F7;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-.pd-main-img-box img {
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    box-sizing: border-box;
-    object-fit: cover;
-    transition: 0.3s;
-}
-.pd-badges {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    z-index: 10;
-}
-.badge-new { background: #fff; color: #141718; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; border: 1px solid #E8ECEF;}
-.badge-sale { background: #38CB89; color: #fff; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px;}
-.badge-oos { background: #FF5630; color: #fff; padding: 4px 12px; font-size: 12px; font-weight: 700; border-radius: 4px; letter-spacing: 0.03em; }
+    /* ── Breadcrumb ── */
+    .pd-breadcrumb {
+        font-size: 14px;
+        color: #6C7275;
+        margin-bottom: 32px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-.pd-thumbs-wrap {
-    position: relative;
-    width: 100%;
-}
-.pd-thumbs {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    padding: 0 44px 4px 44px; /* added side padding for nav arrows */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-}
-.pd-thumbs::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
-}
-.pd-thumb {
-    width: 100px;
-    height: 100px;
-    border-radius: 6px;
-    background: #F3F5F7;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: 0.2s;
-    flex-shrink: 0;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.pd-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.pd-thumb.active { border-color: #141718; }
-.pd-thumb:hover { border-color: #6C7275; }
+    .pd-breadcrumb a {
+        color: #6C7275;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
 
-.thumb-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
-    background: #fff;
-    border: 1px solid #E8ECEF;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: 0.2s;
-    font-size: 14px;
-    color: #141718;
-    z-index: 5;
-    margin-top: -6px; /* Offset for scrollbar height */
-}
-.thumb-nav:hover {
-    background: #141718;
-    color: #fff;
-}
-.thumb-nav.left { left: 8px; }
-.thumb-nav.right { right: 8px; }
+    .pd-breadcrumb a:hover {
+        color: #141718;
+    }
 
-/* Info Column */
-.pd-info {
-    min-width: 0; /* Prevents grid column blowout */
-    display: flex;
-    flex-direction: column;
-}
-.pd-stars {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-.stars-icons { color: #141718; font-size: 14px; letter-spacing: 2px;}
-.stars-text { font-size: 14px; color: #6C7275; }
+    .pd-breadcrumb .current {
+        color: #141718;
+        font-weight: 500;
+    }
 
-.pd-title {
-    font-size: 40px;
-    font-weight: 600;
-    margin: 0 0 16px;
-    line-height: 1.2;
-    font-family: 'Poppins', sans-serif;
-    letter-spacing: -0.5px;
-    /* Limit title length to 2 lines */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+    /* ── Top Section Grid ── */
+    .pd-top {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 60px;
+        margin-bottom: 60px;
+        align-items: start;
+    }
 
-.pd-desc {
-    font-size: 16px;
-    color: #6C7275;
-    line-height: 1.6;
-    margin-bottom: 24px;
-    /* Limit description to 3 lines */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    overflow-wrap: break-word;
-    white-space: normal;
-}
+    /* Gallery */
+    .pd-gallery {
+        min-width: 0;
+        /* Prevents grid column blowout */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
-.pd-price-row {
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 32px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #E8ECEF;
-}
-.pd-price-main { font-size: 28px; font-weight: 600; color: #141718; }
-.pd-price-old { font-size: 20px; font-weight: 400; color: #6C7275; text-decoration: line-through; }
+    .pd-main-img-box {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #F3F5F7;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
 
-/* Countdown */
-.pd-timer-box { margin-bottom: 32px; }
-.timer-label { font-size: 16px; font-weight: 500; color: #141718; margin-bottom: 12px; display:block; }
-.timer-blocks { display: flex; gap: 16px; }
-.t-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    background: #F3F5F7;
-    border-radius: 8px;
-}
-.t-num { font-size: 24px; font-weight: 600; color: #141718; line-height: 1;}
-.t-txt { font-size: 12px; color: #6C7275; margin-top: 4px; }
+    .pd-main-img-box img {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        box-sizing: border-box;
+        object-fit: cover;
+        transition: 0.3s;
+    }
 
-/* Meta Info */
-.pd-meta-row { margin-bottom: 24px; font-size: 16px; color: #6C7275;}
-.pd-meta-row strong { font-weight: 500; color: #141718; margin-right: 8px; }
+    .pd-badges {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 10;
+    }
 
-/* Colors */
-.pd-color-select { margin-bottom: 32px; }
-.color-label { display: block; font-size: 16px; font-weight: 500; margin-bottom: 12px; color: #6C7275; }
-.color-label span { color: #141718; font-weight: 600; }
-.color-options { display: flex; gap: 16px; flex-wrap: wrap; }
-.c-option {
-    width: 50px;
-    height: 50px;
-    background: #F3F5F7;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid #E8ECEF;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.c-option img { width: 100%; height: 100%; object-fit: contain; }
-.c-option.active { border: 2px solid #141718; }
-.c-option:hover { border-color: #6C7275; }
+    .badge-new {
+        background: #fff;
+        color: #141718;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 4px;
+        border: 1px solid #E8ECEF;
+    }
 
-/* Actions */
-.pd-actions { display: grid; grid-template-columns: 140px 1fr; gap: 24px; margin-bottom: 32px; }
-.pd-qty {
-    display: flex;
-    align-items: center;
-    background: #F3F5F7;
-    border-radius: 8px;
-    height: 52px;
-}
-.qty-btn {
-    width: 44px;
-    height: 100%;
-    background: none;
-    border: none;
-    font-size: 18px;
-    font-weight: 500;
-    cursor: pointer;
-    color: #141718;
-}
-.qty-input {
-    flex: 1;
-    text-align: center;
-    font-size: 16px;
-    font-weight: 600;
-    border: none;
-    background: none;
-    outline: none;
-}
-.pd-wishlist-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 52px;
-    background: #fff;
-    border: 1.5px solid #141718;
-    color: #141718;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-    width: 100%;
-}
-.pd-wishlist-btn:hover { background: #141718; color: #fff; }
-.pd-wishlist-btn svg { transition: stroke 0.2s, fill 0.2s; }
-.pd-wishlist-btn:hover svg { stroke: #fff; }
+    .badge-sale {
+        background: #38CB89;
+        color: #fff;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 4px;
+    }
 
-.pd-add-btn {
-    grid-column: 1 / -1;
-    height: 52px;
-    background: #141718;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.pd-add-btn:hover { background: #343839; }
-.pd-add-btn.disabled {
-    background: #CBCFD2; color: #fff; cursor: not-allowed; pointer-events: none; opacity: 0.65;
-}
+    .badge-oos {
+        background: #FF5630;
+        color: #fff;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 4px;
+        letter-spacing: 0.03em;
+    }
 
-.pd-meta-links {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    border-top: 1px solid #E8ECEF;
-    padding-top: 24px;
-    color: #6C7275;
-    font-size: 15px;
-}
-.pd-meta-links strong { color: #141718; font-weight: 500; width: 80px; display: inline-block;}
+    .pd-thumbs-wrap {
+        position: relative;
+        width: 100%;
+    }
 
-/* ── Tabs / Accordions ── */
-.pd-tabs-section {
-    border-top: 1px solid #E8ECEF;
-    margin-top: 60px;
-    padding-top: 40px;
-}
-.tabs-nav {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 40px;
-    border-bottom: 1px solid #E8ECEF;
-}
-.tab-link {
-    font-size: 20px;
-    font-weight: 500;
-    color: #6C7275;
-    cursor: pointer;
-    padding-bottom: 16px;
-    border-bottom: 2px solid transparent;
-    transition: 0.2s;
-    margin-bottom: -1px;
-}
-.tab-link.active {
-    color: #141718;
-    border-color: #141718;
-}
+    .pd-thumbs {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding: 0 44px 4px 44px;
+        /* added side padding for nav arrows */
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
 
-/* Reviews List */
-.reviews-wrap { display: block; }
-.rev-header-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-}
-.rev-title { font-size: 24px; font-weight: 600; color: #141718;}
-.rev-sort {
-    border: 1px solid #E8ECEF;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    color: #141718;
-    outline: none;
-    cursor: pointer;
-}
-.review-item {
-    display: flex;
-    gap: 24px;
-    padding-bottom: 32px;
-    margin-bottom: 32px;
-    border-bottom: 1px solid #E8ECEF;
-}
-.rev-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #e8ecef;
-}
-.rev-content { flex: 1; }
-.rev-c-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-.rev-name { font-size: 18px; font-weight: 600; color: #141718; }
-.rev-stars { color: #141718; letter-spacing: 2px; font-size: 14px;}
-.rev-txt { font-size: 16px; color: #6C7275; line-height: 1.6; margin-bottom: 16px; }
-.rev-actions { display: flex; gap: 16px; font-size: 14px; font-weight: 500; color: #6C7275; }
-.rev-act-btn { cursor: pointer; transition: color 0.1s; }
-.rev-act-btn:hover { color: #141718; }
+    .pd-thumbs::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
 
-.load-more-wrap { text-align: center; margin-top: 40px; }
-.btn-load-more {
-    background: none;
-    border: 1.5px solid #141718;
-    color: #141718;
-    padding: 10px 40px;
-    border-radius: 40px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.btn-load-more:hover { background: #141718; color: #fff; }
+    .pd-thumb {
+        width: 100px;
+        height: 100px;
+        border-radius: 6px;
+        background: #F3F5F7;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: 0.2s;
+        flex-shrink: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-/* Tab contents to hide by default */
-.tab-pane { display: none; }
-.tab-pane.active { display: block; animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
+    .pd-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-/* Newsletter */
-.newsletter {
-    position: relative;
-    overflow: hidden;
-    background: #F3F5F7;
-    text-align: center;
-    padding: 80px 24px;
-    margin-top: 80px;
-}
-.newsletter-inner { position: relative; z-index: 2; max-width: 440px; margin: 0 auto; }
-.newsletter h2 { font-size: 36px; font-weight: 500; margin: 0 0 10px; font-family: 'Poppins', sans-serif; color: #141718; }
-.newsletter p { font-size: 15px; color: #6C7275; margin: 0 0 32px; }
-.newsletter-form {
-    display: flex;
-    align-items: center;
-    border-bottom: 1.5px solid #6C7275;
-    padding-bottom: 8px;
-    gap: 8px;
-}
-.newsletter-form input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: #6C7275; }
-.newsletter-form input::placeholder { color: #9BA3AF; }
-.newsletter-form button { background: none; border: none; font-size: 15px; font-weight: 600; cursor: pointer; color: #6C7275; }
+    .pd-thumb.active {
+        border-color: #141718;
+    }
 
-/* Responsive Mobile */
-@media (max-width: 900px) {
-    .pd-top { grid-template-columns: 1fr; gap: 40px; }
-    .pd-gallery { max-width: 600px; margin: 0 auto; }
-    .pd-title { font-size: 32px; }
-    .tabs-nav { gap: 20px; overflow-x: auto; white-space: nowrap; padding-bottom: 4px; margin-bottom: 30px;}
-    .tab-link { font-size: 16px; }
-    .pd-actions { grid-template-columns: 1fr 1fr; }
-    .pd-add-btn { grid-column: 1 / -1; }
-}
-@media (max-width: 600px) {
-    .timer-blocks { gap: 10px; }
-    .t-block { width: 60px; height: 60px; }
-    .t-num { font-size: 20px; }
-    .pd-actions { grid-template-columns: 120px 1fr; }
-    .pd-wishlist-btn { padding: 0 12px; font-size: 14px;}
-    .review-item { flex-direction: column; gap: 16px; }
-}
+    .pd-thumb:hover {
+        border-color: #6C7275;
+    }
+
+    .thumb-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        background: #fff;
+        border: 1px solid #E8ECEF;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: 0.2s;
+        font-size: 14px;
+        color: #141718;
+        z-index: 5;
+        margin-top: -6px;
+        /* Offset for scrollbar height */
+    }
+
+    .thumb-nav:hover {
+        background: #141718;
+        color: #fff;
+    }
+
+    .thumb-nav.left {
+        left: 8px;
+    }
+
+    .thumb-nav.right {
+        right: 8px;
+    }
+
+    /* Info Column */
+    .pd-info {
+        min-width: 0;
+        /* Prevents grid column blowout */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pd-stars {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stars-icons {
+        color: #141718;
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+
+    .stars-text {
+        font-size: 14px;
+        color: #6C7275;
+    }
+
+    .pd-title {
+        font-size: 40px;
+        font-weight: 600;
+        margin: 0 0 16px;
+        line-height: 1.2;
+        font-family: 'Poppins', sans-serif;
+        letter-spacing: -0.5px;
+        /* Limit title length to 2 lines */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .pd-desc {
+        font-size: 16px;
+        color: #6C7275;
+        line-height: 1.6;
+        margin-bottom: 24px;
+        /* Limit description to 3 lines */
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        overflow-wrap: break-word;
+        white-space: normal;
+    }
+
+    .pd-price-row {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #E8ECEF;
+    }
+
+    .pd-price-main {
+        font-size: 28px;
+        font-weight: 600;
+        color: #141718;
+    }
+
+    .pd-price-old {
+        font-size: 20px;
+        font-weight: 400;
+        color: #6C7275;
+        text-decoration: line-through;
+    }
+
+    /* Countdown */
+    .pd-timer-box {
+        margin-bottom: 32px;
+    }
+
+    .timer-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #141718;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .timer-blocks {
+        display: flex;
+        gap: 16px;
+    }
+
+    .t-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        background: #F3F5F7;
+        border-radius: 8px;
+    }
+
+    .t-num {
+        font-size: 24px;
+        font-weight: 600;
+        color: #141718;
+        line-height: 1;
+    }
+
+    .t-txt {
+        font-size: 12px;
+        color: #6C7275;
+        margin-top: 4px;
+    }
+
+    /* Meta Info */
+    .pd-meta-row {
+        margin-bottom: 24px;
+        font-size: 16px;
+        color: #6C7275;
+    }
+
+    .pd-meta-row strong {
+        font-weight: 500;
+        color: #141718;
+        margin-right: 8px;
+    }
+
+    /* Colors */
+    .pd-color-select {
+        margin-bottom: 32px;
+    }
+
+    .color-label {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 12px;
+        color: #6C7275;
+    }
+
+    .color-label span {
+        color: #141718;
+        font-weight: 600;
+    }
+
+    .color-options {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .c-option {
+        width: 50px;
+        height: 50px;
+        background: #F3F5F7;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 1px solid #E8ECEF;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .c-option img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .c-option.active {
+        border: 2px solid #141718;
+    }
+
+    .c-option:hover {
+        border-color: #6C7275;
+    }
+
+    /* Actions */
+    .pd-actions {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .pd-qty {
+        display: flex;
+        align-items: center;
+        background: #F3F5F7;
+        border-radius: 8px;
+        height: 52px;
+    }
+
+    .qty-btn {
+        width: 44px;
+        height: 100%;
+        background: none;
+        border: none;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        color: #141718;
+    }
+
+    .qty-input {
+        flex: 1;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        background: none;
+        outline: none;
+    }
+
+    .pd-wishlist-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 52px;
+        background: #fff;
+        border: 1.5px solid #141718;
+        color: #141718;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+        width: 100%;
+    }
+
+    .pd-wishlist-btn:hover {
+        background: #141718;
+        color: #fff;
+    }
+
+    .pd-wishlist-btn svg {
+        transition: stroke 0.2s, fill 0.2s;
+    }
+
+    .pd-wishlist-btn:hover svg {
+        stroke: #fff;
+    }
+
+    .pd-add-btn {
+        grid-column: 1 / -1;
+        height: 52px;
+        background: #141718;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .pd-add-btn:hover {
+        background: #343839;
+    }
+
+    .pd-add-btn.disabled {
+        background: #CBCFD2;
+        color: #fff;
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.65;
+    }
+
+    .pd-meta-links {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-top: 1px solid #E8ECEF;
+        padding-top: 24px;
+        color: #6C7275;
+        font-size: 15px;
+    }
+
+    .pd-meta-links strong {
+        color: #141718;
+        font-weight: 500;
+        width: 80px;
+        display: inline-block;
+    }
+
+    /* ── Tabs / Accordions ── */
+    .pd-tabs-section {
+        border-top: 1px solid #E8ECEF;
+        margin-top: 60px;
+        padding-top: 40px;
+    }
+
+    .tabs-nav {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 40px;
+        border-bottom: 1px solid #E8ECEF;
+    }
+
+    .tab-link {
+        font-size: 20px;
+        font-weight: 500;
+        color: #6C7275;
+        cursor: pointer;
+        padding-bottom: 16px;
+        border-bottom: 2px solid transparent;
+        transition: 0.2s;
+        margin-bottom: -1px;
+    }
+
+    .tab-link.active {
+        color: #141718;
+        border-color: #141718;
+    }
+
+
+    .rev-top-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+
+    .rev-main-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #141718;
+        margin-bottom: 10px;
+    }
+
+    .rev-rating-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+
+    .rev-stars-big {
+        font-size: 16px;
+        letter-spacing: 2px;
+        color: #141718;
+    }
+
+    .rev-rating-text,
+    .rev-count-text {
+        font-size: 14px;
+        color: #6C7275;
+    }
+
+    .rev-product-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #141718;
+    }
+
+    .write-review-btn {
+        border: none;
+        background: #141718;
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 22px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+    }
+
+    .write-review-btn:hover {
+        background: #2c2f31;
+    }
+
+    .write-review-box {
+        border: 1px solid #E8ECEF;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 32px;
+        background: #fff;
+    }
+
+    .write-review-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #141718;
+        margin: 0 0 20px;
+    }
+
+    .write-review-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .wr-row label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #141718;
+    }
+
+    .wr-row select,
+    .wr-row textarea {
+        width: 100%;
+        border: 1px solid #DADFE3;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 15px;
+        font-family: inherit;
+        outline: none;
+        background: #fff;
+    }
+
+    .wr-row textarea {
+        resize: vertical;
+    }
+
+    .wr-submit-btn {
+        align-self: flex-start;
+        border: none;
+        background: #141718;
+        color: #fff;
+        border-radius: 999px;
+        padding: 12px 26px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .wr-submit-btn:hover {
+        background: #2c2f31;
+    }
+
+    .review-login-box {
+        border: 1px dashed #E8ECEF;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 28px;
+        color: #6C7275;
+        font-size: 15px;
+    }
+
+    .review-login-box a {
+        color: #141718;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+    .rev-list-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .rev-list-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #141718;
+    }
+
+    .rev-sort {
+        min-width: 120px;
+        border: 1px solid #E8ECEF;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        color: #141718;
+        outline: none;
+        cursor: pointer;
+        background: #fff;
+    }
+
+    .rev-empty-box {
+        text-align: center;
+        padding: 40px;
+        color: #6C7275;
+        border: 1px dashed #E8ECEF;
+        border-radius: 8px;
+    }
+
+    .review-item {
+        display: flex;
+        gap: 16px;
+        padding: 24px 0;
+        border-bottom: 1px solid #E8ECEF;
+    }
+
+    .rev-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #e8ecef;
+        flex-shrink: 0;
+    }
+
+    .rev-content {
+        flex: 1;
+    }
+
+    .rev-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #141718;
+        margin-bottom: 6px;
+    }
+
+    .rev-stars {
+        color: #141718;
+        letter-spacing: 2px;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .rev-txt {
+        font-size: 14px;
+        color: #6C7275;
+        line-height: 1.75;
+        margin-bottom: 14px;
+        max-width: 900px;
+    }
+
+    .rev-actions {
+        display: flex;
+        gap: 18px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6C7275;
+    }
+
+    .rev-act-btn {
+        cursor: pointer;
+        transition: color 0.1s;
+    }
+
+    .rev-act-btn:hover {
+        color: #141718;
+    }
+
+    .load-more-wrap {
+        text-align: center;
+        margin-top: 28px;
+    }
+
+    .btn-load-more {
+        background: #fff;
+        border: 1.5px solid #141718;
+        color: #141718;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-load-more:hover {
+        background: #141718;
+        color: #fff;
+    }
+
+    .hidden-review {
+        display: none;
+    }
+
+    .review-message {
+        margin-bottom: 18px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .review-message.success {
+        background: #ecfdf3;
+        border: 1px solid #abefc6;
+        color: #067647;
+    }
+
+    .review-message.error {
+        background: #fef3f2;
+        border: 1px solid #fecdca;
+        color: #b42318;
+    }
+
+    @media (max-width: 900px) {
+
+        .rev-top-summary,
+        .rev-list-head {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .review-item {
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .rev-avatar {
+            width: 56px;
+            height: 56px;
+        }
+
+        .rev-main-title {
+            font-size: 24px;
+        }
+
+        .rev-list-title {
+            font-size: 20px;
+        }
+    }
+
+    /* Tab contents to hide by default */
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Newsletter */
+    .newsletter {
+        position: relative;
+        overflow: hidden;
+        background: #F3F5F7;
+        text-align: center;
+        padding: 80px 24px;
+        margin-top: 80px;
+        width: 100%;
+    }
+
+    .newsletter-inner {
+        position: relative;
+        z-index: 2;
+        max-width: 440px;
+        margin: 0 auto;
+    }
+
+    .newsletter h2 {
+        font-size: 36px;
+        font-weight: 500;
+        margin: 0 0 10px;
+        font-family: 'Poppins', sans-serif;
+        color: #141718;
+    }
+
+    .newsletter p {
+        font-size: 15px;
+        color: #6C7275;
+        margin: 0 0 32px;
+
+    }
+
+    .newsletter-form {
+        display: flex;
+        align-items: center;
+        border-bottom: 1.5px solid #6C7275;
+        padding-bottom: 8px;
+        gap: 8px;
+    }
+
+    .newsletter-form input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 15px;
+        color: #6C7275;
+    }
+
+    .newsletter-form input::placeholder {
+        color: #9BA3AF;
+    }
+
+    .newsletter-form button {
+        background: none;
+        border: none;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        color: #6C7275;
+    }
+
+    /* Responsive Mobile */
+    @media (max-width: 900px) {
+        .pd-top {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+
+        .pd-gallery {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .pd-title {
+            font-size: 32px;
+        }
+
+        .tabs-nav {
+            gap: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 4px;
+            margin-bottom: 30px;
+        }
+
+        .tab-link {
+            font-size: 16px;
+        }
+
+        .pd-actions {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .pd-add-btn {
+            grid-column: 1 / -1;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .timer-blocks {
+            gap: 10px;
+        }
+
+        .t-block {
+            width: 60px;
+            height: 60px;
+        }
+
+        .t-num {
+            font-size: 20px;
+        }
+
+        .pd-actions {
+            grid-template-columns: 120px 1fr;
+        }
+
+        .pd-wishlist-btn {
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+        .review-item {
+            flex-direction: column;
+            gap: 16px;
+        }
+    }
+
+    .write-review-box {
+        border: 1px solid #E8ECEF;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 32px;
+        background: #fff;
+    }
+
+    .write-review-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #141718;
+        margin: 0 0 20px;
+    }
+
+    .write-review-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .wr-row label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #141718;
+    }
+
+    .wr-row select,
+    .wr-row textarea {
+        width: 100%;
+        border: 1px solid #DADFE3;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 15px;
+        font-family: inherit;
+        outline: none;
+        background: #fff;
+    }
+
+    .wr-row textarea {
+        resize: vertical;
+    }
+
+    .wr-submit-btn {
+        align-self: flex-start;
+        border: none;
+        background: #141718;
+        color: #fff;
+        border-radius: 999px;
+        padding: 12px 26px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .wr-submit-btn:hover {
+        background: #2c2f31;
+    }
+
+    .rating-stars-input {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+
+    .rating-star {
+        font-size: 32px;
+        color: #d9d9d9;
+        cursor: pointer;
+        transition: 0.2s ease;
+        line-height: 1;
+    }
+
+    .rating-star:hover,
+    .rating-star.active {
+        color: #f5a623;
+        transform: scale(1.08);
+    }
+
+    .rating-text {
+        display: inline-block;
+        font-size: 14px;
+        color: #6C7275;
+        margin-top: 4px;
+    }
+
+    .review-login-box {
+        border: 1px dashed #E8ECEF;
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin-bottom: 28px;
+        color: #6C7275;
+        font-size: 15px;
+    }
+
+    .review-login-box a {
+        color: #141718;
+        font-weight: 600;
+        text-decoration: underline;
+    }
 </style>
 
 <div class="pd-wrap">
-    
+
     <!-- Breadcrumb -->
     <nav class="pd-breadcrumb">
-        <a href="index.php">Home</a> > 
-        <a href="shop.php">Shop</a> > 
-        <a href="shop.php?cat=<?= htmlspecialchars($product['category_slug']) ?>"><?= htmlspecialchars($product['category_name']) ?></a> > 
+        <a href="index.php">Home</a> >
+        <a href="shop.php">Shop</a> >
+        <a
+            href="shop.php?cat=<?= htmlspecialchars($product['category_slug']) ?>"><?= htmlspecialchars($product['category_name']) ?></a>
+        >
         <span class="current">Product</span>
     </nav>
 
     <!-- Top Section (Gallery + Info) -->
     <div class="pd-top">
-        
+
         <!-- Left: Gallery -->
         <div class="pd-gallery">
             <div class="pd-main-img-box">
                 <!-- Badges -->
                 <div class="pd-badges">
-                    <?php if ((int)$product['stock'] <= 0): ?>
+                    <?php if ((int) $product['stock'] <= 0): ?>
                         <span class="badge-oos">OUT OF STOCK</span>
                     <?php elseif ($product['is_featured']): ?>
                         <span class="badge-new">NEW</span>
@@ -588,18 +1246,21 @@ input[type=number] {
                 </div>
                 <!-- Main Image -->
                 <?php $mainImg = getRealImage($all_images[0] ?? 'placeholder.jpg'); ?>
-                <img id="mainGalleryImage" src="<?= $mainImg ?>" alt="<?= htmlspecialchars($product['name']) ?>" onerror="this.src='../assets/images/sofa.jpg'">
+                <img id="mainGalleryImage" src="<?= $mainImg ?>" alt="<?= htmlspecialchars($product['name']) ?>"
+                    onerror="this.src='../assets/images/sofa.jpg'">
             </div>
 
             <div class="pd-thumbs-wrap">
                 <button class="thumb-nav left" onclick="scrollThumbs(-1)">&#10094;</button>
                 <div class="pd-thumbs" id="pdThumbs">
-                    <?php foreach($all_images as $index => $imgName): 
+                    <?php foreach ($all_images as $index => $imgName):
                         $thumbSrc = getRealImage($imgName);
-                    ?>
-                    <div class="pd-thumb <?= $index === 0 ? 'active' : '' ?>" onclick="switchGalleryImage(this, '<?= $thumbSrc ?>')">
-                        <img src="<?= $thumbSrc ?>" alt="thumb" onerror="this.src='../assets/images/sofa.jpg'; this.onerror=null;">
-                    </div>
+                        ?>
+                        <div class="pd-thumb <?= $index === 0 ? 'active' : '' ?>"
+                            onclick="switchGalleryImage(this, '<?= $thumbSrc ?>')">
+                            <img src="<?= $thumbSrc ?>" alt="thumb"
+                                onerror="this.src='../assets/images/sofa.jpg'; this.onerror=null;">
+                        </div>
                     <?php endforeach; ?>
                 </div>
                 <button class="thumb-nav right" onclick="scrollThumbs(1)">&#10095;</button>
@@ -611,9 +1272,9 @@ input[type=number] {
             <!-- Stars -->
             <div class="pd-stars">
                 <div class="stars-icons">
-                    <?php 
+                    <?php
                     $fullStars = floor($avgRating);
-                    for($i=0; $i<5; $i++){
+                    for ($i = 0; $i < 5; $i++) {
                         echo $i < $fullStars ? '★' : '☆';
                     }
                     ?>
@@ -625,11 +1286,11 @@ input[type=number] {
             <h1 class="pd-title"><?= htmlspecialchars($product['name']) ?></h1>
             <?php
             $shortDesc = !empty($product['short_desc']) ? $product['short_desc'] : 'Buy one or buy a few and make every space where you sit more convenient. Light and easy to move around with removable tray top, handy for serving snacks.';
-            
+
             /* Magic AI Text Formatter to fix broken crawler data */
             // 1. Lowercase or Number followed by Uppercase -> Add ". " (e.g., sản phẩmMàu -> sản phẩm. Màu)
             $shortDesc = preg_replace('/(\p{Ll}|\p{N})(\p{Lu})/u', '$1. $2', $shortDesc);
-            
+
             // 2. Acronyms followed by Capitalized Word -> Add Space (e.g., PPĐặc -> PP Đặc)
             $shortDesc = preg_replace('/(\p{Lu})(\p{Lu}\p{Ll})/u', '$1 $2', $shortDesc);
             ?>
@@ -645,46 +1306,54 @@ input[type=number] {
 
             <!-- Dynamic Countdown Timer -->
             <?php if ($hasSale): ?>
-            <div class="pd-timer-box">
-                <span class="timer-label">Offer expires in:</span>
-                <div class="timer-blocks">
-                    <div class="t-block"><span class="t-num" id="t-days">02</span><span class="t-txt">Days</span></div>
-                    <div class="t-block"><span class="t-num" id="t-hours">12</span><span class="t-txt">Hours</span></div>
-                    <div class="t-block"><span class="t-num" id="t-minutes">45</span><span class="t-txt">Minutes</span></div>
-                    <div class="t-block"><span class="t-num" id="t-seconds">05</span><span class="t-txt">Seconds</span></div>
+                <div class="pd-timer-box">
+                    <span class="timer-label">Offer expires in:</span>
+                    <div class="timer-blocks">
+                        <div class="t-block"><span class="t-num" id="t-days">02</span><span class="t-txt">Days</span></div>
+                        <div class="t-block"><span class="t-num" id="t-hours">12</span><span class="t-txt">Hours</span>
+                        </div>
+                        <div class="t-block"><span class="t-num" id="t-minutes">45</span><span class="t-txt">Minutes</span>
+                        </div>
+                        <div class="t-block"><span class="t-num" id="t-seconds">05</span><span class="t-txt">Seconds</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
             <?php endif; ?>
 
-            <?php 
+            <?php
             $pSize = $product['size'] ?? '';
             $pMeas = $product['measurements'] ?? '';
             $sizeRaw = $pSize ?: ($pMeas ?: '17 1/2 × 20 5/8 "');
             $sizeClean = str_replace('*', ' × ', $sizeRaw);
             ?>
             <div class="pd-meta-row" style="display: flex; align-items: center; gap: 12px; margin-bottom: 28px;">
-                <strong>Measurements:</strong> 
-                <span style="background: #F3F5F7; padding: 6px 14px; border-radius: 6px; font-weight: 600; color: #141718; font-size: 14px; letter-spacing: 0.5px;"><?= htmlspecialchars($sizeClean) ?></span>
+                <strong>Measurements:</strong>
+                <span
+                    style="background: #F3F5F7; padding: 6px 14px; border-radius: 6px; font-weight: 600; color: #141718; font-size: 14px; letter-spacing: 0.5px;"><?= htmlspecialchars($sizeClean) ?></span>
             </div>
 
             <!-- Authentic Options from DB Variants -->
             <?php if (!empty($variants)): ?>
-            <div class="pd-color-select">
-                <?php 
+                <div class="pd-color-select">
+                    <?php
                     $firstVarTitle = !empty($variants[0]['color']) ? $variants[0]['color'] : (!empty($variants[0]['size']) ? $variants[0]['size'] : 'Standard');
-                ?>
-                <label class="color-label">Choose Option > <span id="colorNameLabel"><?= htmlspecialchars($firstVarTitle) ?></span></label>
-                <div class="color-options">
-                    <?php foreach($variants as $index => $var): 
-                        $varImg = !empty($var['image']) ? $var['image'] : (!empty($all_images[0]) ? $all_images[0] : 'placeholder.jpg');
-                        $varTitle = !empty($var['color']) ? $var['color'] : (!empty($var['size']) ? $var['size'] : 'Standard');
                     ?>
-                    <div class="c-option <?= $index === 0 ? 'active' : '' ?>" title="<?= htmlspecialchars($varTitle) ?>" onclick="selectColor(this, '<?= htmlspecialchars($varTitle) ?>')">
-                        <img src="<?= htmlspecialchars(getRealImage($varImg)) ?>" alt="<?= htmlspecialchars($varTitle) ?>" onerror="this.src='<?= htmlspecialchars(getRealImage($mainImg)) ?>'">
+                    <label class="color-label">Choose Option > <span
+                            id="colorNameLabel"><?= htmlspecialchars($firstVarTitle) ?></span></label>
+                    <div class="color-options">
+                        <?php foreach ($variants as $index => $var):
+                            $varImg = !empty($var['image']) ? $var['image'] : (!empty($all_images[0]) ? $all_images[0] : 'placeholder.jpg');
+                            $varTitle = !empty($var['color']) ? $var['color'] : (!empty($var['size']) ? $var['size'] : 'Standard');
+                            ?>
+                            <div class="c-option <?= $index === 0 ? 'active' : '' ?>" title="<?= htmlspecialchars($varTitle) ?>"
+                                onclick="selectColor(this, '<?= htmlspecialchars($varTitle) ?>')">
+                                <img src="<?= htmlspecialchars(getRealImage($varImg)) ?>"
+                                    alt="<?= htmlspecialchars($varTitle) ?>"
+                                    onerror="this.src='<?= htmlspecialchars(getRealImage($mainImg)) ?>'">
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
                 </div>
-            </div>
             <?php endif; ?>
 
             <!-- Actions Form -->
@@ -693,21 +1362,25 @@ input[type=number] {
                 <div class="pd-actions">
                     <!-- Qty Spinner -->
                     <div class="pd-qty">
-                        <button type="button" class="qty-btn" onclick="updateQty(-1)" <?= (int)$product['stock'] <= 0 ? 'disabled' : '' ?>>-</button>
-                        <input type="number" id="qtyInput" name="quantity" class="qty-input" value="1" min="1" max="<?= $product['stock'] > 0 ? $product['stock'] : 0 ?>" <?= (int)$product['stock'] <= 0 ? 'disabled' : '' ?>>
-                        <button type="button" class="qty-btn" onclick="updateQty(1)" <?= (int)$product['stock'] <= 0 ? 'disabled' : '' ?>>+</button>
+                        <button type="button" class="qty-btn" onclick="updateQty(-1)" <?= (int) $product['stock'] <= 0 ? 'disabled' : '' ?>>-</button>
+                        <input type="number" id="qtyInput" name="quantity" class="qty-input" value="1" min="1"
+                            max="<?= $product['stock'] > 0 ? $product['stock'] : 0 ?>" <?= (int) $product['stock'] <= 0 ? 'disabled' : '' ?>>
+                        <button type="button" class="qty-btn" onclick="updateQty(1)" <?= (int) $product['stock'] <= 0 ? 'disabled' : '' ?>>+</button>
                     </div>
 
                     <!-- Wishlist Toggle Button -->
-                    <button type="button" class="pd-wishlist-btn" id="wishlistToggleBtn" onclick="toggleDetailWishlist(<?= $product['id'] ?>)">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="<?= $isWished ? '#FF3333' : 'none' ?>" stroke="<?= $isWished ? '#FF3333' : '#141718' ?>" stroke-width="2">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    <button type="button" class="pd-wishlist-btn" id="wishlistToggleBtn"
+                        onclick="toggleDetailWishlist(<?= $product['id'] ?>)">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="<?= $isWished ? '#FF3333' : 'none' ?>"
+                            stroke="<?= $isWished ? '#FF3333' : '#141718' ?>" stroke-width="2">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
                         <span id="wishBtnText">Wishlist</span>
                     </button>
 
                     <!-- Add to Cart -->
-                    <?php if ((int)$product['stock'] <= 0): ?>
+                    <?php if ((int) $product['stock'] <= 0): ?>
                         <button type="button" class="pd-add-btn disabled" disabled>Out of Stock</button>
                     <?php else: ?>
                         <button type="submit" class="pd-add-btn">Add to Cart</button>
@@ -716,7 +1389,8 @@ input[type=number] {
             </form>
 
             <div class="pd-meta-links">
-                <div><strong>SKU</strong> : <?= htmlspecialchars(!empty($product['sku']) ? $product['sku'] : 'N/A') ?></div>
+                <div><strong>SKU</strong> : <?= htmlspecialchars(!empty($product['sku']) ? $product['sku'] : 'N/A') ?>
+                </div>
                 <div><strong>Category</strong> : <?= htmlspecialchars($product['category_name']) ?></div>
             </div>
         </div>
@@ -735,11 +1409,14 @@ input[type=number] {
             <div id="tab-additional" class="tab-pane active">
                 <div style="font-size: 16px; color: #6C7275; line-height: 1.8;">
                     <h3 style="color:#141718; font-weight:600; margin-top:0;">Details</h3>
-                    <p><?= nl2br(htmlspecialchars(!empty($product['description']) ? $product['description'] : 'You can use the removable tray for serving. The design makes it easy to put the tray back after use since you place it directly on the table frame without having to fit it into any holes.')) ?></p>
+                    <p><?= nl2br(htmlspecialchars(!empty($product['description']) ? $product['description'] : 'You can use the removable tray for serving. The design makes it easy to put the tray back after use since you place it directly on the table frame without having to fit it into any holes.')) ?>
+                    </p>
                     <br>
                     <h3 style="color:#141718; font-weight:600; margin-top:0;">Material & Care</h3>
                     <ul>
-                        <li>Material: <?= htmlspecialchars(!empty($product['material']) ? $product['material'] : 'Powder-coated steel') ?></li>
+                        <li>Material:
+                            <?= htmlspecialchars(!empty($product['material']) ? $product['material'] : 'Powder-coated steel') ?>
+                        </li>
                         <li>Wipe clean with a damp cloth</li>
                         <li>Check regularly that all assembly fastenings are properly tightened</li>
                     </ul>
@@ -756,211 +1433,380 @@ input[type=number] {
             <!-- TAB: Reviews -->
             <div id="tab-reviews" class="tab-pane">
                 <div class="reviews-wrap">
-                    <div class="rev-header-bar">
-                        <div class="rev-title">Customer Reviews</div>
-                        <select class="rev-sort">
+
+                    <?php if (isset($_SESSION['review_success'])): ?>
+                        <div class="review-message success">
+                            <?= $_SESSION['review_success'];
+                            unset($_SESSION['review_success']); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($_SESSION['review_error'])): ?>
+                        <div class="review-message error">
+                            <?= $_SESSION['review_error'];
+                            unset($_SESSION['review_error']); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="rev-top-summary">
+                        <div class="rev-summary-left">
+                            <div class="rev-main-title">Customer Reviews</div>
+
+                            <div class="rev-rating-line">
+                                <div class="rev-stars-big">
+                                    <?php
+                                    $fullAvg = floor($avgRating);
+                                    for ($i = 1; $i <= 5; $i++) {
+                                        echo $i <= $fullAvg ? '★' : '☆';
+                                    }
+                                    ?>
+                                </div>
+                                <div class="rev-rating-text">
+                                    <?= number_format($avgRating, 1) ?>
+                                </div>
+                                <div class="rev-count-text">
+                                    <?= (int) $totalReviews ?> Reviews
+                                </div>
+                            </div>
+
+                            <div class="rev-product-name">
+                                <?= htmlspecialchars($product['name']) ?>
+                            </div>
+                        </div>
+
+                        <div class="rev-summary-right">
+                            <?php if (isset($_SESSION['user'])): ?>
+                                <button type="button" class="write-review-btn" onclick="toggleReviewForm()">
+                                    Write Review
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <div class="write-review-box" id="writeReviewBox" style="display:none;">
+                            <h3 class="write-review-title">Write a Review</h3>
+
+                            <form action="../controllers/ReviewController.php?action=create" method="POST"
+                                class="write-review-form">
+                                <input type="hidden" name="product_id" value="<?= (int) $product['id'] ?>">
+
+                                <div class="wr-row">
+                                    <label>Your Rating</label>
+
+                                    <div class="rating-stars-input" id="ratingStars">
+                                        <span class="rating-star" data-value="1">&#9733;</span>
+                                        <span class="rating-star" data-value="2">&#9733;</span>
+                                        <span class="rating-star" data-value="3">&#9733;</span>
+                                        <span class="rating-star" data-value="4">&#9733;</span>
+                                        <span class="rating-star" data-value="5">&#9733;</span>
+                                    </div>
+
+                                    <input type="hidden" name="rating" id="rating" required>
+                                    <small class="rating-text" id="ratingText">Select your rating</small>
+                                </div>
+
+                                <div class="wr-row">
+                                    <label for="comment">Your Review</label>
+                                    <textarea name="comment" id="comment" rows="5" placeholder="Write your comment here..."
+                                        required></textarea>
+                                </div>
+
+                                <button type="submit" class="wr-submit-btn">Submit Review</button>
+                            </form>
+                        </div>
+                    <?php else: ?>
+                        <div class="review-login-box">
+                            Please <a href="login.php">login</a> to write a review.
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="rev-list-head">
+                        <div class="rev-list-title">
+                            <?= (int) $totalReviews ?> Reviews
+                        </div>
+                        <select class="rev-sort" id="reviewSort">
                             <option value="newest">Newest</option>
                             <option value="highest">Highest Rating</option>
+                            <option value="lowest">Lowest Rating</option>
                         </select>
                     </div>
 
                     <?php if (empty($reviews)): ?>
-                        <div style="text-align:center; padding: 40px; color:#6C7275; border: 1px dashed #E8ECEF; border-radius: 8px;">
+                        <div class="rev-empty-box">
                             <p>No reviews yet.</p>
                         </div>
                     <?php else: ?>
-                        <?php foreach($reviews as $rev): 
-                            $avatar = strpos(!empty($rev['user_avatar']) ? $rev['user_avatar'] : '', 'http') === 0 ? $rev['user_avatar'] : '../assets/images/' . (!empty($rev['user_avatar']) ? $rev['user_avatar'] : 'default.jpg');
-                        ?>
-                        <div class="review-item">
-                            <img src="<?= htmlspecialchars($avatar) ?>" alt="<?= htmlspecialchars($rev['user_name']) ?>" class="rev-avatar" onerror="this.src='../assets/images/default.jpg'">
-                            <div class="rev-content">
-                                <div class="rev-name"><?= htmlspecialchars($rev['user_name']) ?></div>
-                                <div class="rev-c-hdr">
-                                    <div class="rev-stars">
-                                        <?php 
-                                        $rStars = (int)$rev['rating'];
-                                        for($i=0; $i<5; $i++) echo $i < $rStars ? '★' : '☆';
-                                        ?>
+                        <div id="reviewList">
+                            <?php foreach ($reviews as $index => $rev):
+                                $avatar = strpos(!empty($rev['user_avatar']) ? $rev['user_avatar'] : '', 'http') === 0
+                                    ? $rev['user_avatar']
+                                    : '../assets/images/' . (!empty($rev['user_avatar']) ? $rev['user_avatar'] : 'default.jpg');
+                                ?>
+                                <div class="review-item <?= $index >= 5 ? 'hidden-review' : '' ?>"
+                                    data-rating="<?= (int) $rev['rating'] ?>"
+                                    data-date="<?= strtotime($rev['created_at'] ?? 'now') ?>">
+                                    <img src="<?= htmlspecialchars($avatar) ?>" alt="<?= htmlspecialchars($rev['user_name']) ?>"
+                                        class="rev-avatar" onerror="this.src='../assets/images/default.jpg'">
+
+                                    <div class="rev-content">
+                                        <div class="rev-name">
+                                            <?= htmlspecialchars($rev['user_name']) ?>
+                                        </div>
+
+                                        <div class="rev-stars">
+                                            <?php
+                                            $rStars = (int) $rev['rating'];
+                                            for ($i = 0; $i < 5; $i++)
+                                                echo $i < $rStars ? '★' : '☆';
+                                            ?>
+                                        </div>
+
+                                        <div class="rev-txt">
+                                            <?= nl2br(htmlspecialchars(!empty($rev['comment']) ? $rev['comment'] : 'Great product!')) ?>
+                                        </div>
+
+                                        <div class="rev-actions">
+                                            <span class="rev-act-btn">Like</span>
+                                            <span class="rev-act-btn">Reply</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="rev-txt"><?= nl2br(htmlspecialchars(!empty($rev['comment']) ? $rev['comment'] : 'Great product!')) ?></div>
-                                <div class="rev-actions">
-                                    <span class="rev-act-btn">Like</span>
-                                    <span class="rev-act-btn">Reply</span>
-                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <?php if ($totalReviews > 5): ?>
+                            <div class="load-more-wrap">
+                                <button class="btn-load-more" id="loadMoreReviewsBtn" type="button">Load more</button>
                             </div>
-                        </div>
-                        <?php endforeach; ?>
-                        
-                        <?php if($totalReviews > 3): ?>
-                        <div class="load-more-wrap">
-                            <button class="btn-load-more">Load more</button>
-                        </div>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
-    </div> <!-- /tabs -->
-
-</div> <!-- /pd-wrap -->
+    </div>
+    </div> <!-- /pd-tabs-section -->
+ </div> <!-- /pd-wrap -->
 
 <?php include '../includes/newsletter.php'; ?>
 
 <?php include '../includes/footer.php'; ?>
 
 <script>
-// 1. Gallery Image Switching
-function switchGalleryImage(el, src) {
-    document.getElementById('mainGalleryImage').src = src;
-    
-    // Remove active from all thumbs
-    document.querySelectorAll('.pd-thumb').forEach(thumb => {
-        thumb.classList.remove('active');
-    });
-    // Add active state to thumbnail
-    el.classList.add('active');
-}
+    // 1. Gallery Image Switching
+    function switchGalleryImage(el, src) {
+        document.getElementById('mainGalleryImage').src = src;
 
-function scrollThumbs(direction) {
-    const container = document.getElementById('pdThumbs');
-    // Scroll amount is thumbnail width (100) + gap (16)
-    const scrollAmount = 116 * 2; 
-    container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-}
+        // Remove active from all thumbs
+        document.querySelectorAll('.pd-thumb').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        // Add active state to thumbnail
+        el.classList.add('active');
+    }
 
-// 2. Select Color Option
-function selectColor(el, colorName) {
-    document.getElementById('colorNameLabel').innerText = colorName;
-    document.querySelectorAll('.c-option').forEach(opt => {
-        opt.classList.remove('active');
-    });
-    el.classList.add('active');
-    
-    // Switch main image to this color's image
-    const imgSrc = el.querySelector('img').src;
-    document.getElementById('mainGalleryImage').src = imgSrc;
-}
+    function scrollThumbs(direction) {
+        const container = document.getElementById('pdThumbs');
+        // Scroll amount is thumbnail width (100) + gap (16)
+        const scrollAmount = 116 * 2;
+        container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
 
-// 3. Tab Navigation
-function openTab(tabId) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-pane').forEach(pane => {
-        pane.classList.remove('active');
-    });
-    // Reset nav links
-    document.querySelectorAll('.tab-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    
-    // Activate target
-    document.getElementById(tabId).classList.add('active');
-    // Activate link (find the one that was clicked)
-    event.target.classList.add('active');
-}
+    // 2. Select Color Option
+    function selectColor(el, colorName) {
+        document.getElementById('colorNameLabel').innerText = colorName;
+        document.querySelectorAll('.c-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        el.classList.add('active');
 
-// 4. Quantity Spinner
-function updateQty(delta) {
-    const input = document.getElementById('qtyInput');
-    let current = parseInt(input.value) || 1;
-    let max = parseInt(input.max) || 99;
-    
-    let nextVal = current + delta;
-    if (nextVal < 1) nextVal = 1;
-    if (nextVal > max) nextVal = max;
-    
-    input.value = nextVal;
-}
+        // Switch main image to this color's image
+        const imgSrc = el.querySelector('img').src;
+        document.getElementById('mainGalleryImage').src = imgSrc;
+    }
 
-// 4.1 Validate manual quantity input
-document.addEventListener('DOMContentLoaded', function() {
-    const qtyInput = document.getElementById('qtyInput');
-    if (!qtyInput) return;
-    
-    qtyInput.addEventListener('input', function() {
-        let max = parseInt(this.max) || 99;
-        let val = parseInt(this.value);
-        if (val > max) {
-            this.value = max; // Cap at max stock
-        } else if (val <= 0) {
-            this.value = 1; // Prevent 0 or negative
+    // 3. Tab Navigation
+    function openTab(tabId) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('active');
+        });
+        // Reset nav links
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // Activate target
+        document.getElementById(tabId).classList.add('active');
+        // Activate link (find the one that was clicked)
+        event.target.classList.add('active');
+    }
+
+    // 4. Quantity Spinner
+    function updateQty(delta) {
+        const input = document.getElementById('qtyInput');
+        let current = parseInt(input.value) || 1;
+        let max = parseInt(input.max) || 99;
+
+        let nextVal = current + delta;
+        if (nextVal < 1) nextVal = 1;
+        if (nextVal > max) nextVal = max;
+
+        input.value = nextVal;
+    }
+
+    // 4.1 Validate manual quantity input
+    document.addEventListener('DOMContentLoaded', function () {
+        const qtyInput = document.getElementById('qtyInput');
+        if (!qtyInput) return;
+
+        qtyInput.addEventListener('input', function () {
+            let max = parseInt(this.max) || 99;
+            let val = parseInt(this.value);
+            if (val > max) {
+                this.value = max; // Cap at max stock
+            } else if (val <= 0) {
+                this.value = 1; // Prevent 0 or negative
+            }
+        });
+
+        qtyInput.addEventListener('blur', function () {
+            if (!this.value || parseInt(this.value) < 1) {
+                this.value = 1; // Reset to 1 if left empty
+            }
+        });
+
+        // 4.2 Dynamic Countdown Timer
+        const elDays = document.getElementById('t-days');
+        const elHours = document.getElementById('t-hours');
+        const elMins = document.getElementById('t-minutes');
+        const elSecs = document.getElementById('t-seconds');
+        if (elDays && elHours && elMins && elSecs) {
+            let days = parseInt(elDays.innerText) || 0;
+            let hours = parseInt(elHours.innerText) || 0;
+            let mins = parseInt(elMins.innerText) || 0;
+            let secs = parseInt(elSecs.innerText) || 0;
+
+            let totalSeconds = (days * 86400) + (hours * 3600) + (mins * 60) + secs;
+
+            const timer = setInterval(() => {
+                if (totalSeconds <= 0) {
+                    clearInterval(timer);
+                    return;
+                }
+                totalSeconds--;
+
+                let d = Math.floor(totalSeconds / 86400);
+                let h = Math.floor((totalSeconds % 86400) / 3600);
+                let m = Math.floor((totalSeconds % 3600) / 60);
+                let s = Math.floor(totalSeconds % 60);
+
+                elDays.innerText = d < 10 ? '0' + d : d;
+                elHours.innerText = h < 10 ? '0' + h : h;
+                elMins.innerText = m < 10 ? '0' + m : m;
+                elSecs.innerText = s < 10 ? '0' + s : s;
+            }, 1000);
         }
     });
 
-    qtyInput.addEventListener('blur', function() {
-        if (!this.value || parseInt(this.value) < 1) {
-            this.value = 1; // Reset to 1 if left empty
-        }
-    });
+    // 5. AJAX Wishlist Toggle
+    async function toggleDetailWishlist(productId) {
+        // Ensure we send post data
+        try {
+            const fd = new FormData();
+            fd.append('product_id', productId);
 
-    // 4.2 Dynamic Countdown Timer
-    const elDays = document.getElementById('t-days');
-    const elHours = document.getElementById('t-hours');
-    const elMins = document.getElementById('t-minutes');
-    const elSecs = document.getElementById('t-seconds');
-    if (elDays && elHours && elMins && elSecs) {
-        let days = parseInt(elDays.innerText) || 0;
-        let hours = parseInt(elHours.innerText) || 0;
-        let mins = parseInt(elMins.innerText) || 0;
-        let secs = parseInt(elSecs.innerText) || 0;
+            const btn = document.getElementById('wishlistToggleBtn');
+            const svg = btn.querySelector('svg');
 
-        let totalSeconds = (days * 86400) + (hours * 3600) + (mins * 60) + secs;
+            const res = await fetch('../controllers/ProductController.php?action=ajax_toggle_wishlist', {
+                method: 'POST',
+                body: fd
+            });
+            const data = await res.json();
 
-        const timer = setInterval(() => {
-            if (totalSeconds <= 0) {
-                clearInterval(timer);
+            if (data.need_login) {
+                window.location.href = 'login.php';
                 return;
             }
-            totalSeconds--;
-            
-            let d = Math.floor(totalSeconds / 86400);
-            let h = Math.floor((totalSeconds % 86400) / 3600);
-            let m = Math.floor((totalSeconds % 3600) / 60);
-            let s = Math.floor(totalSeconds % 60);
-            
-            elDays.innerText = d < 10 ? '0' + d : d;
-            elHours.innerText = h < 10 ? '0' + h : h;
-            elMins.innerText = m < 10 ? '0' + m : m;
-            elSecs.innerText = s < 10 ? '0' + s : s;
-        }, 1000);
-    }
-});
 
-// 5. AJAX Wishlist Toggle
-async function toggleDetailWishlist(productId) {
-    // Ensure we send post data
-    try {
-        const fd = new FormData();
-        fd.append('product_id', productId);
-        
-        const btn = document.getElementById('wishlistToggleBtn');
-        const svg = btn.querySelector('svg');
-        
-        const res = await fetch('../controllers/ProductController.php?action=ajax_toggle_wishlist', {
-            method: 'POST',
-            body: fd
-        });
-        const data = await res.json();
-        
-        if (data.need_login) {
-            window.location.href = 'login.php';
+            if (data.success) {
+                if (data.is_wished) {
+                    svg.setAttribute('fill', '#FF3333');
+                    svg.setAttribute('stroke', '#FF3333');
+                } else {
+                    svg.setAttribute('fill', 'none');
+                    svg.setAttribute('stroke', '#141718');
+                }
+            }
+        } catch (e) {
+            console.error('Failed to toggle wishlist', e);
+        }
+    }
+</script>
+<script>
+    function toggleReviewForm() {
+        const box = document.getElementById('writeReviewBox');
+
+        if (!box) {
+            console.log("Không tìm thấy writeReviewBox");
             return;
         }
-        
-        if (data.success) {
-            if (data.is_wished) {   
-                svg.setAttribute('fill', '#FF3333');
-                svg.setAttribute('stroke', '#FF3333');
-            } else {
-                svg.setAttribute('fill', 'none');
-                svg.setAttribute('stroke', '#141718');
-            }
+
+        if (box.style.display === 'none' || box.style.display === '') {
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
         }
-    } catch(e) {
-        console.error('Failed to toggle wishlist', e);
     }
-}
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stars = document.querySelectorAll('#ratingStars .rating-star');
+        const ratingInput = document.getElementById('rating');
+        const ratingText = document.getElementById('ratingText');
+
+        const ratingLabels = {
+            1: 'Poor',
+            2: 'Fair',
+            3: 'Good',
+            4: 'Very Good',
+            5: 'Excellent'
+        };
+
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', function () {
+                const value = parseInt(this.dataset.value, 10);
+                highlightStars(value);
+            });
+
+            star.addEventListener('click', function () {
+                const value = parseInt(this.dataset.value, 10);
+                ratingInput.value = value;
+                ratingText.textContent = value + ' Star - ' + ratingLabels[value];
+
+                stars.forEach(s => s.classList.remove('selected'));
+                highlightStars(value, true);
+            });
+        });
+
+        document.getElementById('ratingStars').addEventListener('mouseleave', function () {
+            const currentValue = parseInt(ratingInput.value || '0', 10);
+            highlightStars(currentValue, true);
+        });
+
+        function highlightStars(value, keepSelected = false) {
+            stars.forEach(star => {
+                const starValue = parseInt(star.dataset.value, 10);
+                star.classList.remove('active');
+
+                if (starValue <= value) {
+                    star.classList.add('active');
+                }
+            });
+        }
+    });
 </script>
 </body>
+
 </html>

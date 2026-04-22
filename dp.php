@@ -1,0 +1,14 @@
+<?php
+$host = "103.139.203.43";
+$user = "sql_nhom63_itimi";
+$pass = "4985fa586653f8";
+$db   = "sql_nhom63_itimi";
+
+$conn = new mysqli($host, $user, $pass, $db);
+
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+
+$conn->set_charset("utf8mb4");
+?>

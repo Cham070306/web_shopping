@@ -126,5 +126,44 @@ class Product {
         $stmt->bind_param("i", $id);
         return $stmt->execute();
     }
+
+    // --- PRODUCT IMAGES (GALLERY) ---
+    
+    // Thêm nhiều ảnh phụ
+    public function addImages($product_id, $images) {
+        if (empty($images)) return true;
+        
+        $query = "INSERT INTO product_images (product_id, image_url, sort_order) VALUES (?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        
+        $success = true;
+        $sort = 0;
+        foreach ($images as $img) {
+            $stmt->bind_param("isi", $product_id, $img, $sort);
+            if (!$stmt->execute()) {
+                $success = false;
+            }
+            $sort++;
+        }
+        return $success;
+    }
+
+    // Lấy danh sách ảnh phụ
+    public function getImages($product_id) {
+        $query = "SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order ASC, id ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // Xoá 1 ảnh phụ
+    public function deleteImage($image_id) {
+        $query = "DELETE FROM product_images WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $image_id);
+        return $stmt->execute();
+    }
 }
 ?>

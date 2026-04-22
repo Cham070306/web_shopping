@@ -140,7 +140,26 @@ if ($admin_action === 'create_product') {
         'is_active' => isset($_POST['is_active']) ? 1 : 0
     ];
 
-    if ($productModel->create($data)) {
+    $product_id = $productModel->create($data);
+    if ($product_id) {
+        // Handle gallery images
+        $gallery_images = [];
+        if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+            $total_files = count($_FILES['images']['name']);
+            for ($i = 0; $i < $total_files; $i++) {
+                if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES['images']['tmp_name'][$i];
+                    $img_name = time() . '_' . uniqid() . '_' . basename($_FILES['images']['name'][$i]);
+                    if (move_uploaded_file($tmp_name, $upload_dir . $img_name)) {
+                        $gallery_images[] = $img_name;
+                    }
+                }
+            }
+        }
+        if (!empty($gallery_images)) {
+            $productModel->addImages($product_id, $gallery_images);
+        }
+
         $_SESSION['success'] = "Product added successfully!";
     } else {
         $_SESSION['error'] = "Error adding product.";
@@ -202,11 +221,53 @@ if ($admin_action === 'update_product') {
     ];
 
     if ($productModel->update($id, $data)) {
+        // Handle gallery images
+        $gallery_images = [];
+        if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+            $total_files = count($_FILES['images']['name']);
+            for ($i = 0; $i < $total_files; $i++) {
+                if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
+                    $tmp_name = $_FILES['images']['tmp_name'][$i];
+                    $img_name = time() . '_' . uniqid() . '_' . basename($_FILES['images']['name'][$i]);
+                    $upload_dir = '../assets/product-images/';
+                    if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+                    if (move_uploaded_file($tmp_name, $upload_dir . $img_name)) {
+                        $gallery_images[] = $img_name;
+                    }
+                }
+            }
+        }
+        if (!empty($gallery_images)) {
+            $productModel->addImages($id, $gallery_images);
+        }
+
         $_SESSION['success'] = "Product updated successfully!";
     } else {
         $_SESSION['error'] = "Cannot update product.";
     }
     header("Location: ../admin/products/index.php");
+    exit;
+}
+
+if ($admin_action === 'delete_product_image') {
+    if (empty($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+        die('Unauthorized');
+    }
+    require_once "../models/Product.php";
+    $productModel = new Product($conn);
+    
+    $image_id = $_POST['image_id'] ?? 0;
+    $product_id = $_POST['product_id'] ?? 0;
+    
+    // Optional: Get image url and delete file physically here if needed
+    // But safely just delete from DB for now as old files might be used elsewhere or clean up script needed
+    
+    if ($productModel->deleteImage($image_id)) {
+        $_SESSION['success'] = "Image removed successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to remove image.";
+    }
+    header("Location: ../admin/products/edit.php?id=" . $product_id);
     exit;
 }
 

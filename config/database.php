@@ -2,7 +2,9 @@
 $host = "localhost";
 $username = "root";
 $password = "";
-$database = "shop_db";
+$database = "web_shopping";
+
+
 
 $conn = mysqli_connect($host, $username, $password, $database);
 

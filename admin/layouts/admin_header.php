@@ -14,15 +14,22 @@ $_admin_email = $_admin_user['email'] ?? '';
 
 $_nav_items = [
     ['page' => 'dashboard',   'href' => 'dashboard.php',          'icon' => 'fa-chart-pie',      'label' => 'Dashboard',  'group' => 'Overview'],
+
     ['page' => 'categories',  'href' => 'categories/index.php',   'icon' => 'fa-layer-group',    'label' => 'Categories', 'group' => 'Catalog'],
     ['page' => 'products',    'href' => 'products/index.php',     'icon' => 'fa-box-open',       'label' => 'Products',   'group' => 'Catalog'],
+
     ['page' => 'orders',      'href' => 'orders/index.php',       'icon' => 'fa-bag-shopping',   'label' => 'Orders',     'group' => 'Sales'],
     ['page' => 'inventory',   'href' => 'inventory/index.php',    'icon' => 'fa-warehouse',      'label' => 'Inventory',  'group' => 'Operations'],
-    ['page' => 'customers',   'href' => 'customers.php',          'icon' => 'fa-users',          'label' => 'Customers',  'group' => 'System'],
+
+    ['page' => 'customers',   'href' => 'customers/index.php',    'icon' => 'fa-users',          'label' => 'Customers',  'group' => 'System'],
+    ['page' => 'posts',       'href' => 'posts/index.php',        'icon' => 'fa-blog',           'label' => 'Posts',      'group' => 'System'],
+    ['page' => 'coupons',     'href' => 'coupons/index.php',      'icon' => 'fa-ticket',         'label' => 'Coupons',    'group' => 'System'],
+    ['page' => 'reports',     'href' => 'reports/index.php',      'icon' => 'fa-chart-line',     'label' => 'Reports',    'group' => 'System'],
+    ['page' => 'settings',    'href' => 'settings/index.php',     'icon' => 'fa-gear',           'label' => 'Settings',   'group' => 'System'],
+
     ['page' => 'store',       'href' => '../user/index.php',      'icon' => 'fa-store',          'label' => 'View Store', 'group' => 'System'],
     ['page' => 'logout',      'href' => '../controllers/LogoutController.php', 'icon' => 'fa-arrow-right-from-bracket', 'label' => 'Logout', 'group' => 'System'],
 ];
-
 // Group nav items
 $_nav_groups = [];
 foreach ($_nav_items as $item) {
@@ -44,7 +51,7 @@ foreach ($_nav_items as $item) {
 <div class="adm-sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
-<?php $sidebarThemeClass = ($currentPage === 'dashboard') ? 'adm-sidebar-light' : 'adm-sidebar-dark'; ?>
+<?php $sidebarThemeClass = 'adm-sidebar-dark'; ?>
 <aside class="adm-sidebar <?= $sidebarThemeClass ?>" id="adminSidebar">
     <a href="<?= $base_path ?>../user/index.php" class="adm-sidebar-logo">
         3legant.<span>Admin</span>

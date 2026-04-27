@@ -138,7 +138,6 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     border-bottom: 2px solid var(--black);
 }
 
-/* ── Mega Menu Dropdown ── */
 .nav-has-dropdown {
     position: relative;
     display: inline-flex;
@@ -165,7 +164,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     top: 100%;
     left: -20px;
     background: #fff;
-    min-width: 240px; /* Slightly wider to fit Accessories & Decor on one line */
+    min-width: 240px; 
     box-shadow: 0 16px 40px rgba(0,0,0,0.08);
     border-radius: 8px;
     padding: 12px 0;
@@ -175,7 +174,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 10000;
 }
-/* Show dropdown on hover */
+
 .nav-has-dropdown:hover .nav-dropdown {
     opacity: 1;
     visibility: visible;
@@ -193,7 +192,7 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 .nav-dropdown a:hover {
     color: var(--black) !important;
     background: #F3F5F7;
-    padding-left: 28px !important; /* Nice hover indent effect */
+    padding-left: 28px !important; 
 }
 
 .icons {
@@ -251,50 +250,6 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
     border: 2px solid white;
 }
 
-/* Mini Cart */
-.cart-wrapper-container:hover .mini-cart-dropdown {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-.mini-cart-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 320px;
-    background: #fff;
-    border: 1px solid #E8ECEF;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 999;
-    padding: 16px;
-    margin-top: 16px;
-}
-.mini-cart-dropdown::before {
-    content: ''; position: absolute; top: -16px; right: 0; width: 60px; height: 16px; background: transparent;
-}
-.mini-cart-items {
-    display: flex; flex-direction: column; gap: 12px; max-height: 280px; overflow-y: auto; margin-bottom: 16px;
-}
-.mc-item {
-    display: flex; gap: 12px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #F3F5F7;
-}
-.mc-item:last-child { border-bottom: none; padding-bottom: 0; }
-.mc-item img { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: #F3F5F7; }
-.mc-info { flex: 1; min-width: 0; }
-.mc-name { font-size: 13px; font-weight: 600; color: #141718; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-.mc-price { font-size: 13px; color: #6C7275; }
-.mc-actions { border-top: 1px solid #E8ECEF; padding-top: 16px; display: flex; }
-.mc-btn-cart { 
-    display: block; width: 100%; text-align: center; background: #141718; color: #fff; 
-    padding: 12px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; 
-}
-.mc-btn-cart:hover { background: #343839; }
-
 .desktop {
     display: flex;
 }
@@ -340,7 +295,9 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
 
     .navbar {
         height: 64px;
-        background: rgba(255, 255, 255, 0.95);
+        background: #ffffff !important; 
+        backdrop-filter: none !important; 
+        -webkit-backdrop-filter: none !important;
     }
 
     .navbar-container {
@@ -404,6 +361,15 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
         border-bottom: 1px solid #d1d1d1;
         padding: 14px 0;
     }
+    .nav-has-dropdown {
+        border-bottom: 1px solid #d1d1d1;
+        padding: 10px 0;
+    }
+
+    .nav-has-dropdown > a {
+        border-bottom: none !important;
+        padding: 0;
+    }
 
     .navbar .menu a.active {
         border-bottom: 1px solid var(--black);
@@ -459,60 +425,23 @@ $_show_topbar = !in_array($current_page, $_hide_topbar_pages);
             </a>
 
             <a href="my_account.php" class="icon-link desktop">
-                <?php if (!empty($_SESSION['user']['avatar'])): ?>
-                    <img src="../assets/images/<?= htmlspecialchars($_SESSION['user']['avatar']) ?>" alt="account" style="width:24px; height:24px; border-radius:50%; object-fit:cover;" onerror="this.src='../assets/image/Vector1.png'">
-                <?php else: ?>
-                    <img src="../assets/image/Vector1.png" alt="account">
-                <?php endif; ?>
+                <img src="../assets/image/Vector1.png" alt="account">
             </a>
 
-            <div class="cart-wrapper-container" style="position:relative;">
-                <a href="cart.php" class="cart-wrapper">
-                    <img src="../assets/image/shopping bag.png" alt="bag">
-                    <span id="cart-count" class="cart-badge">
-                        <?php
-                            $total = 0;
-                            $navCartItems = [];
-                            if (isset($conn)) {
-                                require_once __DIR__ . '/../models/Order.php';
-                                if (!isset($_cartModel)) {
-                                    $_cartModel = new Order($conn);
-                                }
-                                $_uid = $_SESSION['user']['id'] ?? null;
-                                $_sid = session_id();
-                                $total = $_cartModel->getCartCount($_uid, $_sid);
-                                $navCartItems = $_cartModel->getCartItems($_uid, $_sid);
+            <a href="cart.php" class="cart-wrapper">
+                <img src="../assets/image/shopping bag.png" alt="bag">
+                <span id="cart-count" class="cart-badge">
+                    <?php
+                        $total = 0;
+                        if (isset($_SESSION['cart'])) {
+                            foreach ($_SESSION['cart'] as $item) {
+                                $total += $item['quantity'];
                             }
-                            echo $total;
-                        ?>
-                    </span>
-                </a>
-                
-                <!-- Mini Cart Dropdown -->
-                <div class="mini-cart-dropdown">
-                    <?php if (empty($navCartItems)): ?>
-                        <div style="padding: 20px; text-align: center; color: #6C7275; font-size: 13px;">Chưa có sản phẩm nào</div>
-                    <?php else: ?>
-                        <div class="mini-cart-items">
-                            <?php foreach (array_slice($navCartItems, 0, 4) as $item): ?>
-                                <div class="mc-item">
-                                    <img src="<?= (strpos($item['thumbnail'], 'http') === 0) ? htmlspecialchars($item['thumbnail']) : '../assets/images/' . htmlspecialchars($item['thumbnail']) ?>" alt="" onerror="this.src='../assets/images/sofa.jpg'">
-                                    <div class="mc-info">
-                                        <div class="mc-name"><?= htmlspecialchars($item['name']) ?></div>
-                                        <div class="mc-price"><?= number_format($item['sale_price'] ?: $item['price'], 0, ',', '.') ?>đ x <?= $item['quantity'] ?></div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                        <?php if (count($navCartItems) > 4): ?>
-                            <div style="text-align:center; padding: 8px; font-size: 12px; color: #6C7275;">+<?= count($navCartItems) - 4 ?> more items</div>
-                        <?php endif; ?>
-                        <div class="mc-actions">
-                            <a href="cart.php" class="mc-btn-cart">View Cart</a>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+                        }
+                        echo $total;
+                    ?>
+                </span>
+            </a>
         </div>
 
         <label for="menu-toggle" class="overlay"></label>
@@ -566,4 +495,4 @@ if (
 <a href="../admin/dashboard.php" class="admin-fab">
     <i class="fa-solid fa-gauge"></i> Admin Panel
 </a>
-<?php endif; ?>
+<?php endif; ?>

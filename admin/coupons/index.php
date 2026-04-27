@@ -47,20 +47,20 @@ $base_path = '../';
 <?php include '../layouts/admin_header.php'; ?>
 
 <style>
-/* Overall Layout */
 .coupons-page {
     width: 100%;
     max-width: 100%;
+    overflow-x: hidden;
     box-sizing: border-box;
 }
 
 .coupons-header {
-    margin-bottom: 24px;
+    margin-bottom: 22px;
 }
 
 .coupons-header h1 {
     margin: 0 0 6px;
-    font-size: 28px;
+    font-size: clamp(24px, 2vw, 32px);
     color: #111827;
 }
 
@@ -70,32 +70,33 @@ $base_path = '../';
     font-size: 15px;
 }
 
-/* 2-Column Grid Layout */
 .coupon-layout {
     display: grid;
-    grid-template-columns: 340px minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    gap: 18px;
     align-items: start;
     width: 100%;
+    max-width: 100%;
 }
 
 .coupon-card {
     background: #fff;
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 18px;
+    padding: 18px;
     box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
-    min-width: 0; 
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .coupon-card h3 {
-    margin: 0 0 18px;
-    font-size: 20px;
+    margin: 0 0 16px;
+    font-size: 19px;
     color: #111827;
 }
 
-/* Form Styling */
 .form-group {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 .form-group label {
@@ -125,12 +126,11 @@ $base_path = '../';
     resize: vertical;
 }
 
-/* Checkbox Alignment Fix */
 .checkbox-row {
     display: flex !important;
     align-items: center !important;
     gap: 10px;
-    margin: 15px 0;
+    margin: 14px 0;
 }
 
 .checkbox-row input[type="checkbox"] {
@@ -159,9 +159,8 @@ $base_path = '../';
     cursor: pointer;
 }
 
-/* Search Box */
 .search-box {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .search-box form {
@@ -170,6 +169,7 @@ $base_path = '../';
 }
 
 .search-box input {
+    min-width: 0;
     flex: 1;
     height: 40px;
     padding: 0 12px;
@@ -178,6 +178,7 @@ $base_path = '../';
 }
 
 .search-box button {
+    flex-shrink: 0;
     border: none;
     background: #111827;
     color: white;
@@ -187,25 +188,27 @@ $base_path = '../';
     font-weight: 600;
 }
 
-/* Table Styling */
 .adm-table-wrap {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     display: block;
 }
 
 .coupon-table {
     width: 100%;
+    min-width: 720px;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .coupon-table th,
 .coupon-table td {
-    padding: 12px 8px;
+    padding: 11px 7px;
     border-bottom: 1px solid #f1f5f9;
     text-align: left;
     font-size: 13px;
-    white-space: normal; 
+    vertical-align: middle;
     word-break: break-word;
 }
 
@@ -214,7 +217,42 @@ $base_path = '../';
     color: #64748b;
     font-size: 11px;
     text-transform: uppercase;
-    font-weight: 600;
+    font-weight: 700;
+}
+
+.coupon-table th:nth-child(1),
+.coupon-table td:nth-child(1) {
+    width: 22%;
+}
+
+.coupon-table th:nth-child(2),
+.coupon-table td:nth-child(2) {
+    width: 11%;
+}
+
+.coupon-table th:nth-child(3),
+.coupon-table td:nth-child(3) {
+    width: 14%;
+}
+
+.coupon-table th:nth-child(4),
+.coupon-table td:nth-child(4) {
+    width: 12%;
+}
+
+.coupon-table th:nth-child(5),
+.coupon-table td:nth-child(5) {
+    width: 11%;
+}
+
+.coupon-table th:nth-child(6),
+.coupon-table td:nth-child(6) {
+    width: 13%;
+}
+
+.coupon-table th:nth-child(7),
+.coupon-table td:nth-child(7) {
+    width: 17%;
 }
 
 .code {
@@ -224,31 +262,43 @@ $base_path = '../';
     padding: 4px 8px;
     border-radius: 6px;
     display: inline-block;
+    max-width: 100%;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .badge {
-    padding: 4px 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 9px;
     border-radius: 999px;
     font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
 }
 
-.active { background: #dcfce7; color: #16a34a; }
-.inactive { background: #fee2e2; color: #ef4444; }
+.active {
+    background: #dcfce7;
+    color: #16a34a;
+}
 
-/* Actions & Icon Buttons (Đã sửa lại để đều tăm tắp) */
+.inactive {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
 .actions {
     display: flex;
     gap: 6px;
     align-items: center;
+    flex-wrap: nowrap;
 }
 
-/* Ép form thành khối flex để các nút bên trong không bị lệch */
-.actions form { 
-    margin: 0; 
-    display: flex; 
+.actions form {
+    margin: 0;
+    display: flex;
 }
 
 .btn-small {
@@ -260,31 +310,66 @@ $base_path = '../';
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 32px; /* Cố định chiều cao cho tất cả các nút */
+    height: 32px;
     box-sizing: border-box;
 }
 
-.btn-toggle { 
-    background: #eff6ff; 
-    color: #2563eb; 
-    width: 75px; /* Ép cứng chiều rộng để nút Enable/Disable bằng nhau */
+.btn-toggle {
+    background: #eff6ff;
+    color: #2563eb;
+    width: 74px;
 }
 
-/* Trash Icon Button */
-.btn-delete { 
-    background: #fff1f2; 
-    color: #e11d48; 
-    width: 32px; /* Ép cứng chiều rộng bằng chiều cao để tạo hình vuông */
-    padding: 0; /* Xóa padding để icon căn giữa tuyệt đối */
+.btn-delete {
+    background: #fff1f2;
+    color: #e11d48;
+    width: 32px;
+    padding: 0;
 }
 
 .btn-delete:hover {
     background: #ffe4e6;
 }
 
+@media (max-width: 1280px) {
+    .coupon-layout {
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .coupon-card {
+        padding: 16px;
+    }
+
+    .coupon-table th,
+    .coupon-table td {
+        font-size: 12px;
+        padding: 10px 6px;
+    }
+}
+
 @media (max-width: 1100px) {
     .coupon-layout {
         grid-template-columns: 1fr;
+    }
+
+    .coupon-table {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 640px) {
+    .search-box form {
+        flex-direction: column;
+    }
+
+    .search-box button {
+        height: 40px;
+    }
+
+    .coupon-card {
+        border-radius: 14px;
+        padding: 14px;
     }
 }
 </style>

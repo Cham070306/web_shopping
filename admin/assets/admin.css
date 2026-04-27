@@ -147,12 +147,19 @@ body {
     background: var(--white);
     border-bottom: 1px solid var(--gray-300);
     padding: 0 32px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
+
+    position: fixed;
     top: 0;
-    z-index: 50;
+    left: var(--sidebar-w);
+    right: 0;
+    width: calc(100% - var(--sidebar-w));
+
+    z-index: 999;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
 }
 .adm-breadcrumb { font-size: 14px; color: var(--gray-400); }
 .adm-breadcrumb span { color: var(--black); font-weight: 600; }
@@ -163,8 +170,8 @@ body {
 .adm-content {
     padding: 32px;
     flex: 1;
+    margin-top: 68px;
 }
-
 /* ─── PAGE HEADER ───────────────────── */
 .adm-page-header {
     display: flex;
@@ -440,7 +447,12 @@ input[type="file"]::file-selector-button:hover, input[type="file"]::-webkit-file
     .adm-main { margin-left: 0; }
 
     /* Topbar */
-    .adm-topbar { padding: 0 16px; gap: 12px; }
+    .adm-topbar {
+    padding: 0 16px;
+    gap: 12px;
+    left: 0;
+    width: 100%;
+}
     .adm-breadcrumb { font-size: 13px; }
     .adm-topbar-right a span { display: none; } /* hide text, show icon only */
 

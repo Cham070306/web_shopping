@@ -14,182 +14,227 @@ require_once "../../models/Order.php";
 
 $orderModel = new Order($conn);
 
-$status   = $_GET['status']  ?? '';
-$search   = trim($_GET['search'] ?? '');
-$page_num = max(1, (int)($_GET['page'] ?? 1));
+$status = $_GET['status'] ?? '';
+$search = trim($_GET['search'] ?? '');
+$page_num = max(1, (int) ($_GET['page'] ?? 1));
 $per_page = 15;
-$offset   = ($page_num - 1) * $per_page;
+$offset = ($page_num - 1) * $per_page;
 
 $filters = ['status' => $status, 'search' => $search];
-$orders  = $orderModel->getAllOrders($filters, $per_page, $offset);
-$total   = $orderModel->countAllOrders($filters);
-$pages   = max(1, ceil($total / $per_page));
+$orders = $orderModel->getAllOrders($filters, $per_page, $offset);
+$total = $orderModel->countAllOrders($filters);
+$pages = max(1, ceil($total / $per_page));
 
 $stats = $orderModel->getAdminDashboardStats();
 
 $currentPage = 'orders';
-$pageTitle   = 'Order Management';
-$breadcrumb  = 'Sales / Orders';
-$base_path   = '../';
+$pageTitle = 'Order Management';
+$breadcrumb = 'Sales / Orders';
+$base_path = '../';
 
 include '../layouts/admin_header.php';
 
 $statusLabels = [
-    'pending'   => ['Pending', '#FFAB00', '#FFF7ED'],
+    'pending' => ['Pending', '#FFAB00', '#FFF7ED'],
     'confirmed' => ['Confirmed', '#2196F3', '#E3F2FD'],
-    'shipping'  => ['Shipping', '#9C27B0', '#F3E5F5'],
+    'shipping' => ['Shipping', '#9C27B0', '#F3E5F5'],
     'delivered' => ['Delivered', '#38CB89', '#E8F9EE'],
     'cancelled' => ['Cancelled', '#FF5630', '#FFF0F0'],
 ];
 
 if (!function_exists('formatVND')) {
     function formatVND($price) {
-        return number_format((int)$price, 0, ',', '.') . ' đ';
+        return number_format((int) $price, 0, ',', '.') . ' đ';
     }
 }
 ?>
 
 <style>
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
-.stat-card {
-    background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #E8ECEF;
-    display: flex; flex-direction: column; gap: 8px;
-}
-.stat-title { font-size: 13px; color: #6C7275; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-.stat-value { font-size: 24px; font-weight: 700; color: #141718; }
+    /* CHỐT CHẶN CỨNG: Ép toàn bộ nội dung không được trôi ngang */
+    .order-container {
+        max-width: 1250px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow-x: hidden !important; /* Tuyệt đối không cho trang trôi */
+    }
 
-.filter-bar {
-    background: #fff; padding: 16px; border-radius: 12px; border: 1px solid #E8ECEF;
-    display: flex; gap: 16px; margin-bottom: 24px; align-items: center;
-}
-.filter-input { flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid #E8ECEF; border-radius: 8px; outline: none; font-family: 'Inter', sans-serif;}
-.filter-select { padding: 10px 14px; border: 1px solid #E8ECEF; border-radius: 8px; outline: none; background: #fff; font-family: 'Inter', sans-serif; }
-.btn-filter { padding: 10px 24px; background: #141718; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-.btn-filter:hover { background: #343839; }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
 
-.status-select-inline {
-    padding: 6px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; border: none;
-    outline: none; cursor: pointer; appearance: none; -webkit-appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23141718%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat; background-position: right 8px top 50%; background-size: 8px auto;
-    padding-right: 24px !important; transition: all 0.2s;
-}
+    .stat-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #E8ECEF;
+    }
 
-.pagination { display: flex; gap: 8px; justify-content: center; margin-top: 24px; padding-bottom: 40px; }
-.page-btn {
-    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-    border: 1px solid #E8ECEF; border-radius: 8px; color: #141718; text-decoration: none; font-size: 14px;
-}
-.page-btn:hover { background: #F3F5F7; }
-.page-btn.active { background: #141718; color: #fff; border-color: #141718; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #141718; display: block; margin-top: 5px; }
+
+    /* Filter Bar */
+    .filter-bar {
+        background: #fff;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #E8ECEF;
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+
+    .filter-input { flex: 1; min-width: 200px; padding: 10px; border: 1px solid #E8ECEF; border-radius: 8px; }
+
+    /* BẢNG ĐỨNG IM */
+    .order-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #E8ECEF;
+        width: 100%;
+        overflow: hidden; /* Cắt nội dung tràn */
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* KHÓA CỨNG CỘT */
+    }
+
+    th, td {
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid #E8ECEF;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Dấu ... khi chữ dài */
+    }
+
+    th { background: #F3F5F7; color: #6C7275; font-size: 11px; text-transform: uppercase; font-weight: 700; }
+
+    /* Chia tỉ lệ cột chuẩn */
+    th:nth-child(1), td:nth-child(1) { width: 120px; } /* Code */
+    th:nth-child(2), td:nth-child(2) { width: auto; }  /* Customer */
+    th:nth-child(3), td:nth-child(3) { width: 110px; } /* Phone */
+    th:nth-child(4), td:nth-child(4) { width: 110px; } /* Total */
+    th:nth-child(5), td:nth-child(5) { width: 120px; } /* Status */
+    th:nth-child(6), td:nth-child(6) { width: 140px; } /* Date */
+    th:nth-child(7), td:nth-child(7) { width: 90px; }  /* Action */
+
+    .status-select-inline {
+        width: 100%;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-view {
+        padding: 6px 12px;
+        background: #F3F5F7;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 700;
+        color: #141718;
+    }
 </style>
 
-<div class="adm-page-header">
-    <div>
-        <h1><?= htmlspecialchars($pageTitle) ?></h1>
-        <p><?= htmlspecialchars($breadcrumb) ?></p>
+<div class="order-container">
+    <div style="margin-bottom: 24px;">
+        <h1 style="margin:0; font-size: 28px;"><?= htmlspecialchars($pageTitle) ?></h1>
+        <p style="color: #6C7275; margin: 5px 0 0;"><?= htmlspecialchars($breadcrumb) ?></p>
     </div>
-</div>
 
-<!-- Stats -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <span class="stat-title">Total Orders</span>
-        <span class="stat-value"><?= number_format($stats['total_orders'] ?? 0) ?></span>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span style="font-size:12px; color:#6C7275; font-weight:600;">TOTAL ORDERS</span>
+            <span class="stat-value"><?= number_format($stats['total_orders'] ?? 0) ?></span>
+        </div>
+        <div class="stat-card">
+            <span style="font-size:12px; color:#6C7275; font-weight:600;">REVENUE</span>
+            <span class="stat-value"><?= formatVND($stats['revenue'] ?? 0) ?></span>
+        </div>
+        <div class="stat-card">
+            <span style="font-size:12px; color:#6C7275; font-weight:600;">PENDING</span>
+            <span class="stat-value"><?= number_format($stats['pending_orders'] ?? 0) ?></span>
+        </div>
+        <div class="stat-card">
+            <span style="font-size:12px; color:#6C7275; font-weight:600;">CUSTOMERS</span>
+            <span class="stat-value"><?= number_format($stats['total_customers'] ?? 0) ?></span>
+        </div>
     </div>
-    <div class="stat-card">
-        <span class="stat-title">Total Revenue</span>
-        <span class="stat-value"><?= formatVND($stats['revenue'] ?? 0) ?></span>
-    </div>
-    <div class="stat-card">
-        <span class="stat-title">New Orders (Pending)</span>
-        <span class="stat-value"><?= number_format($stats['pending_orders'] ?? 0) ?></span>
-    </div>
-    <div class="stat-card">
-        <span class="stat-title">Customers</span>
-        <span class="stat-value"><?= number_format($stats['total_customers'] ?? 0) ?></span>
-    </div>
-</div>
 
-<!-- Filter -->
-<form class="filter-bar" method="GET">
-    <input type="text" name="search" class="filter-input" placeholder="Search by order code, name, email, phone..." value="<?= htmlspecialchars($search) ?>">
-    <select name="status" class="filter-select">
-        <option value="">All Statuses</option>
-        <?php foreach ($statusLabels as $k => $v): ?>
-            <option value="<?= $k ?>" <?= $status === $k ? 'selected' : '' ?>><?= $v[0] ?></option>
-        <?php endforeach; ?>
-    </select>
-    <button type="submit" class="btn-filter">Search</button>
-</form>
+    <form class="filter-bar" method="GET">
+        <input type="text" name="search" class="filter-input" placeholder="Search orders..." value="<?= htmlspecialchars($search) ?>">
+        <select name="status" class="filter-input" style="max-width: 200px;">
+            <option value="">All Status</option>
+            <?php foreach ($statusLabels as $k => $v): ?>
+                <option value="<?= $k ?>" <?= $status === $k ? 'selected' : '' ?>><?= $v[0] ?></option>
+            <?php endforeach; ?>
+        </select>
+        <button type="submit" style="padding: 10px 25px; background: #141718; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Search</button>
+    </form>
 
-<!-- Table -->
-<div class="adm-card">
-    <table class="adm-table">
-        <thead>
-            <tr>
-                <th>Order Code</th>
-                <th>Customer</th>
-                <th>Phone</th>
-                <th>Total</th>
-                <th>Payment</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (empty($orders)): ?>
-                <tr><td colspan="8" style="text-align: center; padding: 40px; color: #6C7275;">No orders found.</td></tr>
-            <?php else: ?>
-                <?php foreach ($orders as $ord): ?>
+    <div class="order-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
                     <tr>
-                        <td style="font-family: monospace; font-weight: 600;">
-                            <a href="detail.php?id=<?= $ord['id'] ?>" style="color: #141718; text-decoration: none; border-bottom: 1px dashed;">
-                                <?= htmlspecialchars($ord['order_code']) ?>
-                            </a>
-                        </td>
-                        <td><?= htmlspecialchars($ord['full_name']) ?></td>
-                        <td><?= htmlspecialchars($ord['phone']) ?></td>
-                        <td style="font-weight: 600;"><?= formatVND($ord['total']) ?></td>
-                        <td><span style="font-size: 12px; color: #6C7275; text-transform: uppercase;"><?= htmlspecialchars($ord['payment_method']) ?></span></td>
-                        <td>
-                            <?php $currConf = $statusLabels[$ord['status']] ?? ['Unknown','#000','#eee']; ?>
-                            <select class="status-select-inline sts-<?= $ord['id'] ?>"
-                                    style="background-color: <?= $currConf[2] ?>; color: <?= $currConf[1] ?>;"
-                                    onchange="updateStatus(<?= $ord['id'] ?>, this)">
-                                <?php foreach ($statusLabels as $stKey => $stConf): ?>
-                                    <option value="<?= $stKey ?>" <?= $stKey === $ord['status'] ? 'selected' : '' ?>
-                                            data-bg="<?= $stConf[2] ?>" data-color="<?= $stConf[1] ?>">
-                                        <?= $stConf[0] ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                        <td style="font-size: 13px; color: #6C7275;"><?= date('d/m/Y H:i', strtotime($ord['created_at'])) ?></td>
-                        <td style="text-align: right;">
-                            <a href="detail.php?id=<?= $ord['id'] ?>" class="btn btn-outline btn-sm">
-                                <i class="fa-solid fa-eye"></i> Details
-                            </a>
-                        </td>
+                        <th>Code</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
                     </tr>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    <?php if (empty($orders)): ?>
+                        <tr><td colspan="7" style="text-align: center; padding: 40px; color: #999;">No orders found.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($orders as $ord): ?>
+                            <tr>
+                                <td style="font-weight: 700;">#<?= htmlspecialchars($ord['order_code']) ?></td>
+                                <td title="<?= htmlspecialchars($ord['full_name']) ?>"><?= htmlspecialchars($ord['full_name']) ?></td>
+                                <td><?= htmlspecialchars($ord['phone']) ?></td>
+                                <td style="font-weight: 700;"><?= formatVND($ord['total']) ?></td>
+                                <td>
+                                    <?php $currConf = $statusLabels[$ord['status']] ?? ['Unknown', '#000', '#eee']; ?>
+                                    <select class="status-select-inline" 
+                                            style="background: <?= $currConf[2] ?>; color: <?= $currConf[1] ?>;"
+                                            onchange="updateStatus(<?= $ord['id'] ?>, this)">
+                                        <?php foreach ($statusLabels as $stKey => $stConf): ?>
+                                            <option value="<?= $stKey ?>" <?= $stKey === $ord['status'] ? 'selected' : '' ?>
+                                                    data-bg="<?= $stConf[2] ?>" data-color="<?= $stConf[1] ?>">
+                                                <?= $stConf[0] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </td>
+                                <td style="color: #6C7275; font-size: 12px;"><?= date('d/m/Y H:i', strtotime($ord['created_at'])) ?></td>
+                                <td><a href="detail.php?id=<?= $ord['id'] ?>" class="btn-view">Details</a></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<!-- Pagination -->
-<?php if ($pages > 1): ?>
-<div class="pagination">
-    <?php for ($i = 1; $i <= $pages; $i++): ?>
-        <a href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&status=<?= urlencode($status) ?>"
-           class="page-btn <?= $i === $page_num ? 'active' : '' ?>">
-            <?= $i ?>
-        </a>
-    <?php endfor; ?>
-</div>
-<?php endif; ?>
 
 <?php include '../layouts/admin_footer.php'; ?>
 
@@ -211,15 +256,14 @@ async function updateStatus(orderId, selectEl) {
         });
         const data = await res.json();
         if (data.success) {
-            selectEl.style.backgroundColor = bg;
+            selectEl.style.background = bg;
             selectEl.style.color = color;
         } else {
-            alert(data.message || 'Update failed');
-            window.location.reload();
+            alert('Error: ' + (data.message || 'Update failed'));
+            location.reload();
         }
     } catch (e) {
-        console.error(e);
-        alert('Connection error!');
+        alert('Network error!');
     }
 }
 </script>

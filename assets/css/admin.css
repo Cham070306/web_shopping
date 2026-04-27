@@ -1,146 +1,415 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-body{
-    background:#f8f9fc;
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    background: #f3f5f7;
 }
 
-.admin-layout{
-    display:flex;
-    min-height:100vh;
+/* SIDEBAR */
+.adm-sidebar,
+.admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    min-width: 260px;
+    max-width: 260px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #111827;
+    color: #fff;
+    z-index: 1000;
 }
 
-/* Sidebar */
-.admin-sidebar{
-    width:260px;
-    background:#111827;
-    color:white;
-    padding:20px;
-    position:fixed;
-    left:0;
-    top:0;
-    height:100vh;
-    overflow-y:auto;
+/* MAIN */
+.adm-main,
+.admin-content {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    min-height: 100vh;
+    background: #f3f5f7;
+    overflow-x: hidden;
 }
 
-.admin-sidebar .logo{
-    margin-bottom:30px;
+.adm-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 32px;
+    overflow-x: hidden;
 }
 
-.admin-sidebar h2{
-    font-size:22px;
+.adm-topbar {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
-.admin-sidebar ul{
-    list-style:none;
+/* PAGE WRAPPER */
+.page,
+.admin-page,
+.reports-page,
+.settings-page,
+.coupons-page,
+.customers-page,
+.posts-page {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
-.admin-sidebar ul li{
-    margin-bottom:12px;
+/* CARD */
+.card,
+.adm-card,
+.setting-card,
+.report-card,
+.section,
+.filter-box {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 16px;
 }
 
-.admin-sidebar ul li a{
-    color:white;
-    text-decoration:none;
-    display:block;
-    padding:12px;
-    border-radius:8px;
-    transition:0.3s;
+/* TABLE */
+.adm-table-wrap,
+.table-wrap,
+.report-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
 }
 
-.admin-sidebar ul li a:hover{
-    background:#1f2937;
-}
-
-/* Main content */
-.admin-content{
-    margin-left:260px;
-    width:calc(100% - 260px);
-    padding:30px;
-}
-
-/* Cards */
-.card{
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.05);
-    margin-bottom:20px;
-}
-
-/* Page title */
-.page-title{
-    margin-bottom:20px;
-}
-
-.page-title h1{
-    font-size:28px;
-    margin-bottom:8px;
-}
-
-.page-title p{
-    color:#666;
-}
-
-/* Tables */
-.admin-table{
-    width:100%;
-    border-collapse:collapse;
+table,
+.admin-table,
+.adm-table,
+.report-order-table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
 }
 
 .admin-table th,
-.admin-table td{
-    padding:14px;
-    border-bottom:1px solid #eee;
-    text-align:left;
+.admin-table td,
+.adm-table th,
+.adm-table td,
+.report-order-table th,
+.report-order-table td {
+    white-space: nowrap;
 }
 
-.admin-table th{
-    background:#f5f5f5;
-}
-
-/* Buttons */
-.btn{
-    padding:10px 16px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    text-decoration:none;
-    display:inline-block;
-}
-
-.btn-primary{
-    background:black;
-    color:white;
-}
-
-.btn-danger{
-    background:#dc2626;
-    color:white;
-}
-
-.btn-secondary{
-    background:#ddd;
-    color:black;
-}
-
-/* Form */
+/* FORM */
 input,
 select,
-textarea{
-    width:100%;
-    padding:10px;
-    border:1px solid #ddd;
-    border-radius:8px;
-    margin-bottom:12px;
+textarea,
+button {
+    max-width: 100%;
 }
 
-label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
+img,
+canvas {
+    max-width: 100% !important;
+}
+
+/* GRID */
+.stats-grid,
+.report-stats-grid,
+.report-main-grid,
+.report-bottom-grid,
+.settings-grid,
+.setting-grid,
+.coupon-layout,
+.dashboard-grid {
+    max-width: 100%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+    .adm-content {
+        padding: 24px;
+    }
+
+    .report-main-grid,
+    .coupon-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .adm-sidebar,
+    .admin-sidebar {
+        transform: translateX(-100%);
+        transition: 0.25s ease;
+    }
+
+    .adm-sidebar.open,
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .adm-main,
+    .admin-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .adm-content {
+        padding: 18px;
+    }
+
+    .report-stats-grid,
+    .report-main-grid,
+    .report-bottom-grid,
+    .setting-grid,
+    .coupon-layout,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+/* ===============================
+   FIX ADMIN TABLE PAGES OVERFLOW
+================================ */
+
+.adm-main,
+.admin-content {
+    max-width: calc(100vw - 260px);
+}
+
+.adm-content {
+    min-width: 0;
+}
+
+.page,
+.admin-page,
+.posts-page,
+.customers-page,
+.coupons-page,
+.products-page,
+.orders-page {
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.adm-card,
+.card,
+.section,
+.filter-box {
+    min-width: 0;
+}
+
+/* Table wrapper bắt buộc scroll trong card */
+.adm-table-wrap,
+.table-wrap,
+.report-table-wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Bảng có nhiều cột thì không ép vỡ layout */
+.adm-table,
+.admin-table,
+.report-order-table,
+table {
+    min-width: 900px;
+}
+
+/* Riêng bảng nhỏ vẫn có thể co */
+.settings-page table,
+.reports-page table {
+    min-width: unset;
+}
+
+/* Form search/filter không được đẩy ngang */
+.filter-box,
+.filter-form,
+.search-box {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filter-form input,
+.filter-form select,
+.filter-form button {
+    flex: 1 1 180px;
+}
+
+/* Coupon layout tránh bị 2 cột ép tràn */
+.coupon-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1200px) {
+    .coupon-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .adm-table,
+    .admin-table,
+    .report-order-table,
+    table {
+        min-width: 760px;
+    }
+}
+/* FINAL ADMIN OVERFLOW FIX */
+.adm-main {
+    width: calc(100vw - var(--sidebar-w));
+    max-width: calc(100vw - var(--sidebar-w));
+    overflow-x: hidden;
+}
+
+.adm-content {
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.page,
+.admin-page,
+.posts-page,
+.products-page,
+.orders-page,
+.customers-page,
+.coupons-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin-left: 0 !important;
+    overflow-x: hidden;
+}
+
+.adm-card,
+.card,
+.table-card,
+.filter-box,
+.search-box {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.adm-table-wrap,
+.table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.adm-table,
+table {
+    min-width: 760px;
+}
+
+@media (max-width: 768px) {
+    .adm-main {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+/* ===== FINAL FIX: ADMIN NO HORIZONTAL OVERFLOW ===== */
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+}
+
+.adm-sidebar {
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    position: fixed !important;
+    left: 0;
+    top: 0;
+    height: 100vh;
+}
+
+.adm-main {
+    margin-left: 260px !important;
+    width: auto !important;
+    max-width: calc(100vw - 260px) !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+}
+
+.adm-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 32px !important;
+    overflow-x: hidden !important;
+}
+
+.adm-topbar {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+.customers-page,
+.coupons-page,
+.products-page,
+.orders-page,
+.posts-page,
+.page,
+.admin-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+}
+
+.customer-card,
+.coupon-card,
+.adm-card,
+.card,
+.table-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.adm-table-wrap,
+.customer-table-wrap,
+.table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+}
+
+table {
+    max-width: 100%;
+}
+
+@media (max-width: 900px) {
+    .adm-main {
+        margin-left: 0 !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+    }
+
+    .adm-content {
+        padding: 18px !important;
+    }
 }

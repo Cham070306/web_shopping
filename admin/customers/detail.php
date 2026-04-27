@@ -3,427 +3,519 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Tạm comment nếu auth admin chưa fix
-// if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-//     header("Location: ../../user/index.php");
-//     exit();
-// }
-
 require_once "../../config/database.php";
 
-$id = (int)($_GET['id'] ?? 0);
+$search = trim($_GET['search'] ?? '');
 
-if ($id <= 0) {
-    echo "Invalid customer ID.";
-    exit;
-}
-
-// Customer info
-$stmt = $conn->prepare("
+$sql = "
     SELECT 
-        id, name, email, phone, avatar, gender, date_of_birth,
-        is_active, last_login, created_at
-    FROM users
-    WHERE id = ? AND role = 'user'
-    LIMIT 1
-");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$customer = $stmt->get_result()->fetch_assoc();
+        u.id,
+        u.name,
+        u.email,
+        u.phone,
+        u.avatar,
+        u.is_active,
+        COUNT(DISTINCT o.id) AS total_orders,
+        COALESCE(SUM(o.total), 0) AS total_spent
+    FROM users u
+    LEFT JOIN orders o ON u.id = o.user_id
+    WHERE u.role = 'user'
+";
 
-if (!$customer) {
-    echo "Customer not found.";
-    exit;
+$params = [];
+$types = '';
+
+if ($search !== '') {
+    $sql .= " AND (u.name LIKE ? OR u.email LIKE ?)";
+    $like = "%{$search}%";
+    $params[] = $like;
+    $params[] = $like;
+    $types .= 'ss';
 }
 
-// Addresses
-$stmt = $conn->prepare("
-    SELECT *
-    FROM user_addresses
-    WHERE user_id = ?
-    ORDER BY is_default DESC, id DESC
-");
-$stmt->bind_param("i", $id);
+$sql .= "
+    GROUP BY u.id
+    ORDER BY u.id DESC
+";
+
+$stmt = $conn->prepare($sql);
+
+if ($stmt === false) {
+    die("SQL Error: " . $conn->error);
+}
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
 $stmt->execute();
-$addresses = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$customers = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 
-// Orders
-$stmt = $conn->prepare("
-    SELECT id, order_code, total, payment_method, payment_status, status, created_at
-    FROM orders
-    WHERE user_id = ?
-    ORDER BY created_at DESC
-");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-// Notes
-$stmt = $conn->prepare("
-    SELECT cn.*, u.name AS admin_name
-    FROM customer_notes cn
-    LEFT JOIN users u ON cn.admin_id = u.id
-    WHERE cn.user_id = ?
-    ORDER BY cn.created_at DESC
-");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$notes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
-$totalOrders = count($orders);
-$totalSpent = array_sum(array_column($orders, 'total'));
-
-$avatar = !empty($customer['avatar'])
-    ? "../../assets/avatar/" . $customer['avatar']
-    : "../../assets/avatar/default.png";
 $currentPage = 'customers';
-$pageTitle = 'Customer Detail';
-$breadcrumb = 'System / Customers / Detail';
+$pageTitle = 'Customers Management';
+$breadcrumb = 'System / Customers';
 $base_path = '../';
+
+include '../layouts/admin_header.php';
 ?>
-<?php include '../layouts/admin_header.php'; ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Customer Detail</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f6f8fb;
-            color: #222;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        .page {
-            max-width: 1250px;
-            margin: auto;
-            padding: 24px;
-        }
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
 
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 22px;
-        }
+.customers-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    overflow: hidden;
+}
 
-        .topbar h1 {
-            margin: 0 0 6px;
-            font-size: 28px;
-        }
+.customers-header h1 {
+    margin: 0 0 8px;
+    font-size: 28px;
+    color: #111827;
+}
 
-        .topbar p {
-            margin: 0;
-            color: #666;
-            font-size: 14px;
-        }
+.customers-header p {
+    margin: 0 0 24px;
+    color: #64748b;
+    font-size: 14px;
+}
 
-        .back-link {
-            color: #111;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-        }
+.customer-search-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
 
-        .profile-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 22px;
-            display: grid;
-            grid-template-columns: 120px 1fr 280px;
-            gap: 22px;
-            align-items: center;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-            margin-bottom: 22px;
-        }
+.customer-search-card form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
 
-        .avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #eee;
-        }
+.customer-search-card input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+}
 
-        .profile-info h2 {
-            margin: 0 0 8px;
-            font-size: 24px;
-        }
+.customer-search-card button {
+    height: 40px;
+    min-width: 110px;
+    background: #111827;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-        .profile-info p {
-            margin: 5px 0;
-            color: #666;
-            font-size: 14px;
-        }
+.customer-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    width: 100%;
+    overflow: hidden;
+}
 
-        .status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 8px;
-        }
+.adm-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
 
-        .active {
-            background: #e9f9ef;
-            color: #1f7a3f;
-        }
+.customer-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-        .inactive {
-            background: #ffeaea;
-            color: #d93025;
-        }
+.customer-table th,
+.customer-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+    font-size: 13px;
+    vertical-align: middle;
+}
 
-        .stats {
-            display: grid;
-            gap: 12px;
-        }
+.customer-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    white-space: nowrap;
+}
 
-        .stat-box {
-            background: #f6f8fb;
-            border-radius: 12px;
-            padding: 14px;
-        }
+.customer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f3f4f6;
+}
 
-        .stat-box strong {
-            display: block;
-            font-size: 22px;
-            margin-bottom: 4px;
-        }
+.customer-info {
+    max-width: 240px;
+}
 
-        .stat-box span {
-            color: #666;
-            font-size: 13px;
-        }
+.customer-name {
+    font-weight: 700;
+    color: #111827;
+    white-space: normal;
+    word-break: break-word;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 22px;
-        }
+.customer-email {
+    color: #64748b;
+    font-size: 12px;
+    white-space: normal;
+    word-break: break-word;
+}
 
-        .card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-        }
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
 
-        .card h3 {
-            margin: 0 0 16px;
-            font-size: 18px;
-        }
+.status-active {
+    background: #dcfce7;
+    color: #16a34a;
+}
 
-        .address-item,
-        .note-item {
-            border-bottom: 1px solid #eee;
-            padding: 12px 0;
-        }
+.status-inactive {
+    background: #fee2e2;
+    color: #ef4444;
+}
 
-        .address-item:last-child,
-        .note-item:last-child {
-            border-bottom: none;
-        }
+.view-btn {
+    display: inline-block;
+    background: #eef2ff;
+    color: #2563eb;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
 
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 999px;
-            background: #edf2ff;
-            color: #2f5bea;
-            font-size: 12px;
-            margin-left: 6px;
-        }
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+}
 
-        .muted {
-            color: #777;
-            font-size: 13px;
-        }
+@media(max-width: 992px) {
+    .customers-page {
+        padding: 14px;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .customer-table th,
+    .customer-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
 
-        th, td {
-            padding: 13px 12px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-            font-size: 14px;
-        }
+    .customer-avatar {
+        width: 36px;
+        height: 36px;
+    }
 
-        th {
-            background: #fafafa;
-            color: #666;
-            font-size: 13px;
-        }
+    .customer-name {
+        font-size: 12px;
+    }
 
-        .status-order {
-            padding: 5px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            background: #eef1f6;
-            color: #333;
-        }
+    .customer-email {
+        font-size: 11px;
+    }
 
-        .empty {
-            padding: 20px 0;
-            color: #777;
-            font-size: 14px;
-        }
+    .view-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+}
 
-        @media (max-width: 900px) {
-            .profile-card {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
+@media(max-width: 768px) {
+    .customers-header h1 {
+        font-size: 22px;
+    }
 
-            .avatar {
-                margin: auto;
-            }
+    .customers-header p {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
 
-            .grid {
-                grid-template-columns: 1fr;
-            }
+    .customer-search-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
 
-            .table-wrap {
-                overflow-x: auto;
-            }
+    .customer-search-card form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
 
-            table {
-                min-width: 760px;
-            }
-        }
-    </style>
-</head>
+    .customer-search-card input,
+    .customer-search-card button {
+        width: 100%;
+        height: 38px;
+    }
 
-<body>
-<div class="page">
-    <div class="topbar">
-        <div>
-            <h1>Customer Detail</h1>
-            <p>View customer profile, addresses, notes and order history.</p>
-        </div>
-        <a href="index.php" class="back-link">← Back to Customers</a>
+    .customer-search-card button {
+        min-width: 0;
+    }
+
+    .customer-table {
+        transform: scale(0.92);
+        transform-origin: top left;
+        width: 108%;
+    }
+
+    .customer-table th,
+    .customer-table td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
+    .customer-avatar {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+@media(max-width: 576px) {
+    .customers-page {
+        padding: 10px;
+    }
+
+    .customers-header h1 {
+        font-size: 20px;
+    }
+
+    .customers-header p {
+        font-size: 12px;
+    }
+
+    .customer-search-card {
+        padding: 14px;
+        border-radius: 14px;
+        margin-bottom: 18px;
+    }
+
+    .customer-search-card input {
+        height: 36px;
+        font-size: 13px;
+        padding: 0 12px;
+    }
+
+    .customer-search-card button {
+        height: 38px;
+        font-size: 13px;
+        border-radius: 9px;
+    }
+
+    .customer-table {
+        transform: scale(0.84);
+        transform-origin: top left;
+        width: 120%;
+    }
+
+    .view-btn {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+}
+
+@media(max-width: 420px) {
+    .customers-page {
+        padding: 8px;
+    }
+
+    .customer-search-card {
+        padding: 12px;
+        border-radius: 13px;
+    }
+
+    .customer-table {
+        transform: scale(0.78);
+        transform-origin: top left;
+        width: 128%;
+    }
+
+    .customer-table th,
+    .customer-table td {
+        padding: 7px 5px;
+        font-size: 10px;
+    }
+
+    .customer-avatar {
+        width: 26px;
+        height: 26px;
+    }
+
+    .customer-info {
+        max-width: 120px;
+    }
+
+    .customer-name,
+    .customer-email {
+        font-size: 10px;
+        line-height: 1.25;
+    }
+
+    .view-btn {
+        font-size: 9px;
+        padding: 4px 6px;
+    }
+
+    .status-badge {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+}
+</style>
+
+<div class="customers-page">
+
+    <div class="customers-header">
+        <h1>Customers Management</h1>
+        <p>Manage customer accounts and purchase history.</p>
     </div>
 
-    <div class="profile-card">
-        <img src="<?= htmlspecialchars($avatar) ?>" class="avatar" alt="Avatar">
-
-        <div class="profile-info">
-            <h2><?= htmlspecialchars($customer['name']) ?></h2>
-            <p>Email: <?= htmlspecialchars($customer['email']) ?></p>
-            <p>Phone: <?= htmlspecialchars($customer['phone'] ?? '-') ?></p>
-            <p>Gender: <?= htmlspecialchars($customer['gender'] ?? '-') ?></p>
-            <p>Date of birth: <?= !empty($customer['date_of_birth']) ? date('d/m/Y', strtotime($customer['date_of_birth'])) : '-' ?></p>
-            <p>Joined: <?= date('d/m/Y', strtotime($customer['created_at'])) ?></p>
-            <p>Last login: <?= !empty($customer['last_login']) ? date('d/m/Y H:i', strtotime($customer['last_login'])) : '-' ?></p>
-
-            <span class="status <?= $customer['is_active'] ? 'active' : 'inactive' ?>">
-                <?= $customer['is_active'] ? 'Active' : 'Inactive' ?>
-            </span>
-        </div>
-
-        <div class="stats">
-            <div class="stat-box">
-                <strong><?= (int)$totalOrders ?></strong>
-                <span>Total Orders</span>
-            </div>
-            <div class="stat-box">
-                <strong>$<?= number_format($totalSpent, 2) ?></strong>
-                <span>Total Spent</span>
-            </div>
-        </div>
+    <div class="customer-search-card">
+        <form method="GET">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search customer by name or email..."
+                value="<?= htmlspecialchars($search) ?>"
+            >
+            <button type="submit">Search</button>
+        </form>
     </div>
 
-    <div class="grid">
-        <div class="card">
-            <h3>Addresses</h3>
-
-            <?php if (!empty($addresses)): ?>
-                <?php foreach ($addresses as $address): ?>
-                    <div class="address-item">
-                        <strong><?= htmlspecialchars($address['full_name']) ?></strong>
-                        <?php if (!empty($address['is_default'])): ?>
-                            <span class="badge">Default</span>
-                        <?php endif; ?>
-                        <p class="muted">
-                            <?= htmlspecialchars($address['phone']) ?><br>
-                            <?= htmlspecialchars($address['address']) ?><br>
-                            <?= htmlspecialchars($address['ward'] ?? '') ?>
-                            <?= htmlspecialchars($address['district'] ?? '') ?>
-                            <?= htmlspecialchars($address['city'] ?? '') ?>
-                            <?= htmlspecialchars($address['province'] ?? '') ?><br>
-                            <?= htmlspecialchars($address['country'] ?? '') ?>
-                            <?= htmlspecialchars($address['zip_code'] ?? '') ?>
-                        </p>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="empty">No addresses found.</div>
-            <?php endif; ?>
-        </div>
-
-        <div class="card">
-            <h3>Customer Notes</h3>
-
-            <?php if (!empty($notes)): ?>
-                <?php foreach ($notes as $note): ?>
-                    <div class="note-item">
-                        <p><?= nl2br(htmlspecialchars($note['note'])) ?></p>
-                        <div class="muted">
-                            By <?= htmlspecialchars($note['admin_name'] ?? 'Admin') ?>
-                            • <?= date('d/m/Y H:i', strtotime($note['created_at'])) ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="empty">No notes found.</div>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Order History</h3>
-
-        <div class="table-wrap">
-            <table>
+    <div class="customer-card">
+        <div class="adm-table-wrap">
+            <table class="customer-table">
                 <thead>
                     <tr>
-                        <th>Order Code</th>
-                        <th>Total</th>
-                        <th>Payment</th>
-                        <th>Payment Status</th>
-                        <th>Order Status</th>
-                        <th>Date</th>
+                        <th>Avatar</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Orders</th>
+                        <th>Spent</th>
+                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <?php if (!empty($orders)): ?>
-                        <?php foreach ($orders as $order): ?>
+                    <?php if (!empty($customers)): ?>
+                        <?php foreach ($customers as $customer): ?>
+                            <?php
+                            $rawAvatar = trim($customer['avatar'] ?? '');
+
+                            if ($rawAvatar === '') {
+                                $avatar = "../../assets/avatar/default.png";
+                            } elseif (str_contains($rawAvatar, 'assets/') || str_contains($rawAvatar, '/')) {
+                                $avatar = "../../" . ltrim($rawAvatar, '/');
+                            } else {
+                                $avatar = "../../assets/avatar/" . $rawAvatar;
+                            }
+                            ?>
+
                             <tr>
-                                <td><?= htmlspecialchars($order['order_code']) ?></td>
-                                <td>$<?= number_format($order['total'], 2) ?></td>
-                                <td><?= htmlspecialchars($order['payment_method']) ?></td>
-                                <td><span class="status-order"><?= htmlspecialchars($order['payment_status']) ?></span></td>
-                                <td><span class="status-order"><?= htmlspecialchars($order['status']) ?></span></td>
-                                <td><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></td>
+                                <td>
+                                    <img 
+                                        src="<?= htmlspecialchars($avatar) ?>"
+                                        class="customer-avatar"
+                                        alt="Avatar"
+                                        onerror="this.onerror=null; this.src='../../assets/avatar/default.png';"
+                                    >
+                                </td>
+
+                                <td>
+                                    <div class="customer-info">
+                                        <div class="customer-name">
+                                            <?= htmlspecialchars($customer['name']) ?>
+                                        </div>
+                                        <div class="customer-email">
+                                            <?= htmlspecialchars($customer['email']) ?>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td><?= htmlspecialchars($customer['phone'] ?? '-') ?></td>
+
+                                <td><?= (int)$customer['total_orders'] ?></td>
+
+                                <td>
+                                    <strong>
+                                        $<?= number_format((float)$customer['total_spent'], 2) ?>
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    <?php if ((int)$customer['is_active'] === 1): ?>
+                                        <span class="status-badge status-active">Active</span>
+                                    <?php else: ?>
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    <?php endif; ?>
+                                </td>
+
+                                <td>
+                                    <a 
+                                        href="detail.php?id=<?= (int)$customer['id'] ?>"
+                                        class="view-btn"
+                                    >
+                                        View Detail
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="6" class="empty">No orders found.</td>
+                            <td colspan="7" class="empty">
+                                No customers found.
+                            </td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
+
 <?php include '../layouts/admin_footer.php'; ?>

@@ -22,308 +22,441 @@ $pageTitle = 'Posts Management';
 $breadcrumb = 'System / Posts';
 $base_path = '../';
 ?>
+
 <?php include '../layouts/admin_header.php'; ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts Management</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f6f8fb;
-            color: #222;
-        }
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
 
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f6f8fb;
+        color: #222;
+    }
+
+    .page {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        overflow: hidden;
+    }
+
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .page-title h1 {
+        margin: 0;
+        font-size: 24px;
+        color: #111;
+    }
+
+    .page-title p {
+        margin: 4px 0 0;
+        color: #666;
+        font-size: 13px;
+    }
+
+    .add-btn {
+        text-decoration: none;
+        background: #111;
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .filter-box {
+        width: 100%;
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .filter-form input,
+    .filter-form select,
+    .filter-form button {
+        height: 38px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 0 12px;
+        font-size: 13px;
+        min-width: 0;
+    }
+
+    .filter-form input {
+        flex: 1 1 220px;
+    }
+
+    .filter-form select {
+        flex: 0 1 150px;
+    }
+
+    .filter-form button {
+        flex: 0 0 auto;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+        border-color: #111;
+        font-weight: 600;
+    }
+
+    .table-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        width: 100%;
+    }
+
+    .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .posts-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .posts-table th,
+    .posts-table td {
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    .posts-table th {
+        background: #fafafa;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        white-space: nowrap;
+    }
+
+    .thumb {
+        width: 60px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 6px;
+        display: block;
+        border: 1px solid #eee;
+    }
+
+    .post-title-wrap {
+        max-width: 260px;
+        min-width: 0;
+    }
+
+    .post-title {
+        font-weight: 600;
+        color: #111;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        line-height: 1.35;
+    }
+
+    .post-slug {
+        font-size: 11px;
+        color: #888;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        margin-top: 2px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-published {
+        background: #e9f9ef;
+        color: #1f7a3f;
+    }
+
+    .status-draft {
+        background: #fff4e5;
+        color: #a76400;
+    }
+
+    .action-wrap {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .btn-edit-icon,
+    .btn-delete-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .btn-edit-icon {
+        background: #edf2ff;
+        color: #2f5bea;
+    }
+
+    .btn-delete-icon {
+        background: #fff1f2;
+        color: #e11d48;
+    }
+
+    .empty-posts {
+        text-align: center;
+        padding: 42px 16px;
+        color: #777;
+    }
+
+    @media (max-width: 992px) {
         .page {
-            max-width: 1250px;
-            margin: 0 auto;
-            padding: 24px;
+            padding: 14px;
         }
 
+        .posts-table th,
+        .posts-table td {
+            padding: 10px 8px;
+            font-size: 12px;
+        }
+
+        .thumb {
+            width: 52px;
+            height: 36px;
+        }
+
+        .post-title {
+            font-size: 13px;
+        }
+
+        .btn-edit-icon,
+        .btn-delete-icon {
+            width: 28px;
+            height: 28px;
+        }
+    }
+
+    @media (max-width: 768px) {
         .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .topbar-left h1 {
-            margin: 0 0 6px;
-            font-size: 28px;
-        }
-
-        .topbar-left p {
-            margin: 0;
-            color: #666;
-            font-size: 14px;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .add-btn {
-            display: inline-block;
-            text-decoration: none;
-            background: #111;
-            color: #fff;
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
+            width: 100%;
+            text-align: center;
         }
 
-        .filter-box {
-            background: #fff;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-        }
-
-        .filter-form {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+        .page-title h1 {
+            font-size: 22px;
         }
 
         .filter-form input,
         .filter-form select,
         .filter-form button {
-            height: 42px;
-            padding: 0 14px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .filter-form input {
-            min-width: 260px;
-        }
-
-        .filter-form select {
-            min-width: 180px;
-        }
-
-        .filter-form button {
-            background: #111;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .table-card {
-            background: #fff;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-        }
-
-        table {
             width: 100%;
-            border-collapse: collapse;
+            flex: 1 1 100%;
         }
 
-        th, td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-
-        th {
-            background: #fafafa;
-            font-size: 13px;
-            color: #666;
-            font-weight: 600;
-        }
-
-        td {
-            font-size: 14px;
+        .posts-table {
+            transform: scale(0.95);
+            transform-origin: top left;
+            width: 105%;
         }
 
         .thumb {
-            width: 90px;
-            height: 68px;
-            object-fit: cover;
-            border-radius: 10px;
-            background: #eee;
-            display: block;
+            width: 46px;
+            height: 32px;
         }
 
         .post-title {
-            font-weight: 600;
-            color: #111;
-            margin-bottom: 4px;
-            line-height: 1.4;
+            font-size: 12px;
         }
 
         .post-slug {
-            font-size: 12px;
-            color: #888;
+            font-size: 10px;
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 999px;
+            font-size: 10px;
+            padding: 3px 6px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .page {
+            padding: 10px;
+        }
+
+        .page-title h1 {
+            font-size: 18px;
+        }
+
+        .page-title p {
             font-size: 12px;
-            font-weight: 700;
         }
 
-        .status-published {
-            background: #e9f9ef;
-            color: #1f7a3f;
+        .filter-box {
+            padding: 12px;
         }
 
-        .status-draft {
-            background: #fff4e5;
-            color: #a76400;
+        .posts-table {
+            transform: scale(0.88);
+            transform-origin: top left;
+            width: 114%;
         }
 
-        .action-wrap {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+        .posts-table th,
+        .posts-table td {
+            padding: 8px 6px;
+            font-size: 11px;
         }
 
-        .btn-edit,
-        .btn-delete {
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
+        .thumb {
+            width: 40px;
+            height: 30px;
         }
 
-        .btn-edit {
-            background: #edf2ff;
-            color: #2f5bea;
+        .btn-edit-icon,
+        .btn-delete-icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .page {
+            padding: 8px;
         }
 
-        .btn-delete {
-            background: #ffeaea;
-            color: #d93025;
+        .posts-table {
+            transform: scale(0.80);
+            transform-origin: top left;
+            width: 125%;
         }
+    }
+</style>
 
-        .empty-row {
-            text-align: center;
-            color: #666;
-            padding: 32px 16px;
-        }
-
-        @media (max-width: 900px) {
-            .admin-shell {
-            display: flex;
-            min-height: 100vh;
-            background: #f6f8fb;
-         }
-
-        .admin-main {
-            flex: 1;
-            margin-left: 260px;
-            width: calc(100% - 260px);
-        }
-
-        .admin-sidebar {
-            width: 260px;
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
-            .page {
-                padding: 16px;
-            }
-
-            .filter-form input,
-            .filter-form select,
-            .filter-form button {
-                width: 100%;
-            }
-
-            .table-card {
-                overflow-x: auto;
-            }
-
-            table {
-                min-width: 900px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="page">
-        <div class="topbar">
-            <div class="topbar-left">
-                <h1>Posts Management</h1>
-                <p>Manage blog posts, published articles, and drafts.</p>
-            </div>
-            <a href="create.php" class="add-btn">+ Add New Post</a>
+<div class="page">
+    <div class="topbar">
+        <div class="page-title">
+            <h1>Posts Management</h1>
+            <p>Manage blog posts and drafts.</p>
         </div>
 
-        <div class="filter-box">
-            <form method="GET" class="filter-form">
-                <input
-                    type="text"
-                    name="search"
-                    placeholder="Search by title or slug..."
-                    value="<?= htmlspecialchars($search) ?>"
-                >
+        <a href="create.php" class="add-btn">+ New Post</a>
+    </div>
 
-                <select name="status">
-                    <option value="">All Status</option>
-                    <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Published</option>
-                    <option value="0" <?= $status === '0' ? 'selected' : '' ?>>Draft</option>
-                </select>
+    <div class="filter-box">
+        <form method="GET" class="filter-form">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search..." 
+                value="<?= htmlspecialchars($search) ?>"
+            >
 
-                <button type="submit">Filter</button>
-            </form>
-        </div>
+            <select name="status">
+                <option value="">All Status</option>
+                <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Published</option>
+                <option value="0" <?= $status === '0' ? 'selected' : '' ?>>Draft</option>
+            </select>
 
-        <div class="table-card">
-            <table>
+            <button type="submit">Filter</button>
+        </form>
+    </div>
+
+    <div class="table-card">
+        <div class="table-wrap">
+            <table class="posts-table">
                 <thead>
                     <tr>
-                        <th>Thumbnail</th>
-                        <th>Post</th>
+                        <th>Thumb</th>
+                        <th>Post Title</th>
                         <th>Category</th>
                         <th>Status</th>
                         <th>Views</th>
-                        <th>Published Date</th>
+                        <th>Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     <?php if (!empty($posts)): ?>
                         <?php foreach ($posts as $post): ?>
-                            <?php
-                                $thumb = !empty($post['thumbnail'])
-                                    ? "../../assets/images/posts/" . $post['thumbnail']
-                                    : "../../assets/images/banner.jpg";
-                            ?>
                             <tr>
                                 <td>
-                                    <img src="<?= htmlspecialchars($thumb) ?>" alt="Thumbnail" class="thumb">
+                                    <?php
+                                    $thumbnail = !empty($post['thumbnail']) ? $post['thumbnail'] : 'default.jpg';
+                                    ?>
+                                    <img 
+                                        src="../../assets/images/posts/<?= htmlspecialchars($thumbnail) ?>" 
+                                        class="thumb" 
+                                        alt="Post thumbnail"
+                                    >
+                                </td>
+
+                                <td title="<?= htmlspecialchars($post['title'] ?? '') ?>">
+                                    <div class="post-title-wrap">
+                                        <div class="post-title">
+                                            <?= htmlspecialchars($post['title'] ?? 'Untitled') ?>
+                                        </div>
+
+                                        <div class="post-slug">
+                                            <?= htmlspecialchars($post['slug'] ?? '') ?>
+                                        </div>
+                                    </div>
                                 </td>
 
                                 <td>
-                                    <div class="post-title"><?= htmlspecialchars($post['title']) ?></div>
-                                    <div class="post-slug"><?= htmlspecialchars($post['slug']) ?></div>
+                                    <?= htmlspecialchars($post['category_name'] ?? 'General') ?>
                                 </td>
-
-                                <td><?= htmlspecialchars($post['category_name'] ?? 'Uncategorized') ?></td>
 
                                 <td>
                                     <span class="status-badge <?= !empty($post['is_published']) ? 'status-published' : 'status-draft' ?>">
@@ -331,20 +464,34 @@ $base_path = '../';
                                     </span>
                                 </td>
 
-                                <td><?= (int)($post['views'] ?? 0) ?></td>
+                                <td>
+                                    <?= number_format((int)($post['views'] ?? 0)) ?>
+                                </td>
 
                                 <td>
-                                    <?= !empty($post['published_at']) ? date('d/m/Y', strtotime($post['published_at'])) : '-' ?>
+                                    <?php
+                                    $dateValue = $post['published_at'] ?? '';
+                                    echo !empty($dateValue) ? date('d/m/y', strtotime($dateValue)) : '—';
+                                    ?>
                                 </td>
 
                                 <td>
                                     <div class="action-wrap">
-                                        <a href="edit.php?id=<?= (int)$post['id'] ?>" class="btn-edit">Edit</a>
+                                        <a href="edit.php?id=<?= (int)$post['id'] ?>" class="btn-edit-icon" title="Edit">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                            </svg>
+                                        </a>
 
-                                        <form action="../../controllers/PostController.php" method="POST" onsubmit="return confirm('Delete this post?');" style="display:inline;">
+                                        <form action="../../controllers/PostController.php" method="POST" onsubmit="return confirm('Delete?');" style="margin:0">
                                             <input type="hidden" name="id" value="<?= (int)$post['id'] ?>">
                                             <input type="hidden" name="action" value="delete">
-                                            <button type="submit" class="btn-delete">Delete</button>
+
+                                            <button type="submit" class="btn-delete-icon" title="Delete">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                                </svg>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
@@ -352,11 +499,15 @@ $base_path = '../';
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="empty-row">No posts found.</td>
+                            <td colspan="7" class="empty-posts">
+                                No posts found.
+                            </td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
+</div>
+
 <?php include '../layouts/admin_footer.php'; ?>

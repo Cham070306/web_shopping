@@ -26,19 +26,38 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 input, button, select, textarea, ::file-selector-button { font-family: 'Inter', sans-serif; }
 
+/* Fix admin layout overflow */
 html, body {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    max-width: 100%;
+    overflow-x: hidden;
 }
-html::-webkit-scrollbar, body::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+
+.adm-main {
+    width: calc(100% - var(--sidebar-w));
+    min-width: 0;
 }
-*::-webkit-scrollbar { 
-    display: none; 
+
+.adm-content {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
 }
-* {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+
+.adm-card {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.adm-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.adm-table {
+    width: 100%;
+    min-width: 900px;
 }
 
 body {
